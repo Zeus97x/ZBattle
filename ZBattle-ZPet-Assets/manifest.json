@@ -1,0 +1,300 @@
+{
+  "source": "ZPet-Coding-Checkpoint-2026-10-08.zip",
+  "files": [
+    {
+      "path": "assets/monsters/abysscourser.png",
+      "source": "ZPet/app/src/main/assets/monsters/abysscourser.png",
+      "sha256": "097eabb537796db7e2e61c4bb9a8eb63b381119fcfebddd3c7e1288247928e4c"
+    },
+    {
+      "path": "assets/monsters/astrapex.png",
+      "source": "ZPet/app/src/main/assets/monsters/astrapex.png",
+      "sha256": "0b85a9fa9b186ca0695d993cb4cc8870647863fb95460169ecf3bfade1cc0520"
+    },
+    {
+      "path": "assets/monsters/aurorabeetle.png",
+      "source": "ZPet/app/src/main/assets/monsters/aurorabeetle.png",
+      "sha256": "e1d63a01607213013e75135de8984ea049c124a18be642544da4d5b57fbce420"
+    },
+    {
+      "path": "assets/monsters/cindlet.png",
+      "source": "ZPet/app/src/main/assets/monsters/cindlet.png",
+      "sha256": "3bbff4783229d4d4e26afdde94d8bd2ffe2d9ba5d8057365ef34b065424510a9"
+    },
+    {
+      "path": "assets/monsters/crescenthop.png",
+      "source": "ZPet/app/src/main/assets/monsters/crescenthop.png",
+      "sha256": "d4da9be5e96ea0ed9bc5c38bca81c03a069945f1b1dcfaf75e4cc7927d599444"
+    },
+    {
+      "path": "assets/monsters/crestcharger.png",
+      "source": "ZPet/app/src/main/assets/monsters/crestcharger.png",
+      "sha256": "be5faa558e6428f49cd87b9e491e6582faba27df2e56f28cdcac75c3cf723e3a"
+    },
+    {
+      "path": "assets/monsters/crownstorm.png",
+      "source": "ZPet/app/src/main/assets/monsters/crownstorm.png",
+      "sha256": "f271ceb6f5c087279163a5c9c424556d0789f90e316415886453fc23a8e71f63"
+    },
+    {
+      "path": "assets/monsters/dawnflare.png",
+      "source": "ZPet/app/src/main/assets/monsters/dawnflare.png",
+      "sha256": "371bafcfd18020a2f49e76a5986ad62fdae3641098ea0053d46ba6ed56d44127"
+    },
+    {
+      "path": "assets/monsters/dawnscarab.png",
+      "source": "ZPet/app/src/main/assets/monsters/dawnscarab.png",
+      "sha256": "abdc81dcaf691e7685dea9a09ae7ceb563a0e025dd32dd88205210daebe1d9bc"
+    },
+    {
+      "path": "assets/monsters/dreamskip.png",
+      "source": "ZPet/app/src/main/assets/monsters/dreamskip.png",
+      "sha256": "fa3b37e37b0b3f8f02ac40f51d764f089572f9f57f05cf28c1ecc3f159040424"
+    },
+    {
+      "path": "assets/monsters/dunepup.png",
+      "source": "ZPet/app/src/main/assets/monsters/dunepup.png",
+      "sha256": "1d2ee4167035c1f273a0d3c4d7b060e117fa8c9f75db5767d059eead6277cc0d"
+    },
+    {
+      "path": "assets/monsters/duskjudge.png",
+      "source": "ZPet/app/src/main/assets/monsters/duskjudge.png",
+      "sha256": "bdc2cb782ffd51f74841c8e246a4df4c325ac81fea4afe873c529cd22d059d1f"
+    },
+    {
+      "path": "assets/monsters/emberveil.png",
+      "source": "ZPet/app/src/main/assets/monsters/emberveil.png",
+      "sha256": "92574ace31d951877967b7a154779b9eda53e91dd63919e363d7cda6e8dbb7fa"
+    },
+    {
+      "path": "assets/monsters/flarecrest.png",
+      "source": "ZPet/app/src/main/assets/monsters/flarecrest.png",
+      "sha256": "1ec6a175130639d30bd4e0ee902a6516758966399e2c7e0c02051f278126b87e"
+    },
+    {
+      "path": "assets/monsters/foalfoam.png",
+      "source": "ZPet/app/src/main/assets/monsters/foalfoam.png",
+      "sha256": "b33e4a80f0b41cb69ca8d67f7ead5f2cfd51be6b2d9e27c31f2a9d47532a23bd"
+    },
+    {
+      "path": "assets/monsters/forgehide.png",
+      "source": "ZPet/app/src/main/assets/monsters/forgehide.png",
+      "sha256": "7f4dee3016455fd0eb71e078df570c5744dc8e61f8fee2912224a65844bbcd63"
+    },
+    {
+      "path": "assets/monsters/galeplume.png",
+      "source": "ZPet/app/src/main/assets/monsters/galeplume.png",
+      "sha256": "ddb8e3dc45ee5be09ae3b3aaf954b4e62daa003496a86fe2445bd4de28f08d03"
+    },
+    {
+      "path": "assets/monsters/galestride.png",
+      "source": "ZPet/app/src/main/assets/monsters/galestride.png",
+      "sha256": "387ff6e546628a73b8451226a0a0f4b5d7309ade97ddb16e886fc833b35cf83a"
+    },
+    {
+      "path": "assets/monsters/giltguard.png",
+      "source": "ZPet/app/src/main/assets/monsters/giltguard.png",
+      "sha256": "1e1c6082a84a1df0d08300e884fe1e046a242992a7b7adcf15088b26bd7f28e1"
+    },
+    {
+      "path": "assets/monsters/glintgrub.png",
+      "source": "ZPet/app/src/main/assets/monsters/glintgrub.png",
+      "sha256": "3fd31b84abe1f0034e4fa1455eee75e4f93e1957d6b48aaf1b190303f3723656"
+    },
+    {
+      "path": "assets/monsters/glyphwing.png",
+      "source": "ZPet/app/src/main/assets/monsters/glyphwing.png",
+      "sha256": "0cd586e9113b712eb0f5b1643640bd48eaad2d02d2671f6284cc3f8027ecc94a"
+    },
+    {
+      "path": "assets/monsters/halohover.png",
+      "source": "ZPet/app/src/main/assets/monsters/halohover.png",
+      "sha256": "aca1f1caad658bb2c57b7e6086cef5ca3e2db3f8a6dc1183d82533f22ccd167e"
+    },
+    {
+      "path": "assets/monsters/inkling.png",
+      "source": "ZPet/app/src/main/assets/monsters/inkling.png",
+      "sha256": "822609b33fe5d28586bf09bdc9b1094aad8cc8286a1b2d7596ddbeb13b37232f"
+    },
+    {
+      "path": "assets/monsters/ironquill.png",
+      "source": "ZPet/app/src/main/assets/monsters/ironquill.png",
+      "sha256": "76b7210e073ad8b15762e849a86b563ede13c9632ecf29f8381760227b658676"
+    },
+    {
+      "path": "assets/monsters/jadebound.png",
+      "source": "ZPet/app/src/main/assets/monsters/jadebound.png",
+      "sha256": "8df3f4cbea780f270764e51a489bf2d86d06a2f6d222775ea92127b0db59da0c"
+    },
+    {
+      "path": "assets/monsters/jadecoil.png",
+      "source": "ZPet/app/src/main/assets/monsters/jadecoil.png",
+      "sha256": "5104fa1c0b8b8bebe03785d7716ad3a5e85656f35eb2a9049de29a3a6155946c"
+    },
+    {
+      "path": "assets/monsters/kilnback.png",
+      "source": "ZPet/app/src/main/assets/monsters/kilnback.png",
+      "sha256": "e879cc1a8299831e235491cd8c0586ac86dfc7be528f52cb36957484f4d1c633"
+    },
+    {
+      "path": "assets/monsters/lanternfox.png",
+      "source": "ZPet/app/src/main/assets/monsters/lanternfox.png",
+      "sha256": "13487f4a8274b39fabf64dc634224d2a1b2c9a9bd9f76b1e91ce8d5d29fab63d"
+    },
+    {
+      "path": "assets/monsters/lunarwarden.png",
+      "source": "ZPet/app/src/main/assets/monsters/lunarwarden.png",
+      "sha256": "a2df0e7ea767eb921a836d4a071f2c75c4592ef3089370c531a97771f76e286c"
+    },
+    {
+      "path": "assets/monsters/mirrortail.png",
+      "source": "ZPet/app/src/main/assets/monsters/mirrortail.png",
+      "sha256": "6b3847ca17abec9f0296cf38499437a6b98180337c71aa4bab68db8fa2689807"
+    },
+    {
+      "path": "assets/monsters/mistgallop.png",
+      "source": "ZPet/app/src/main/assets/monsters/mistgallop.png",
+      "sha256": "8d396af1c12fe868568bc5336983cc86ed711ab3a983fa42a8614b7466df52d5"
+    },
+    {
+      "path": "assets/monsters/moonbun.png",
+      "source": "ZPet/app/src/main/assets/monsters/moonbun.png",
+      "sha256": "e2193aefb6103ba0bacedcaa3bc9d5ce3e4ea264bbb33e63c235aa55973bf186"
+    },
+    {
+      "path": "assets/monsters/moondancer.png",
+      "source": "ZPet/app/src/main/assets/monsters/moondancer.png",
+      "sha256": "c7e0ba88e910f613a5682885fb0b817c66360b0ccb4e20d797bf1e456220ab1f"
+    },
+    {
+      "path": "assets/monsters/oracrow.png",
+      "source": "ZPet/app/src/main/assets/monsters/oracrow.png",
+      "sha256": "409d7eac19ef0b06e2c3ff7f3bba143d48c841a48173b46c3bb8d4ba50bb787d"
+    },
+    {
+      "path": "assets/monsters/plumeling.png",
+      "source": "ZPet/app/src/main/assets/monsters/plumeling.png",
+      "sha256": "d80ad10def55a5266c21ecc1f2b9535700e0802fb75f810e3a21319871db84f1"
+    },
+    {
+      "path": "assets/monsters/plumeserp.png",
+      "source": "ZPet/app/src/main/assets/monsters/plumeserp.png",
+      "sha256": "9af002ad5593f6f9debf29398c602f68edae5f2244a2469aba4dbbac395dc416"
+    },
+    {
+      "path": "assets/monsters/pyrelisk.png",
+      "source": "ZPet/app/src/main/assets/monsters/pyrelisk.png",
+      "sha256": "9071bf127392da188f0e008dab5ef3045e19d25500b3bf3c52f750b8971ffd6c"
+    },
+    {
+      "path": "assets/monsters/reefmane.png",
+      "source": "ZPet/app/src/main/assets/monsters/reefmane.png",
+      "sha256": "0022ca6396e90605f7b275c1c7e89a1fa8b7892d3521c6a902639ccc7c67d0f3"
+    },
+    {
+      "path": "assets/monsters/runebeak.png",
+      "source": "ZPet/app/src/main/assets/monsters/runebeak.png",
+      "sha256": "89d89f00537e8a48e61a969e73ba75d937f28667ba4be1fd6239285fbb249a3a"
+    },
+    {
+      "path": "assets/monsters/sandward.png",
+      "source": "ZPet/app/src/main/assets/monsters/sandward.png",
+      "sha256": "384f6a748a094e605dbd6ec08e39a3bf4e9c20b0461bdef349eac67b590a142d"
+    },
+    {
+      "path": "assets/monsters/skyweaver.png",
+      "source": "ZPet/app/src/main/assets/monsters/skyweaver.png",
+      "sha256": "f23c3cab5531d6d324da0b069db2e2ed7b59b746f3d7977360e0d60cd3b46cdc"
+    },
+    {
+      "path": "assets/monsters/solcarapace.png",
+      "source": "ZPet/app/src/main/assets/monsters/solcarapace.png",
+      "sha256": "9bf5c6a330afd8b0f909a24abfb68226600c927a473d3516a211c9c233d1bcc8"
+    },
+    {
+      "path": "assets/monsters/sparklit.png",
+      "source": "ZPet/app/src/main/assets/monsters/sparklit.png",
+      "sha256": "4cc5431ed3074a4d1cb23861594a3c377438b9047e62818aad1cfc6a0c12a115"
+    },
+    {
+      "path": "assets/monsters/sunplate.png",
+      "source": "ZPet/app/src/main/assets/monsters/sunplate.png",
+      "sha256": "0eeb07d8348eff2b2ddecf74047e86fadbbcf21cc02b4ec84b5038f214f33775"
+    },
+    {
+      "path": "assets/monsters/tempestral.png",
+      "source": "ZPet/app/src/main/assets/monsters/tempestral.png",
+      "sha256": "dac1a61c1a7b662b21b803f232ac076011e4d0ed180dd84bb28a7e7503fd6e48"
+    },
+    {
+      "path": "assets/monsters/tidecanter.png",
+      "source": "ZPet/app/src/main/assets/monsters/tidecanter.png",
+      "sha256": "2d46b59be9a102e6d59faf8376e511a12d694497f79d3e9e77762f70b5e63049"
+    },
+    {
+      "path": "assets/monsters/tombwarden.png",
+      "source": "ZPet/app/src/main/assets/monsters/tombwarden.png",
+      "sha256": "5700731bdad0d459f0e14b9c5cba9620eac0cdb2c018cf5f04705fb1ffb118da"
+    },
+    {
+      "path": "assets/monsters/veilfang.png",
+      "source": "ZPet/app/src/main/assets/monsters/veilfang.png",
+      "sha256": "e50d1eafa1e0bbb483996f30e3f9e15adad00aa7a29c4253102c155118c3a2b1"
+    },
+    {
+      "path": "assets/monsters/veilnine.png",
+      "source": "ZPet/app/src/main/assets/monsters/veilnine.png",
+      "sha256": "5990e8a087f301914b0b34dbb24905c6067ab2a90dd17bcb4a7288d0af2fa9fd"
+    },
+    {
+      "path": "assets/monsters/verdantcrest.png",
+      "source": "ZPet/app/src/main/assets/monsters/verdantcrest.png",
+      "sha256": "8193bf01f3c01a603ad706e91b80c05acb5486c73e147d46bff4f90d2b31c983"
+    },
+    {
+      "path": "assets/monsters/voltmaw.png",
+      "source": "ZPet/app/src/main/assets/monsters/voltmaw.png",
+      "sha256": "790005c240801c37e0380ca6cd1a45c1197a54db1205586618ffb8ae24d556e5"
+    },
+    {
+      "path": "assets/monsters/vulcarion.png",
+      "source": "ZPet/app/src/main/assets/monsters/vulcarion.png",
+      "sha256": "20062ecc479901ee88361a6281dd2095297e4598d6b093765d70c0da1de1fadb"
+    },
+    {
+      "path": "assets/monsters/wargraven.png",
+      "source": "ZPet/app/src/main/assets/monsters/wargraven.png",
+      "sha256": "01eee49d708f455bd64668e6e2cad7ec57ae5bd9514e14d8034a1d87b83f4195"
+    },
+    {
+      "path": "assets/monsters/wispkit.png",
+      "source": "ZPet/app/src/main/assets/monsters/wispkit.png",
+      "sha256": "5b75c1c4846436d8141bc274fdd72306372bcc72320df19c1b35a3b2fb2cbbf1"
+    },
+    {
+      "path": "reference/MonsterCatalog.java",
+      "source": "ZPet/app/src/main/java/com/zeus97x/zpet/MonsterCatalog.java",
+      "sha256": "ea6a04ff5f8179eeb8349f7e4a166e7e96ae0f36c9d22ef105dbbd74a01c5eb6"
+    },
+    {
+      "path": "reference/SpeciesCatalog.java",
+      "source": "ZPet/app/src/main/java/com/zeus97x/zpet/SpeciesCatalog.java",
+      "sha256": "96c1d807610220ecb1c003ca7aed60e82a45556b229f5cc17607884ff062a26f"
+    },
+    {
+      "path": "reference/MonsterJournal.java",
+      "source": "ZPet/app/src/main/java/com/zeus97x/zpet/MonsterJournal.java",
+      "sha256": "30d5485d3358bb2378ac0eb6522bdceb554e2979abde28a83a96462df097dacf"
+    },
+    {
+      "path": "reference/CreatureView.java",
+      "source": "ZPet/app/src/main/java/com/zeus97x/zpet/CreatureView.java",
+      "sha256": "02428338c540c9153558b5116a2e9b6153911ddd29dc0e230a625099a716b3d1"
+    },
+    {
+      "path": "reference/RegionCatalog.java",
+      "source": "ZPet/app/src/main/java/com/zeus97x/zpet/RegionCatalog.java",
+      "sha256": "b373755d60f841afe61a9b4968b9756b484b55f2fc92be5e5d889c23dddea082"
+    }
+  ]
+}
