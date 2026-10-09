@@ -13,3 +13,6 @@ Repository: Zeus97x/ZBattle. Preserve project identity and existing features. Re
 - Commit source/assets/configuration with the log: this Markdown file explains recovery but cannot replace missing project files. Record missing source honestly.
 - Never record passwords, API keys, tokens, signing keys or other secrets. Refer only to configuration names and approved secret storage.
 - When creating another Zeus app or website repository, carry over this rule and initialize its own `DEVELOPMENT_LOG.md`.
+
+## Permanent AI workspace
+Read .github/ai/README.md, PROJECT_STATUS.md, TASK_BOARD.md and ROADMAP.md before development. The user-approved 2026-10-09 master workflow controls AI assignments, handoffs, usage, phases and PR integration. Initialize this workspace for future repositories. Current user instructions take precedence over historical guidance.

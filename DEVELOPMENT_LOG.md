@@ -41,3 +41,14 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Verification: commands/checks actually run and their results; state what was not tested.
 - Remaining issues/blockers:
 - Recovery/resume: exact next step and any compatibility or migration details needed to continue safely.
+
+
+## 2026-10-09 — AI-001 / ZB-002, phases 1–2
+- User authorized ZBattle development and permanent AI workflow across GitHub repositories.
+- Baseline 758c43c764c2359803b01ebcf0dc7abbacd6cdc9; dedicated ai/codex/zbattle-foundation; PR integration, no merge.
+- Phase 1: .github/ai workspace, 18-field templates, task board, usage policy, roadmap, decisions and proposed handoffs.
+- Phase 2: native Java Android shell com.zeus97x.zbattle, 0.1.0/code1; versioned saved cosmetic master/name/starter, approved three starter PNGs, four tabs with system insets. Future gameplay explicitly planned. Existing asset/reference files untouched.
+- Files: .github/ai/**, AGENTS.md, README.md, .gitignore, settings.gradle, build.gradle, gradle.properties, app/build.gradle, app/src/main/AndroidManifest.xml, app/src/main/java/com/zeus97x/zbattle/{MainActivity,MasterProfile}.java, tests/MasterProfileTest.java, .github/workflows/verify-foundation.yml, DEVELOPMENT_LOG.md.
+- Verification: javac executable unavailable; JDK compiler module worked. java -m jdk.compiler/com.sun.tools.javac.Main compiled profile suite; MasterProfileTest PASS 30 valid/9 invalid cases. Android SDK/Gradle unavailable; Activity compilation/resource linking/lint/APK/device behavior not verified.
+- Build: manual-only debug verification workflow added, not dispatched. No prior application/signing identity existed. Production signing and APK Releases deferred.
+- Recovery: review PR, native validation when authorized, verify saves/rotation/assets/320dp/large fonts/system nav. Pause before phases 3–4. Claude review proposed, not assigned.
