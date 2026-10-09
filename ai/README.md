@@ -5,7 +5,7 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 ## Current work
 | Task | Owner | Status | Scope |
 |---|---|---|---|
-| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Ready, unclaimed | Build Android UI foundation using existing ZPet assets and new-art placeholders |
+| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | In progress (branch claude/zbattle-ui-foundation) | Build Android UI foundation using existing ZPet assets and new-art placeholders |
 | Artwork phase 1 | ChatGPT | Branding preview made; approval/export pending | Logo, app icon, splash |
 | Artwork phases 2-8 | ChatGPT | Planned, not started | Maps, location scenery, battle scenery, opponents, shop, progress, finishing |
 
