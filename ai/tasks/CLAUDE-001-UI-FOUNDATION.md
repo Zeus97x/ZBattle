@@ -42,3 +42,4 @@ Return PR URL, commit, changes, checks, screenshots if available, remaining bloc
 
 ## Progress log
 - 2026-10-09: claimed. Milestone A started: Gradle wrapper (8.11.1), :core platform-free catalogues/navigation/settings with tests, JVM layout harness in preview/.
+- 2026-10-09: shared Compose screens for all nine layouts + JVM layout harness committed (WIP, paused by user). Android entry point and CI not yet added.

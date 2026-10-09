@@ -62,3 +62,10 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Environment blocker: this cloud session's network policy returns 403 for `dl.google.com` (Google Maven/Android SDK), so AGP, AndroidX and the Android SDK cannot be resolved here. Android compile/lint must be verified on GitHub Actions. The preview harness uses Compose Multiplatform desktop 1.5.12 from Maven Central (newer CMP releases pull AndroidX artifacts from Google Maven).
 - Verification: `./gradlew -p preview test` — 21 core tests passed (catalogue names vs `reference/*.java`, duplicate-tradition group identity, 54 PNG mapping, manifest SHA-256 of all 54 PNGs, collection query, navigation back order, travel/profile rules). Android build not run (blocker above).
 - Next step: shared Compose UI in `ui/`, Android entry point in `app/`, harness screenshots, CI workflow.
+
+## 2026-10-09 — CLAUDE-001 shared Compose screens (work in progress, paused by user)
+- Status: in progress; paused at the user's request. Not reviewed, no PR yet.
+- Changes: `ui/src/main/kotlin/com/zeus97x/zbattle/ui/` — theme tokens, `ArtLoader`/`ArtworkSlot` placeholders, reusable components, `AppState`, root `ZBattleApp` with bottom bar and overlays, screens for Home, Collection, Travel, Challenges, Battle preview, Shop sheet, Item Shop, Double Battle, Profile, Achievements and Events, plus dialogs and the creature detail sheet. `preview/` — `FileArtLoader` and `LayoutRenderTest`, which renders every route/overlay at 412dp and 360dp, 1.3× font and light mode to `preview/build/screenshots/` (not committed).
+- Verification: `./gradlew -p preview test` — 25 tests passed (21 core + 4 layout/state), 42 screenshots rendered and inspected. Android compile not run (Google Maven blocked by this session's network policy).
+- Remaining: Android entry point (`app/src/main/AndroidManifest.xml`, `MainActivity`, asset `ArtLoader`, SharedPreferences `SettingsStore`), CI workflow for assembleDebug/lint, final task status, PR with screenshots. PR #1 conflict still needs the user's decision.
+- Next step: add the Android entry point and CI, then verify on GitHub Actions.
