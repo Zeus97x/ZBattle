@@ -8,5 +8,5 @@ Checks: profile suite compiled/executed via JDK compiler module; 30 valid combin
 Android Activity compilation/lint/assembly/device UI unverified: Android SDK/Gradle unavailable.
 Active tasks AI-001, ZB-002 REVIEW. Claude ZB-003 review proposed, not assigned. Codex ZB-004 verification READY, not assigned/dispatched.
 Blockers: native validation and permanent release signing.
-PR: see branch ai/codex/zbattle-foundation in repository PR list; user merge approval required.
+PR: https://github.com/Zeus97x/ZBattle/pull/1; open, user merge approval required.
 Next: review first pair, authorize native validation; later approve phases 3–4.

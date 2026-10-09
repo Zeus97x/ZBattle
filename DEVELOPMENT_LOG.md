@@ -52,3 +52,10 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Verification: javac executable unavailable; JDK compiler module worked. java -m jdk.compiler/com.sun.tools.javac.Main compiled profile suite; MasterProfileTest PASS 30 valid/9 invalid cases. Android SDK/Gradle unavailable; Activity compilation/resource linking/lint/APK/device behavior not verified.
 - Build: manual-only debug verification workflow added, not dispatched. No prior application/signing identity existed. Production signing and APK Releases deferred.
 - Recovery: review PR, native validation when authorized, verify saves/rotation/assets/320dp/large fonts/system nav. Pause before phases 3–4. Claude review proposed, not assigned.
+
+
+### Publication verification — 2026-10-09
+- Source checkpoint 55e31bb0181cec27cef615f66d41e61835c2249f; PR https://github.com/Zeus97x/ZBattle/pull/1.
+- Read back all 12 rollout trees: all expected files present; no unexpected changes/removals to existing blobs. ZBattle assets preserved. Manifest XML and all four 18-field task records validated locally.
+- Global PR inventory: .github/ai/ROLLOUT_STATUS.md. Other repositories received documentation-only PRs; none merged and no workflow dispatched.
+- Scope this entry: status/log/rollout inventory only, no additional product phase.
