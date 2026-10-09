@@ -1,5 +1,5 @@
 # CLAUDE-001 — Android UI foundation
-Status: IN PROGRESS (claimed). Owner: Claude. Updated 2026-10-09 America/Toronto.
+Status: IN PROGRESS — paused by Claude, handed to ChatGPT (see CLAUDE-001-HANDOFF.md). Original owner: Claude. Updated 2026-10-09 America/Toronto.
 Claim: Claude Code session, started 2026-10-09 ~19:30 America/Toronto; branch claude/zbattle-ui-foundation; base main b1fa4c5414e45daeac5650aa1e96ac3b5dfb121e.
 Parallel work found at claim time: open PR #1 (branch ai/codex/zbattle-foundation, base 758c43c) adds a separate Java Activity shell under app/ plus .github/ai/**. It is unmerged and conflicts with this task's app/ and Gradle files; not overwritten — reconciliation is the user's decision (see Progress log).
 Repo: Zeus97x/ZBattle. Base: current main. Work branch: claude/zbattle-ui-foundation.
@@ -43,3 +43,4 @@ Return PR URL, commit, changes, checks, screenshots if available, remaining bloc
 ## Progress log
 - 2026-10-09: claimed. Milestone A started: Gradle wrapper (8.11.1), :core platform-free catalogues/navigation/settings with tests, JVM layout harness in preview/.
 - 2026-10-09: shared Compose screens for all nine layouts + JVM layout harness committed (WIP, paused by user). Android entry point and CI not yet added.
+- 2026-10-09: handed off to ChatGPT at the user's request; remaining steps in [CLAUDE-001-HANDOFF.md](CLAUDE-001-HANDOFF.md).

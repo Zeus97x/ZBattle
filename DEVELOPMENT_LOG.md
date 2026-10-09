@@ -69,3 +69,9 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Verification: `./gradlew -p preview test` — 25 tests passed (21 core + 4 layout/state), 42 screenshots rendered and inspected. Android compile not run (Google Maven blocked by this session's network policy).
 - Remaining: Android entry point (`app/src/main/AndroidManifest.xml`, `MainActivity`, asset `ArtLoader`, SharedPreferences `SettingsStore`), CI workflow for assembleDebug/lint, final task status, PR with screenshots. PR #1 conflict still needs the user's decision.
 - Next step: add the Android entry point and CI, then verify on GitHub Actions.
+
+## 2026-10-09 — CLAUDE-001 handed off to ChatGPT
+- Status: in progress, paused by Claude; user asked ChatGPT to finish.
+- Changes: added `ai/tasks/CLAUDE-001-HANDOFF.md` (done vs remaining steps, exact files and cautions); updated task status in `ai/tasks/CLAUDE-001-UI-FOUNDATION.md` and `ai/README.md`. Documentation only.
+- Branch head before this entry: `5cf73a3`. Verification: documentation only; no new checks run.
+- Next step: follow the handoff's "Not done" list starting with the Android manifest and MainActivity.
