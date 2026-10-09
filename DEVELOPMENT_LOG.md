@@ -41,3 +41,14 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Verification: commands/checks actually run and their results; state what was not tested.
 - Remaining issues/blockers:
 - Recovery/resume: exact next step and any compatibility or migration details needed to continue safely.
+
+## 2026-10-09 — UI layout and Claude foundation handoff
+- Status: documentation implemented; Android UI foundation planned, not started.
+- Request: put the screenshot-inspired layout and Claude task into the repo so coding can proceed while ChatGPT designs artwork.
+- Inspected: root contents, AGENTS.md, existing log/README, asset README/manifest; no Android source at root. Manifest contains 54 monster PNGs and five Java reference files. Fetched current ZPet RegionCatalog.java (blob cfb3b696838245a37c359622965ef9caabac41fa): 12 catalogue groups / 48 ordered areas, including repeated tradition labels.
+- Changes: added ai/README.md task queue, ai/UI_LAYOUT_SPEC.md detailed nine-screen brief, ai/tasks/CLAUDE-001-UI-FOUNDATION.md scoped implementation handoff; updated root README.md to supersede stale blanket development deferral for this UI task.
+- Implementation: specified responsive tokens, routing, reusable components, stable art lookup/fallbacks, all 48 exact areas, existing creature reuse, local vs preview interactions and explicit verification criteria. Assigned Claude a separate feature branch/PR; ChatGPT owns new artwork. Missing forms remain deferred. No app source, final generated assets, gameplay engine, import or release was added.
+- References: layout commit 257bc447bef7169ba8d855aba60b9a92d84830b0; task commit 665fdb8a31d24cc74f5c57b92a6ea5b6ad7938da; workspace commit ef5a1c62876acde3ed60d3e2bf853631fd07eb44. Connector publishes one text file per commit, so documentation/log updates were sequential rather than a multi-file commit.
+- Verification: fetched source docs and manifest; specification checked against current ZPet catalogue; published files to main. Readback verification follows this entry. No build or application tests run because this change is documentation only.
+- Remaining: generated image boards remain in chat, not repo assets; branding preview approval/export pending; artwork phases 2-8 not started; Claude task Ready/unclaimed.
+- Recovery/resume: read ai/README.md and Claude task, claim branch against fresh main, inspect source/parallel work, scaffold only if app source is still absent, reuse existing assets and keep missing art placeholders. Return a PR without merge/release.
