@@ -32,6 +32,7 @@ jobs:
           python3 -m pip install --quiet jsonschema==4.26.0
           python3 tools/validate_contract.py
           python3 tools/check_doc_links.py
+          python3 tools/campaign_proposal.py
       - name: Layout render harness (360dp / 412dp / 1.3x font / light mode)
         run: ./gradlew -p preview test --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4

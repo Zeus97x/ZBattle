@@ -430,3 +430,19 @@ Remaining work:
   - Nickname editing UI.
   - Delivery of outbound unlocks (Phase D).
 - Next: B4 campaign proposal.
+
+## 2026-10-10 — CLAUDE-005 B4: campaign proposal (Claude)
+- Branch: `claude/zbattle-b4-campaign-proposal` (stacked on B3).
+- Decision basis: D-CAMPAIGN (Q6). This is a proposal only; no runtime content changed.
+- How it was made: a helper agent drafted the roster, formulas and simulation in Claude's scratchpad. Claude reviewed it, moved the generator, validator and simulator into `tools/campaign_proposal.py` with repo-relative paths, and switched first-win XP to ECONOMY Option B.
+- Finding: Option B XP plus the drafted curve is too easy for a party of 3 from group-1 onwards; the drafted solo XP is too slow for a trio. Three resolutions are listed in §7.6 (Q-F).
+- Paths:
+  - `ai/proposals/{CAMPAIGN-PROPOSAL.md,campaign-proposal.json,ECONOMY-PROPOSAL.md,README.md}` (the economy draft travels with B4 because the campaign doc cites it)
+  - `tools/campaign_proposal.py`
+  - `core/src/test/.../battle/CampaignProposalTest.kt`
+  - `.github/workflows/android-ui.yml` (new validator step)
+- Verification:
+  - `python3 tools/campaign_proposal.py` → OK (300 encounters, 22 230 first-win XP).
+  - `--simulate --party 3` output is recorded in §7.6.
+  - `./gradlew -p preview test` → 93 tests, 0 failures (`CampaignProposalTest` 2/2).
+- Next: B5 replay tracking and settlement.

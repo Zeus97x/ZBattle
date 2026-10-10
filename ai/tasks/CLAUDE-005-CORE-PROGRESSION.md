@@ -40,7 +40,7 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 | B1 auto-fight | REVIEW | Built on the proposed D-AUTO-FIGHT scope (foreground only, no items, stops on interruption). Zeus97x still has to confirm that scope. |
 | B2 party/switching | REVIEW | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
 | B3 evolution | REVIEW | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
-| B4 campaign | READY (proposal) | D-CAMPAIGN: proposal + inactive validated config only. |
+| B4 campaign | REVIEW (proposal) | D-CAMPAIGN: proposal + inactive validated config only. |
 | B5 repeat battles | READY | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
 
 ### B1 implementation
@@ -100,3 +100,13 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
   - Founder definitions and thresholds (pending).
   - Cross-app delivery of `outbound` unlocks (Phase D).
 - **Tests:** `EvolutionTest` (9) and `LayoutRenderTest.companionIdsAreAssignedOnceAndPersisted`. Total 91 tests, 0 failures.
+
+### B4 proposal (branch `claude/zbattle-b4-campaign-proposal`)
+- **`ai/proposals/CAMPAIGN-PROPOSAL.md` + `campaign-proposal.json`:**
+  - 300 encounters over `area-00`…`area-47`: 6 per area, plus a region boss in each stage-3 area.
+  - Only existing creatures with artwork; groups 9–11 use same-`family % 3` interim families until their art is approved.
+  - Ordered unlocks; a proposed opponent ramp; the shipped `area-00/slot-0` unchanged.
+- **`tools/campaign_proposal.py`:** generate, validate (in CI) and simulate.
+- **`CampaignProposalTest`:** every row resolves against `CreatureCatalog` and `RegionCatalog`, the shipped encounter is unchanged, and runtime still has exactly 1 playable encounter (the proposal is inactive).
+- **Reconciled with the economy proposal:** the JSON uses Option B XP. The resulting curve mismatch for a party of 3 is documented in §7.6 and left for Zeus97x (Q-F).
+- **Not built:** no runtime campaign, no unlock gates, no new opponent stats until D-CAMPAIGN is approved.
