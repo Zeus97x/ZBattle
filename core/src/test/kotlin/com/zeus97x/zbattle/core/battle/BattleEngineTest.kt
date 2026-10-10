@@ -80,7 +80,7 @@ class BattleEngineTest {
 
     @Test
     fun faintingEndsInDefeat() {
-        var b = start().let { it.copy(player = it.player.copy(hp = 3)) }
+        var b = start().withPlayer { it.copy(hp = 3) }
         b = BattleEngine.act(b, BattleAction.Attack)
         assertEquals(Outcome.Defeat, b.outcome)
         assertEquals(0, b.player.hp)
@@ -89,7 +89,7 @@ class BattleEngineTest {
 
     @Test
     fun turnLimitIsADefeat() {
-        val b = start().let { it.copy(turn = BattleEngine.TURN_LIMIT - 1, enemy = it.enemy.copy(hp = 30, maxHp = 30), player = it.player.copy(hp = 52)) }
+        val b = start().withPlayer { it.copy(hp = 52) }.let { it.copy(turn = BattleEngine.TURN_LIMIT - 1, enemy = it.enemy.copy(hp = 30, maxHp = 30)) }
         assertEquals(Outcome.Defeat, BattleEngine.act(b, BattleAction.Attack).outcome)
     }
 

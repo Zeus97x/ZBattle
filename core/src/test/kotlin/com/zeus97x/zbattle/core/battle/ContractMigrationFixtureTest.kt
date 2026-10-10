@@ -10,7 +10,8 @@ import kotlin.test.assertTrue
 /**
  * CLAUDE-004 A2: the old-save side of the companion-identity migration fixture is a real
  * BattleProgress v1 encoding, and the proposed mapping covers every owned creature exactly once.
- * The new (v2, UUID-bearing) save does not exist yet (Phase D1), so this checks old -> mapping only.
+ * The golden file is frozen at v1 (CLAUDE-005 B2 moved the codec to v2): it must keep decoding,
+ * through the v1 -> v2 migration, to exactly the progress the current engine produces.
  */
 class ContractMigrationFixtureTest {
     private val dir = File(AssetPack.root.parentFile, "ai/integration/fixtures/migration")
@@ -25,11 +26,12 @@ class ContractMigrationFixtureTest {
     }
 
     @Test
-    fun goldenIsTheCurrentCodecOutput() {
-        val encoded = BattleProgressCodec.encode(sample())
-        if (System.getenv("ZBATTLE_UPDATE_GOLDEN") == "1") golden.writeText(encoded + "\n")
-        assertEquals(encoded, golden.readText().trim(), "Regenerate with ZBATTLE_UPDATE_GOLDEN=1 only if the v1 codec intentionally changed")
-        assertEquals(1, java.util.Base64.getDecoder().decode(encoded).let { it[3].toInt() }, "schema v1")
+    fun frozenV1GoldenMigratesToCurrentProgress() {
+        val raw = golden.readText().trim()
+        assertEquals(1, java.util.Base64.getDecoder().decode(raw).let { it[3].toInt() }, "golden stays a v1 save")
+        val migrated = BattleProgressCodec.decode(raw)
+        assertEquals(sample(), migrated)
+        assertEquals(migrated, BattleProgressCodec.decode(BattleProgressCodec.encode(migrated)), "re-saved as v2 without loss")
     }
 
     @Test

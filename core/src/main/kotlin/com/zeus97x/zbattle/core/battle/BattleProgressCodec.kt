@@ -12,9 +12,14 @@ import java.util.Base64
  * Versioned binary save (Base64), in the style of ZPet's `Progression`/`AdventureState` codecs.
  * Decoding validates every field and rejects trailing data; callers keep the raw string for
  * recovery when [decode] fails. Holds no secrets or device paths.
+ *
+ * - v1 (CLAUDE-002): one fighter per battle.
+ * - v2 (CLAUDE-005 B2): chosen party, party battles (team, active member, participants,
+ *   pending replacement) and per-participant XP results. v1 saves are migrated on read: the
+ *   single fighter becomes a one-member team, and the old result is credited to the lead.
  */
 object BattleProgressCodec {
-    const val VERSION = 1
+    const val VERSION = 2
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -28,12 +33,15 @@ object BattleProgressCodec {
             progress.defeated.sorted().forEach(d::writeUTF)
             d.writeInt(progress.wins.size)
             progress.wins.toSortedMap().forEach { (k, v) -> d.writeUTF(k); d.writeInt(v) }
+            d.writeInt(progress.party.size)
+            progress.party.forEach(d::writeLong)
             d.writeBoolean(progress.active != null)
             progress.active?.let { writeBattle(d, it) }
             d.writeBoolean(progress.lastResult != null)
             progress.lastResult?.let { r ->
-                d.writeLong(r.battleId); d.writeUTF(r.encounterId); d.writeUTF(r.outcome.name)
-                d.writeLong(r.xpGained); d.writeInt(r.levelBefore); d.writeInt(r.levelAfter); d.writeBoolean(r.firstVictory)
+                d.writeLong(r.battleId); d.writeUTF(r.encounterId); d.writeUTF(r.outcome.name); d.writeBoolean(r.firstVictory)
+                d.writeInt(r.gains.size)
+                r.gains.forEach { g -> d.writeLong(g.uid); d.writeLong(g.xp); d.writeInt(g.levelBefore); d.writeInt(g.levelAfter) }
             }
         }
         return Base64.getEncoder().encodeToString(bytes.toByteArray())
@@ -42,22 +50,34 @@ object BattleProgressCodec {
     /** @throws IllegalStateException when the data is unreadable or fails validation. */
     fun decode(value: String): BattleProgress = try {
         DataInputStream(ByteArrayInputStream(Base64.getDecoder().decode(value))).use { d ->
-            if (d.readInt() != VERSION) throw IOException("Unknown battle save version")
+            val version = d.readInt()
+            if (version !in 1..VERSION) throw IOException("Unknown battle save version")
             val nextUid = d.readLong()
             val nextBattleId = d.readLong()
             val creatures = List(count(d, 500)) { OwnedCreature(d.readLong(), d.readUTF(), d.readLong()) }
             val defeated = List(count(d, 10_000)) { d.readUTF() }.toSet()
             val wins = List(count(d, 10_000)) { d.readUTF() to d.readInt() }.toMap()
-            val active = if (d.readBoolean()) readBattle(d) else null
-            val last = if (d.readBoolean()) {
-                BattleResult(d.readLong(), d.readUTF(), Outcome.valueOf(d.readUTF()), d.readLong(), d.readInt(), d.readInt(), d.readBoolean())
-            } else null
+            val party = if (version >= 2) List(count(d, BattleEngine.PARTY_SIZE)) { d.readLong() } else emptyList()
+            val active = if (d.readBoolean()) (if (version >= 2) readBattle(d) else readBattleV1(d)) else null
+            val last = if (!d.readBoolean()) null else if (version >= 2) {
+                BattleResult(d.readLong(), d.readUTF(), Outcome.valueOf(d.readUTF()), d.readBoolean(),
+                    List(count(d, BattleEngine.PARTY_SIZE)) { XpGain(d.readLong(), d.readLong(), d.readInt(), d.readInt()) })
+            } else {
+                val battleId = d.readLong(); val encounterId = d.readUTF(); val outcome = Outcome.valueOf(d.readUTF())
+                val xp = d.readLong(); val before = d.readInt(); val after = d.readInt(); val first = d.readBoolean()
+                // v1 results belonged to the only fighter, which was always the lead.
+                val gains = creatures.firstOrNull()?.let { listOf(XpGain(it.uid, xp, before, after)) } ?: emptyList()
+                BattleResult(battleId, encounterId, outcome, first, gains)
+            }
             if (d.available() != 0) throw IOException("Trailing data")
             if (nextUid < 1 || nextBattleId < 1) throw IOException("Invalid counters")
-            if (creatures.any { it.uid >= nextUid } || creatures.map { it.uid }.toSet().size != creatures.size) throw IOException("Invalid creature ids")
+            val uids = creatures.map { it.uid }
+            if (uids.any { it >= nextUid } || uids.toSet().size != uids.size) throw IOException("Invalid creature ids")
             if (wins.values.any { it < 0 }) throw IOException("Invalid wins")
-            if (active != null && (active.battleId >= nextBattleId || creatures.none { it.uid == active.playerUid })) throw IOException("Invalid active battle")
-            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last)
+            if (party.toSet().size != party.size || party.any { it !in uids }) throw IOException("Invalid party")
+            if (active != null && (active.battleId >= nextBattleId || active.team.any { it.uid !in uids })) throw IOException("Invalid active battle")
+            if (last != null && last.gains.any { it.xp < 0 }) throw IOException("Invalid result")
+            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party)
         }
     } catch (e: Exception) {
         throw IllegalStateException("Battle save unreadable; raw data retained for recovery", e)
@@ -66,30 +86,71 @@ object BattleProgressCodec {
     private fun count(d: DataInputStream, max: Int): Int = d.readInt().also { if (it < 0 || it > max) throw IOException("Invalid count") }
 
     private fun writeBattle(d: DataOutputStream, b: BattleState) {
-        d.writeLong(b.battleId); d.writeUTF(b.encounterId); d.writeLong(b.playerUid)
-        writeCombatant(d, b.player); writeCombatant(d, b.enemy)
-        d.writeInt(b.turn); d.writeInt(b.skillCooldown); d.writeInt(b.burnTurns); d.writeInt(b.weakenTurns)
+        d.writeLong(b.battleId); d.writeUTF(b.encounterId)
+        d.writeInt(b.team.size)
+        b.team.forEach { m -> d.writeLong(m.uid); writeCombatant(d, m.combatant); d.writeInt(m.skillCooldown) }
+        d.writeInt(b.activeIndex)
+        writeCombatant(d, b.enemy)
+        d.writeInt(b.turn); d.writeInt(b.burnTurns); d.writeInt(b.weakenTurns)
+        d.writeInt(b.participants.size); b.participants.sorted().forEach(d::writeLong)
+        d.writeBoolean(b.awaitingReplacement)
         d.writeInt(b.log.size); b.log.forEach(d::writeUTF)
         d.writeUTF(b.outcome?.name ?: "")
     }
 
     private fun readBattle(d: DataInputStream): BattleState {
+        val battleId = d.readLong()
+        val encounterId = d.readUTF()
+        val team = List(count(d, BattleEngine.PARTY_SIZE)) { TeamMember(d.readLong(), readCombatant(d), d.readInt()) }
         val state = BattleState(
-            battleId = d.readLong(),
-            encounterId = d.readUTF(),
-            playerUid = d.readLong(),
-            player = readCombatant(d),
+            battleId = battleId,
+            encounterId = encounterId,
+            team = team,
+            activeIndex = d.readInt(),
             enemy = readCombatant(d),
             turn = d.readInt(),
-            skillCooldown = d.readInt(),
             burnTurns = d.readInt(),
             weakenTurns = d.readInt(),
+            participants = List(count(d, BattleEngine.PARTY_SIZE)) { d.readLong() }.toSet(),
+            awaitingReplacement = d.readBoolean(),
             log = List(count(d, 100)) { d.readUTF() },
             outcome = d.readUTF().takeIf { it.isNotEmpty() }?.let(Outcome::valueOf),
         )
+        if (state.participants.any { p -> team.none { it.uid == p } }) throw IOException("Invalid participants")
+        if (state.awaitingReplacement != (state.player.fainted)) throw IOException("Invalid replacement state")
+        if (state.awaitingReplacement && state.benchIndices().isEmpty()) throw IOException("Invalid replacement state")
+        return validated(state)
+    }
+
+    /** v1 battle: one fighter with its own cooldown. */
+    private fun readBattleV1(d: DataInputStream): BattleState {
+        val battleId = d.readLong()
+        val encounterId = d.readUTF()
+        val uid = d.readLong()
+        val player = readCombatant(d)
+        val enemy = readCombatant(d)
+        val turn = d.readInt()
+        val cooldown = d.readInt()
+        val state = BattleState(
+            battleId = battleId,
+            encounterId = encounterId,
+            team = listOf(TeamMember(uid, player, cooldown)),
+            activeIndex = 0,
+            enemy = enemy,
+            turn = turn,
+            burnTurns = d.readInt(),
+            weakenTurns = d.readInt(),
+            participants = if (turn > 0) setOf(uid) else emptySet(),
+            log = List(count(d, 100)) { d.readUTF() },
+            outcome = d.readUTF().takeIf { it.isNotEmpty() }?.let(Outcome::valueOf),
+        )
+        return validated(state)
+    }
+
+    private fun validated(state: BattleState): BattleState {
         if (state.outcome != null) throw IOException("Settled battle stored as active")
         if (Encounters.byId(state.encounterId) == null) throw IOException("Unknown encounter")
-        if (state.turn !in 0 until BattleEngine.TURN_LIMIT || state.skillCooldown !in 0..BattleEngine.SKILL_COOLDOWN ||
+        if (state.turn !in 0 until BattleEngine.TURN_LIMIT || state.team.any { it.skillCooldown !in 0..BattleEngine.SKILL_COOLDOWN } ||
             state.burnTurns !in 0..BattleEngine.EFFECT_TURNS || state.weakenTurns !in 0..BattleEngine.EFFECT_TURNS
         ) throw IOException("Invalid battle counters")
         return state

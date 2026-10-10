@@ -20,6 +20,7 @@ import com.zeus97x.zbattle.core.ShopCategory
 import com.zeus97x.zbattle.core.StageFilter
 import com.zeus97x.zbattle.core.Tab
 import com.zeus97x.zbattle.core.battle.BattleAction
+import com.zeus97x.zbattle.core.battle.OwnedCreature
 import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.Outcome
 import com.zeus97x.zbattle.ui.AppState
@@ -96,6 +97,47 @@ class LayoutRenderTest {
         Triple("17-edit-master", NavState(listOf(Route.Profile), Overlay.EditMaster), visitedSettings),
     )
 
+    /** CLAUDE-005 B2: three owned creatures (all with created art). */
+    private val trio = sliceArea.copy(progress = sliceArea.progress.let {
+        it.copy(creatures = it.creatures + OwnedCreature(it.nextUid, "sparklit", 120) + OwnedCreature(it.nextUid + 1, "inkling", 40), nextUid = it.nextUid + 2)
+    })
+    private val trioMid = trio.copy(progress = trio.progress.startBattle(encounter).act(BattleAction.Skill).switchTo(1))
+    private val trioFainted = trioMid.copy(progress = trioMid.progress.let { p ->
+        val b = p.active!!
+        p.copy(active = b.copy(team = b.team.mapIndexed { i, m -> if (i == b.activeIndex) m.copy(combatant = m.combatant.copy(hp = 1)) else m }))
+    }.act(BattleAction.Attack))
+    private val trioWon = trio.copy(progress = trio.progress.startBattle(encounter).act(BattleAction.Skill).switchTo(1).let { p ->
+        var q = p
+        while (q.active != null) q = q.act(if (q.active!!.skillReady) BattleAction.Skill else BattleAction.Attack)
+        q
+    })
+    private val partyCases = listOf(
+        Triple("21-party-home", NavState(), trio),
+        Triple("22-party-battle", battleNav, trioMid),
+        Triple("23-party-replacement", battleNav, trioFainted),
+        Triple("24-party-result", battleNav, trioWon),
+        Triple("25-party-detail", NavState(listOf(Route.Home), Overlay.CreatureDetail("inkling")), trio),
+    )
+
+    @Test
+    fun partyFlowThroughAppState() {
+        val store = InMemorySettingsStore(trio)
+        val state = AppState(store, NavState(listOf(Route.Home, Route.Challenges(0))))
+        val uids = trio.progress.creatures.map { it.uid }
+        state.makeLead(uids[2])
+        assertEquals(uids[2], store.load().progress.lead!!.uid)
+        state.startBattle(encounter)
+        state.toggleParty(uids[0])
+        assertEquals(3, store.load().progress.partyMembers.size, "party locked during battle")
+        state.startAutoFight()
+        state.switchTo(1)
+        assertEquals(false, state.autoFight, "switching takes control")
+        assertEquals(1, store.load().progress.active!!.turn)
+        assertEquals(1, AppState(store).settings.progress.active!!.activeIndex, "switch survives restart")
+        state.retreatBattle()
+        assertEquals(null, store.load().progress.active)
+    }
+
     @Test
     fun rendersEveryRouteAndOverlay() {
         preloadCreatures()
@@ -105,6 +147,7 @@ class LayoutRenderTest {
             written += render(largeText, name, nav, settings)
         }
         for (phone in phones + largeText) written += render(phone, "05c-battle-auto", battleNav, midBattle) { it.startAutoFight() }
+        for (phone in phones + largeText) for ((name, nav, settings) in partyCases) written += render(phone, name, nav, settings)
         written += render(phones[0], "18-home-light", NavState(), visitedSettings.copy(darkMode = false))
         written += render(phones[0], "19-profile-light", NavState(listOf(Route.Profile)), visitedSettings.copy(darkMode = false))
         written += render(
@@ -154,15 +197,15 @@ class LayoutRenderTest {
         assertEquals(false, state.autoFight, "No auto without an active battle")
         state.startBattle(encounter)
         state.startAutoFight()
-        val id = state.settings.progress.active!!.battleId
-        state.autoFightStep(id, 0)
+        val first = state.settings.progress.active!!
+        state.autoFightStep(first)
         assertEquals(1, state.settings.progress.active!!.turn)
-        state.autoFightStep(id, 0) // duplicate timer for the same turn
+        state.autoFightStep(first) // duplicate timer for the same state
         assertEquals(1, state.settings.progress.active!!.turn)
 
         // A dialog pauses it; Back (retreat prompt) stops it.
         state.show(Overlay.ConfirmRetreat)
-        state.autoFightStep(id, 1)
+        state.autoFightStep(state.settings.progress.active!!)
         assertEquals(1, state.settings.progress.active!!.turn)
         state.dismissOverlay()
         assertTrue(state.back())
@@ -180,12 +223,12 @@ class LayoutRenderTest {
 
         while (state.settings.progress.active != null) {
             val a = state.settings.progress.active!!
-            state.autoFightStep(a.battleId, a.turn)
+            state.autoFightStep(a)
         }
         assertEquals(false, state.autoFight, "Auto stops once the battle settles")
         assertEquals(Outcome.Victory, store.load().progress.lastResult!!.outcome)
         assertEquals(60, store.load().progress.lead!!.xp)
-        state.autoFightStep(id, 0)
+        state.autoFightStep(first)
         assertEquals(60, store.load().progress.lead!!.xp)
         assertEquals(1, store.load().progress.wins.values.sum())
     }

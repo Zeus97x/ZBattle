@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -103,14 +105,15 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             if (state.settings.battleAnimations) for (target in listOf(-10f, 10f, -6f, 0f)) shake.animateTo(target, tween(70))
         }
     }
-    // Auto-fight scheduler: one coroutine per (battle, turn), cancelled when the turn changes or
-    // the screen leaves; the step itself re-checks battle id and turn, so it can never act twice.
+    // Auto-fight scheduler: one coroutine per battle state, cancelled as soon as the state changes
+    // or the screen leaves; the step re-checks that state, so it can never act twice.
     if (state.autoFight) {
-        LaunchedEffect(battle.battleId, battle.turn) {
+        LaunchedEffect(battle) {
             delay(if (state.settings.battleAnimations) AUTO_STEP_MS else AUTO_STEP_FAST_MS)
-            state.autoFightStep(battle.battleId, battle.turn)
+            state.autoFightStep(battle)
         }
     }
+    var picking by remember(battle.battleId) { mutableStateOf(false) }
     DisposableEffect(Unit) { onDispose { state.stopAutoFight() } }
 
     Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
@@ -138,6 +141,7 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                 Pill("Turn ${battle.turn + 1}", container = p.accentDark, content = p.onAccent, icon = Icons.Filled.Bolt)
                 Pill("Next: ${battle.enemyIntent}")
             }
+            if (battle.team.size > 1) TeamStrip(battle)
             if (state.autoFight) {
                 Text("Auto battle on · tap any move to take control. No items are used.", style = MaterialTheme.typography.bodyMedium, color = p.accent)
             }
@@ -166,6 +170,24 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             .padding(Dimens.screenPadding),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        if (battle.awaitingReplacement || picking) {
+            Text(
+                if (battle.awaitingReplacement) "${battle.player.creature.name} fainted · choose who fights next (no turn used)"
+                else "Switch · uses your turn, then the opponent attacks",
+                style = MaterialTheme.typography.titleSmall,
+                color = p.textPrimary,
+            )
+            battle.benchIndices().forEach { i ->
+                val m = battle.team[i].combatant
+                ActionButton("${m.creature.name} · HP ${m.hp}/${m.maxHp}", Icons.Filled.SwapHoriz, Modifier.fillMaxWidth(), primary = true) {
+                    picking = false
+                    notice = null
+                    if (battle.awaitingReplacement) state.replaceWith(i) else state.switchTo(i)
+                }
+            }
+            if (!battle.awaitingReplacement) ActionButton("Cancel", Icons.Filled.DirectionsRun, Modifier.fillMaxWidth()) { picking = false }
+            return@Column
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ActionButton("Attack", Icons.Filled.Bolt, Modifier.weight(1f), primary = true) {
                 notice = null
@@ -192,13 +214,35 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ActionButton("Switch", Icons.Filled.SwapHoriz, Modifier.weight(1f)) {
-                notice = if (state.settings.ownedParty.size > 1) "Switching arrives with multi-creature parties."
-                else "Only one companion so far · more arrive with ZCubes and the ZPet import."
+                if (battle.canSwitch) {
+                    state.stopAutoFight()
+                    picking = true
+                } else {
+                    notice = if (battle.team.size > 1) "No one else can fight right now."
+                    else "Only one companion in your party · more arrive with ZCubes and the ZPet import."
+                }
             }
             ActionButton("Retreat", Icons.Filled.DirectionsRun, Modifier.weight(1f)) {
                 state.stopAutoFight()
                 state.show(Overlay.ConfirmRetreat)
             }
+        }
+    }
+}
+
+/** Party HP at a glance; the active member is highlighted. Wraps at large text sizes. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun TeamStrip(battle: BattleState) {
+    val p = Z.colors
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        battle.team.forEachIndexed { i, m ->
+            val c = m.combatant
+            Pill(
+                "${c.creature.name} ${if (c.fainted) "· fainted" else "${c.hp}/${c.maxHp}"}",
+                container = if (i == battle.activeIndex) p.accentDark else p.elevated,
+                content = if (i == battle.activeIndex) p.onAccent else p.textPrimary,
+            )
         }
     }
 }
@@ -216,8 +260,7 @@ private fun ResultPanel(state: AppState, result: BattleResult) {
         Outcome.Retreat -> "Retreated"
     }
     val detail = when {
-        result.outcome == Outcome.Victory && result.firstVictory -> "+${result.xpGained} XP" +
-            if (result.levelAfter > result.levelBefore) " · Level ${result.levelBefore} → ${result.levelAfter}" else ""
+        result.outcome == Outcome.Victory && result.firstVictory -> "+${result.xpGained} XP shared by the creatures that fought"
         result.outcome == Outcome.Victory -> "Rematch won · practice battles give no XP (encounter rewards arrive with steps/ZCubes)."
         result.outcome == Outcome.Defeat -> "No rewards. Your companion recovers fully after each battle."
         else -> "No rewards."
@@ -230,11 +273,20 @@ private fun ResultPanel(state: AppState, result: BattleResult) {
         Icon(Icons.Filled.EmojiEvents, contentDescription = null, tint = if (result.outcome == Outcome.Victory) p.accent else p.textSecondary, modifier = Modifier.size(64.dp))
         Text(title, style = MaterialTheme.typography.headlineMedium, color = p.textPrimary)
         Text(detail, style = MaterialTheme.typography.bodyLarge, color = p.textSecondary)
-        state.settings.ownedParty.firstOrNull()?.let { lead ->
+        val shown = result.gains.mapNotNull { g -> state.settings.progress.owned(g.uid)?.let { it to g } }
+            .ifEmpty { state.settings.ownedParty.take(1).map { it to null } }
+        shown.forEach { (owned, gain) ->
             ZCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(Dimens.cardPadding), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("${lead.creature.name} · Level ${lead.level}", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
-                    XpRow(lead.xp)
+                    Text("${owned.creature.name} · Level ${owned.level}", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
+                    if (gain != null && gain.xp > 0) {
+                        Text(
+                            "+${gain.xp} XP" + if (gain.levelAfter > gain.levelBefore) " · Level ${gain.levelBefore} → ${gain.levelAfter}" else "",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = p.accent,
+                        )
+                    }
+                    XpRow(owned.xp)
                 }
             }
         }

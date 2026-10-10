@@ -38,6 +38,7 @@ import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.Skills
 
 /** Shows only catalogue facts; unknown stats are omitted rather than invented. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CreatureDetailSheet(state: AppState, creatureId: String) {
     val p = Z.colors
@@ -62,13 +63,33 @@ fun CreatureDetailSheet(state: AppState, creatureId: String) {
             val skill = Skills.forFamily(creature.family.index)
             Text("Your companion · Level ${owned.level}", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
             XpRow(owned.xp)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Pill("HP ${stats.maxHp}")
                 Pill("Power ${stats.power}")
                 Pill("Guard ${stats.guard}")
                 Pill("Speed ${stats.speed}")
             }
             DetailLine("Skill", "${skill.name} · ${skill.effect.label}")
+            val progress = state.settings.progress
+            val inParty = progress.inParty(owned.uid)
+            val isLead = progress.lead?.uid == owned.uid
+            Text(
+                when {
+                    isLead -> "Party lead · fights first"
+                    inParty -> "In your party (${progress.partyMembers.size}/3)"
+                    else -> "Not in your party (${progress.partyMembers.size}/3)"
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = p.textSecondary,
+            )
+            if (progress.active == null && progress.creatures.size > 1) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val full = Modifier.fillMaxWidth()
+                    if (inParty && !isLead) SecondaryButton("Make lead", onClick = { state.makeLead(owned.uid) }, modifier = full)
+                    if (inParty && progress.partyMembers.size > 1) SecondaryButton("Remove from party", onClick = { state.toggleParty(owned.uid) }, modifier = full)
+                    if (!inParty && progress.partyMembers.size < 3) SecondaryButton("Add to party", onClick = { state.toggleParty(owned.uid) }, modifier = full)
+                }
+            }
         } else {
             Text("Not in your party. Catching with ZCubes and the one-way ZPet import are planned.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
         }
@@ -103,7 +124,10 @@ fun ConfirmChallengeDialog(state: AppState, overlay: Overlay.ConfirmChallenge) {
     ZDialog(
         title = "Challenge ${encounter.label}?",
         message = buildString {
-            append("${lead?.creature?.name ?: "Your companion"} (Lv ${lead?.level ?: 1}) vs ${encounter.creature.name} (Lv ${encounter.level}) at ${area.name}. ")
+            val others = state.settings.ownedParty.size - 1
+            append("${lead?.creature?.name ?: "Your companion"} (Lv ${lead?.level ?: 1})")
+            if (others > 0) append(" + $others in reserve")
+            append(" vs ${encounter.creature.name} (Lv ${encounter.level}) at ${area.name}. ")
             append(if (rematch) "Rematches are practice and give no XP." else "First victory: +${encounter.firstWinXp} XP.")
         },
         confirm = "Battle" to { state.startBattle(encounter) },

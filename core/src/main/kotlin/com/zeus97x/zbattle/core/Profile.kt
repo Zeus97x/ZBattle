@@ -20,8 +20,9 @@ data class PlayerSettings(
     val currentArea: Area get() = RegionCatalog.area(currentAreaIndex)
     val displayName: String get() = master?.name ?: "Pet Master"
 
-    /** Owned creatures; the chosen starter until encounters/ZCubes/ZPet import add more. */
-    val ownedParty: List<OwnedCreature> get() = progress.creatures
+    /** Battle party (up to 3, lead first; CLAUDE-005 B2). */
+    val ownedParty: List<OwnedCreature> get() = progress.partyMembers
+    val ownedCreatures: List<OwnedCreature> get() = progress.creatures
     val party: List<Creature> get() = ownedParty.map { it.creature }
 
     /** Makes sure a saved Pet Master owns their starter (new setups and pre-CLAUDE-002 saves). */

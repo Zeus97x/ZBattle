@@ -23,29 +23,49 @@ data class Combatant(
     val fainted: Boolean get() = hp <= 0
 }
 
+/** One party member inside a battle. Skill cooldown belongs to the creature (D-SWITCH-COOLDOWN proposal). */
+data class TeamMember(val uid: Long, val combatant: Combatant, val skillCooldown: Int = 0)
+
 /**
  * A running battle. Pure data: every move returns a new state, so it can be saved after each
  * turn and resumed after the app is closed.
+ *
+ * Party battles (CLAUDE-005 B2, D-PARTY): up to [BattleEngine.PARTY_SIZE] members, one active.
  */
 data class BattleState(
     /** Unique per battle; settlement is accepted only once per id. */
     val battleId: Long,
     val encounterId: String,
-    /** Owned-creature uid fighting for the player. */
-    val playerUid: Long,
-    val player: Combatant,
+    val team: List<TeamMember>,
+    val activeIndex: Int,
     val enemy: Combatant,
     val turn: Int = 0,
-    /** Turns until Skill is ready again (0 = ready). */
-    val skillCooldown: Int = 0,
     val burnTurns: Int = 0,
     val weakenTurns: Int = 0,
+    /** Uids that attacked, used a skill or were switched in during a resolved turn (D-PARTICIPATION). */
+    val participants: Set<Long> = emptySet(),
+    /** The active creature fainted and others can still fight: the player must pick a replacement (free). */
+    val awaitingReplacement: Boolean = false,
     val log: List<String> = emptyList(),
     val outcome: Outcome? = null,
 ) {
+    init {
+        require(team.size in 1..BattleEngine.PARTY_SIZE) { "Party must have 1..${BattleEngine.PARTY_SIZE} members" }
+        require(activeIndex in team.indices) { "Invalid active member" }
+        require(team.map { it.uid }.toSet().size == team.size) { "Duplicate party member" }
+    }
+
+    val active: TeamMember get() = team[activeIndex]
+    val player: Combatant get() = active.combatant
+    val playerUid: Long get() = active.uid
+    val skillCooldown: Int get() = active.skillCooldown
     val over: Boolean get() = outcome != null
-    val skillReady: Boolean get() = skillCooldown == 0 && !over
+    val skillReady: Boolean get() = skillCooldown == 0 && !over && !awaitingReplacement
     val skill: Skill get() = Skills.forFamily(player.creature.family.index)
+
+    /** Members that may be brought in now (alive and not already active). */
+    fun benchIndices(): List<Int> = team.indices.filter { it != activeIndex && !team[it].combatant.fainted }
+    val canSwitch: Boolean get() = !over && !awaitingReplacement && benchIndices().isNotEmpty()
 
     /** ZPet telegraph: every third turn the opponent lands a heavy strike. */
     val enemyIntent: String get() = if ((turn + 1) % 3 == 0) "Heavy strike incoming" else "Steady strike"
@@ -59,22 +79,45 @@ data class BattleState(
  * - Opponent: max(2, power + 4 − guard/2), +5 on every third turn, −3 while weakened.
  * - The faster side acts first; ties go to the player. Burn ticks after the player's hit.
  * - 50-turn limit counts as a defeat.
+ * Party rules (D-PARTY, decided 2026-10-10):
+ * - Switch: uses the player's turn; the opponent then takes its normal turn against the incoming
+ *   creature (no extra free hit). Burn still ticks at the end of that turn.
+ * - When the active creature faints and another can fight, the player picks a replacement. That
+ *   choice costs no turn and the opponent does not act. Defeat only when every member has fainted.
+ * - Skill cooldown is per creature and only counts down on that creature's own Attack turns
+ *   (D-SWITCH-COOLDOWN proposal; the single-creature behaviour is unchanged).
  */
 object BattleEngine {
     const val TURN_LIMIT = 50
     const val SKILL_COOLDOWN = 3
     const val EFFECT_TURNS = 3
     const val EFFECT_AMOUNT = 3
+    const val PARTY_SIZE = 3
 
-    fun start(battleId: Long, encounter: Encounter, playerUid: Long, playerCreatureId: String, playerLevel: Int): BattleState {
-        val creature = CreatureCatalog.require(playerCreatureId)
-        val p = CreatureStats.forCreature(creature, playerLevel)
+    /**
+     * Contract `rulesRevision` for BattleCompleted records (CONTRACT-v0.2). Bump whenever combat rules
+     * change: 1 = CLAUDE-002 single fighter, 2 = CLAUDE-005 B2 party of 3 with switching.
+     */
+    const val RULES_REVISION = "zbattle-rules-2"
+
+    /** A fighter entering battle at full HP (every separate encounter starts fresh, D-REPLAY-REWARDS). */
+    data class Entrant(val uid: Long, val creatureId: String, val level: Int)
+
+    fun start(battleId: Long, encounter: Encounter, playerUid: Long, playerCreatureId: String, playerLevel: Int): BattleState =
+        start(battleId, encounter, listOf(Entrant(playerUid, playerCreatureId, playerLevel)))
+
+    fun start(battleId: Long, encounter: Encounter, party: List<Entrant>): BattleState {
+        val team = party.map { m ->
+            val creature = CreatureCatalog.require(m.creatureId)
+            val p = CreatureStats.forCreature(creature, m.level)
+            TeamMember(m.uid, Combatant(creature.id, m.level, p.maxHp, p.maxHp, p.power, p.guard, p.speed))
+        }
         val e = encounter.stats
         return BattleState(
             battleId = battleId,
             encounterId = encounter.id,
-            playerUid = playerUid,
-            player = Combatant(creature.id, playerLevel, p.maxHp, p.maxHp, p.power, p.guard, p.speed),
+            team = team,
+            activeIndex = 0,
             enemy = Combatant(encounter.creature.id, encounter.level, e.maxHp, e.maxHp, e.power, e.guard, e.speed),
             log = listOf("${encounter.label} appeared!"),
         )
@@ -82,6 +125,7 @@ object BattleEngine {
 
     fun act(state: BattleState, action: BattleAction): BattleState {
         check(!state.over) { "Battle is over" }
+        check(!state.awaitingReplacement) { "Choose a replacement first" }
         if (action == BattleAction.Skill) check(state.skillCooldown == 0) { "Skill is cooling down" }
 
         val turn = state.turn + 1
@@ -104,12 +148,8 @@ object BattleEngine {
             cooldown = maxOf(0, state.skillCooldown - 1)
         }
 
-        var retaliation = maxOf(2, enemy.power + 4 - player.guard / 2)
-        if (turn % 3 == 0) retaliation += 5
-        if (weaken > 0) {
-            retaliation = maxOf(1, retaliation - EFFECT_AMOUNT)
-            weaken--
-        }
+        val (retaliation, weakenAfter) = retaliation(enemy, player, turn, weaken)
+        weaken = weakenAfter
 
         var playerHp = player.hp
         var enemyHp = enemy.hp
@@ -122,7 +162,8 @@ object BattleEngine {
         }
 
         if (enemyFirst) enemyStrikes()
-        if (playerHp > 0) {
+        val acted = playerHp > 0
+        if (acted) {
             enemyHp = maxOf(0, enemyHp - hit)
             lines += "${player.creature.name} uses $moveName for $hit."
             if (action == BattleAction.Skill) lines += "${enemy.creature.name} is affected by ${skill.effect.label}."
@@ -134,25 +175,92 @@ object BattleEngine {
             if (!enemyFirst && enemyHp > 0) enemyStrikes()
         }
 
+        // A creature knocked out before it moves spends no cooldown and applies no effect (matters
+        // once a replacement keeps the battle going; single-creature battles end here anyway).
+        val finalCooldown = if (acted) cooldown else state.skillCooldown
+        if (!acted) {
+            burn = state.burnTurns
+            weaken = maxOf(0, state.weakenTurns - 1)
+        }
+        val team = state.team.toMutableList()
+        team[state.activeIndex] = state.active.copy(combatant = player.copy(hp = playerHp), skillCooldown = finalCooldown)
+        return finishTurn(state, team, turn, enemy.copy(hp = enemyHp), burn, weaken, lines, if (acted) state.participants + state.playerUid else state.participants)
+    }
+
+    /** Brings in bench member [toIndex]. Costs the player's turn; the opponent takes its normal turn. */
+    fun switch(state: BattleState, toIndex: Int): BattleState {
+        check(!state.over) { "Battle is over" }
+        check(!state.awaitingReplacement) { "Choose a replacement instead" }
+        check(toIndex in state.benchIndices()) { "That creature cannot switch in" }
+        val turn = state.turn + 1
+        val incoming = state.team[toIndex]
+        val lines = mutableListOf("${state.player.creature.name} swaps out for ${incoming.combatant.creature.name}.")
+        val (hit, weaken) = retaliation(state.enemy, incoming.combatant, turn, state.weakenTurns)
+        val incomingHp = maxOf(0, incoming.combatant.hp - hit)
+        lines += "${state.enemy.creature.name} hits for $hit."
+        var enemyHp = state.enemy.hp
+        var burn = state.burnTurns
+        if (burn > 0) {
+            enemyHp = maxOf(0, enemyHp - EFFECT_AMOUNT)
+            burn--
+            lines += "Burn deals $EFFECT_AMOUNT."
+        }
+        val team = state.team.toMutableList()
+        team[toIndex] = incoming.copy(combatant = incoming.combatant.copy(hp = incomingHp))
+        val switched = state.copy(activeIndex = toIndex)
+        return finishTurn(switched, team, turn, state.enemy.copy(hp = enemyHp), burn, weaken, lines, state.participants + incoming.uid)
+    }
+
+    /** Replaces a fainted active creature. No turn passes and the opponent does not act. */
+    fun replace(state: BattleState, toIndex: Int): BattleState {
+        check(!state.over) { "Battle is over" }
+        check(state.awaitingReplacement) { "Nothing to replace" }
+        check(toIndex in state.benchIndices()) { "That creature cannot come in" }
+        val name = state.team[toIndex].combatant.creature.name
+        return state.copy(activeIndex = toIndex, awaitingReplacement = false, log = (state.log + "Go, $name!").takeLast(LOG_LIMIT))
+    }
+
+    private fun retaliation(enemy: Combatant, target: Combatant, turn: Int, weakenTurns: Int): Pair<Int, Int> {
+        var hit = maxOf(2, enemy.power + 4 - target.guard / 2)
+        if (turn % 3 == 0) hit += 5
+        var weaken = weakenTurns
+        if (weaken > 0) {
+            hit = maxOf(1, hit - EFFECT_AMOUNT)
+            weaken--
+        }
+        return hit to weaken
+    }
+
+    private fun finishTurn(
+        state: BattleState,
+        team: List<TeamMember>,
+        turn: Int,
+        enemy: Combatant,
+        burn: Int,
+        weaken: Int,
+        lines: MutableList<String>,
+        participants: Set<Long>,
+    ): BattleState {
+        val active = team[state.activeIndex].combatant
+        val anyStanding = team.any { !it.combatant.fainted }
         val outcome = when {
-            enemyHp <= 0 -> Outcome.Victory
-            playerHp <= 0 -> Outcome.Defeat
+            enemy.hp <= 0 -> Outcome.Victory
+            !anyStanding -> Outcome.Defeat
             turn >= TURN_LIMIT -> Outcome.Defeat.also { lines += "Turn limit reached." }
             else -> null
         }
-        when (outcome) {
-            Outcome.Victory -> lines += "${enemy.creature.name} fainted. You win!"
-            Outcome.Defeat -> if (playerHp <= 0) lines += "${player.creature.name} fainted."
-            else -> Unit
-        }
-
+        if (active.fainted) lines += "${active.creature.name} fainted."
+        if (outcome == Outcome.Victory) lines += "${enemy.creature.name} fainted. You win!"
+        val needsReplacement = outcome == null && active.fainted
+        if (needsReplacement) lines += "Choose who fights next."
         return state.copy(
+            team = team,
             turn = turn,
-            player = player.copy(hp = playerHp),
-            enemy = enemy.copy(hp = enemyHp),
-            skillCooldown = cooldown,
+            enemy = enemy,
             burnTurns = burn,
             weakenTurns = weaken,
+            participants = participants,
+            awaitingReplacement = needsReplacement,
             log = (state.log + "Turn $turn").plus(lines).takeLast(LOG_LIMIT),
             outcome = outcome,
         )
