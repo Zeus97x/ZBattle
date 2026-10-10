@@ -90,3 +90,4 @@ Copy this template for a new dated entry; replace every placeholder with facts.
   - Docs: `README.md` build section, `preview/README.md`, `docs/screenshots/claude-001/` (23 downscaled renders + provenance note), task status, `ai/README.md`, handoff marked superseded.
 - Verification: `./gradlew -p preview test` — 25 tests passed; 42 renders inspected at 412dp/360dp, 1.3× font and light mode. Android sources were not compiled locally (dl.google.com blocked in this session); CI result recorded next.
 - Next step: open the PR, read CI, fix any Android compile/lint differences between Compose 1.5 (harness) and BOM 2024.12.01 (app).
+- CI fix (same day): first run of `verify` failed in `android-actions/setup-android@v3` ("Failed to find package 'tools'") before Gradle started. Removed that step from `.github/workflows/android-ui.yml`; GitHub's ubuntu-latest image already provides the Android SDK via `ANDROID_HOME`.
