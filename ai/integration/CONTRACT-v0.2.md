@@ -97,4 +97,4 @@ Both repositories must hold byte-identical `schemas/` and `fixtures/` (checked b
 - Owner-scoped transport and two-account isolation.
 - No backend deployment is authorised by this document.
 
-Pending decisions with owners will be listed in `DECISIONS.md` (added in A3).
+Pending decisions with owners are listed in [DECISIONS.md](DECISIONS.md).

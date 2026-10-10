@@ -23,3 +23,8 @@ Validation: two-account isolation, two-device simultaneous claims, interrupted d
 Use focused feature branches and small PRs in the specified order. Record source paths, rule/config revision, actual validation, unavailable device checks, recovery/migration notes and next step in DEVELOPMENT_LOG.md and task status. Link the ZPet counterpart commit/hash where needed.
 ChatGPT exclusively creates/edits artwork after user approval; Claude integrates existing approved assets only. No invented final gameplay data. No cross-repository writes, auto-merge, release or backend deployment without explicit authorization.
 Pause for review at each phase boundary. Later tasks are queued plans, not permission to silently fill unresolved balancing decisions. Return a concise implementation summary for ChatGPT.
+
+## Phase A outcome (CLAUDE-004, 2026-10-10)
+- **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-NATIVE-SPECIES and D-CONTRACT-ACCEPT (D1), D-ORIGIN-ROUNDING (D2), D-BACKEND (D3/D4), D-OFFLINE-TRUST (D5).
+- **Bounded scope:** D1 implements the BattleProgress v2 save with `companionId` (see `fixtures/migration/`) once D-CONTRACT-ACCEPT is met. D2 needs a ZPet bond producer (gap G4) and D-ORIGIN-ROUNDING. D3 is a read-only backend audit before any plan; no deployment.
+- **Contract impact:** implements rules R1–R12 server-side; `tools/validate_contract.py` sequences are the acceptance tests. See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).

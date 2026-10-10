@@ -24,3 +24,8 @@ Validation: exact probability tree/table boundaries with injected RNG, inventory
 Use focused feature branches and small PRs in the specified order. Record source paths, rule/config revision, actual validation, unavailable device checks, recovery/migration notes and next step in DEVELOPMENT_LOG.md and task status. Link the ZPet counterpart commit/hash where needed.
 ChatGPT exclusively creates/edits artwork after user approval; Claude integrates existing approved assets only. No invented final gameplay data. No cross-repository writes, auto-merge, release or backend deployment without explicit authorization.
 Pause for review at each phase boundary. Later tasks are queued plans, not permission to silently fill unresolved balancing decisions. Return a concise implementation summary for ChatGPT.
+
+## Phase A outcome (CLAUDE-004, 2026-10-10)
+- **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-ECONOMY (C1/C2), D-RARITY (C2/C3), D-WEEK-WINDOW (C4), D-EXCLUSIVE-POOL (C5), D-OFFLINE-TRUST (timers).
+- **Bounded scope:** C1 inventory and ledger can be built without prices. C2/C3 need D-RARITY and D-ECONOMY. C4 needs D-WEEK-WINDOW. C5 stays unavailable until D-EXCLUSIVE-POOL is defined.
+- **Contract impact:** BossState and RewardRedeemed schemas (v0.2). Rolls persisted once per `deliveryId` (rule R12); no re-roll on retry. See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).

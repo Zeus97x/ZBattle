@@ -22,3 +22,8 @@ Validation: status stacking, turn order, duo attribution, restart/resume, effect
 Use focused feature branches and small PRs in the specified order. Record source paths, rule/config revision, actual validation, unavailable device checks, recovery/migration notes and next step in DEVELOPMENT_LOG.md and task status. Link the ZPet counterpart commit/hash where needed.
 ChatGPT exclusively creates/edits artwork after user approval; Claude integrates existing approved assets only. No invented final gameplay data. No cross-repository writes, auto-merge, release or backend deployment without explicit authorization.
 Pause for review at each phase boundary. Later tasks are queued plans, not permission to silently fill unresolved balancing decisions. Return a concise implementation summary for ChatGPT.
+
+## Phase A outcome (CLAUDE-004, 2026-10-10)
+- **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-ADV-COMBAT (F1–F3), D-ELEMENT (weather and element effects).
+- **Bounded scope:** Nothing in F starts before Phase B core is stable and D-ADV-COMBAT values are approved. Double battles stay deferred until F1 is explicitly activated.
+- **Contract impact:** personality and friendship inputs need new ZPet record types (a future contract revision). See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).

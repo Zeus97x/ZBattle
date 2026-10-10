@@ -313,3 +313,24 @@ Remaining work:
   - A Maven JSON-schema dependency was not added; Maven Central rate-limited this session and the Python validator covers it in CI.
 - Gaps: the ZPet-side `pet-N` save fixture belongs to the ZPet project; the v2 ZBattle save is Phase D1.
 - Next: A3, the hash handoff to ZPet, the decision register with owners, and bounded B–G tasks.
+
+## 2026-10-10 — CLAUDE-004 A3: decisions, ZPet hash handoff, bounded B–G (Claude) — Phase A returned for review
+- Status: Phase A complete on the ZBattle side and returned as a PR. CLAUDE-004 → REVIEW. The phase gate is open until Zeus97x and the ZPet owner accept the contract (D-CONTRACT-ACCEPT). Claude stops here before Phase B, as instructed.
+- Changes:
+  - `ai/integration/DECISIONS.md` (new): 20 open decisions, each with evidence, a proposal where justified, an owner and the phases it blocks. No gameplay values were invented.
+  - `ai/integration/CONTRACT-BUNDLE.sha256`: `afc3a8de1367e1ffa0d684463ed81ddb020ccc18cbbc51f36146e6202a83e2c4` over 44 files (contract v0.2, schemas, fixtures); verified by `tools/validate_contract.py`.
+  - `ai/integration/ZPET-HANDOFF-A3.md` (new): what the ZPet owner must do — mirror byte-identical, confirm the hash, add a real ZPet `pet-N` migration fixture, answer the ZPet-owned decisions, report back the commit and hash.
+  - `ai/tasks/CLAUDE-005` to `CLAUDE-010`: "Phase A outcome" sections with blocking decisions, bounded scope and contract impact.
+  - `ai/tasks/CLAUDE-004`: progress and acceptance table.
+  - `ai/CROSS_APP_ROADMAP.md`: pointer to the register and contract v0.2.
+  - `ai/README.md`: links and status.
+  - CONTRACT-v0.2 now links `DECISIONS.md`.
+- Verification:
+  - `python3 tools/validate_contract.py` → OK, bundle hash matches.
+  - `python3 tools/check_doc_links.py` → OK.
+  - `./gradlew -p preview test` → passed.
+  - No device checks were needed (docs and fixtures only).
+- Not done or blocked:
+  - No ZPet copy or ZPet commit exists; ZPet is not writable from this task.
+  - No GitHub PR state API (session errors during the audit).
+- Next step: Zeus97x reviews the Phase A PR and the decision register, and the ZPet owner mirrors the bundle. After D-CONTRACT-ACCEPT and the B decisions (D-AUTO-FIGHT first), Claude starts CLAUDE-005 B1.

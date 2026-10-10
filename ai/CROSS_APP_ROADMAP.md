@@ -29,6 +29,8 @@ Integration introduces narrowly scoped battle event delivery to ZPet; it superse
 ChatGPT: all image/art creation or editing, design and review. Claude: source implementation and integration of approved art. Codex: optional separately assigned testing/debugging, not automatic parallel ownership.
 
 ## Decisions register
+> Phase A turned this list into an owned register: [integration/DECISIONS.md](integration/DECISIONS.md). The contract is now [integration/CONTRACT-v0.2.md](integration/CONTRACT-v0.2.md).
+
 - Rarity mapping proposed: Common/Common, Heroic/Rare, Mythic/Epic, Celestial/Legendary. Preserve IDs; not approved yet.
 - Campaign counts, exact roster per location, unlock rules and repeat XP/coins/tickets remain unresolved.
 - Bond earning and percentage migration belong to ZPet; the existing First bond quest is not percentage bonding.

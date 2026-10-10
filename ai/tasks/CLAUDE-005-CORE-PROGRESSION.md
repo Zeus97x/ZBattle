@@ -23,3 +23,8 @@ Validation: deterministic manual/auto equivalence, interruption/restart, turn ca
 Use focused feature branches and small PRs in the specified order. Record source paths, rule/config revision, actual validation, unavailable device checks, recovery/migration notes and next step in DEVELOPMENT_LOG.md and task status. Link the ZPet counterpart commit/hash where needed.
 ChatGPT exclusively creates/edits artwork after user approval; Claude integrates existing approved assets only. No invented final gameplay data. No cross-repository writes, auto-merge, release or backend deployment without explicit authorization.
 Pause for review at each phase boundary. Later tasks are queued plans, not permission to silently fill unresolved balancing decisions. Return a concise implementation summary for ChatGPT.
+
+## Phase A outcome (CLAUDE-004, 2026-10-10)
+- **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-AUTO-FIGHT (B1), D-PARTY (B2), D-EVOLUTION (B3), D-CAMPAIGN (B4), D-REPLAY-REWARDS (B5).
+- **Bounded scope:** B1 can start once D-AUTO-FIGHT is approved; it reuses `BattleEngine` unchanged. B2 needs D-PARTY. B3 needs D-EVOLUTION. B4 needs approved campaign content (D-CAMPAIGN); no invented rosters. B5 needs D-REPLAY-REWARDS.
+- **Contract impact:** party battles must emit up to 6 `participantCompanionIds` (BattleCompleted schema). Keep `rulesRevision` as `zbattle-rules-N` and bump it whenever combat rules change. See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).

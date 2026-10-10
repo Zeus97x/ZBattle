@@ -1,6 +1,6 @@
 # CLAUDE-004 — Phase A: Audit and finalize shared contract
 Updated 2026-10-10 America/Toronto.
-Owner: Claude. Status: IN PROGRESS — documentation and fixtures only.
+Owner: Claude. Status: REVIEW — Phase A complete on Claude's side and returned as a PR; the Phase A gate waits on Zeus97x and the ZPet owner (D-CONTRACT-ACCEPT).
 Claim fields:
 - **Branch:** `claude/zbattle-phase-a-contract`.
 - **Base:** PR #8 head `a304c72` (contains ZBattle main `d2f938d`).
@@ -34,3 +34,19 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
   - `fixtures/`: 31 records (20 valid, 10 schema-invalid, 1 unknown-version) and 12 sequence scenarios (`manifest.json`).
   - `fixtures/migration/`: a real ZBattle v1 save (golden file) plus the proposed uid → companionId mapping.
   - Reference rule checker `tools/validate_contract.py` (rules R1–R12) and `tools/check_doc_links.py`, both run in CI.
+- A3 (2026-10-10): decision register written (`ai/integration/DECISIONS.md`, 20 decisions, each with an owner and the phase it blocks). Bundle hash recorded in `ai/integration/CONTRACT-BUNDLE.sha256` (`afc3a8de…`) and the ZPet hash handoff in `ai/integration/ZPET-HANDOFF-A3.md`. CLAUDE-005 to CLAUDE-010 each got a bounded "Phase A outcome" section.
+
+## Acceptance status
+| Criterion | Status |
+|---|---|
+| Both owners review identical fixtures | **Pending.** The ZBattle side is ready (hash recorded); the ZPet copy does not exist yet. |
+| No fabricated IDs/names | Met. Catalogue ids are real; fixture UUIDs are synthetic and labelled; illustrative values are flagged. |
+| No accidental evolution/XP authority sharing | Met. Authority table in v0.2 §2, plus rules R4 and R11. |
+| IDs survive reimport | Met for the rules (sequences S2/S3). The real UUID assignment is Phase D1 (ZBattle) and ZPet-owned (ZPet). |
+| Every pending decision has an owner | Met (`DECISIONS.md`). |
+| No gameplay or deployed backend change | Met. |
+
+**Gaps:**
+- No ZPet `pet-N` save fixture; that belongs to the ZPet owner.
+- No v2 ZBattle save yet (D1).
+- The GitHub PR API was unavailable during the audit, so PR states come from git refs.

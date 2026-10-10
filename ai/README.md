@@ -4,13 +4,13 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 
 ## Cross-app A–G queue
 
-[Full roadmap](CROSS_APP_ROADMAP.md) · [Draft contract](integration/CONTRACT-v0.1.md) · [ZPet counterpart handoff](integration/ZPET-COUNTERPART-HANDOFF.md)
+[Full roadmap](CROSS_APP_ROADMAP.md) · [Contract v0.2 draft](integration/CONTRACT-v0.2.md) · [Decisions](integration/DECISIONS.md) · [ZPet A3 handoff](integration/ZPET-HANDOFF-A3.md) · [v0.1](integration/CONTRACT-v0.1.md) · [ZPet counterpart handoff](integration/ZPET-COUNTERPART-HANDOFF.md)
 
 Claude owns implementation-heavy work. ChatGPT owns design/artwork/coordination. Phase A is ready for documentation/fixture work; later phases wait on dependencies and unresolved decisions. Check in after every phase.
 
 | Phase | Task | Status |
 |---|---|---|
-| A | [CLAUDE-004](tasks/CLAUDE-004-CONTRACT-AUDIT.md) | In progress (Claude, branch claude/zbattle-phase-a-contract) |
+| A | [CLAUDE-004](tasks/CLAUDE-004-CONTRACT-AUDIT.md) | Review: contract v0.2 + fixtures; awaiting Zeus97x and ZPet owner (D-CONTRACT-ACCEPT) |
 | B | [CLAUDE-005](tasks/CLAUDE-005-CORE-PROGRESSION.md) | Queued: core/auto battle/campaign |
 | C | [CLAUDE-006](tasks/CLAUDE-006-BOSS-REWARDS.md) | Queued: economy/tickets/mystical bosses |
 | D | [CLAUDE-007](tasks/CLAUDE-007-CROSS-APP-BRIDGE.md) | Queued: origin/bond/inbox |
