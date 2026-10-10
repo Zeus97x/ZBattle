@@ -34,6 +34,8 @@ import com.zeus97x.zbattle.core.PreviewContent
 import com.zeus97x.zbattle.core.RegionCatalog
 import com.zeus97x.zbattle.core.Route
 import com.zeus97x.zbattle.core.TravelRules
+import com.zeus97x.zbattle.core.battle.Encounters
+import com.zeus97x.zbattle.core.battle.Skills
 
 /** Shows only catalogue facts; unknown stats are omitted rather than invented. */
 @Composable
@@ -54,7 +56,22 @@ fun CreatureDetailSheet(state: AppState, creatureId: String) {
         DetailLine("Tradition", creature.family.tradition)
         DetailLine("Evolution line", creature.family.forms.joinToString(" · "))
         Text(creature.family.lore, style = MaterialTheme.typography.bodyLarge, color = p.textPrimary)
-        Text("Battle stats, levels and ownership are not defined yet and are intentionally not shown.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+        val owned = state.settings.progress.ownsSpecies(creature.id)
+        if (owned != null) {
+            val stats = owned.stats
+            val skill = Skills.forFamily(creature.family.index)
+            Text("Your companion · Level ${owned.level}", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
+            XpRow(owned.xp)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Pill("HP ${stats.maxHp}")
+                Pill("Power ${stats.power}")
+                Pill("Guard ${stats.guard}")
+                Pill("Speed ${stats.speed}")
+            }
+            DetailLine("Skill", "${skill.name} · ${skill.effect.label}")
+        } else {
+            Text("Not in your party. Catching with ZCubes and the one-way ZPet import are planned.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+        }
     }
 }
 
@@ -70,11 +87,26 @@ private fun DetailLine(label: String, value: String) {
 @Composable
 fun ConfirmChallengeDialog(state: AppState, overlay: Overlay.ConfirmChallenge) {
     val area = RegionCatalog.area(overlay.areaIndex)
-    val opponent = PreviewContent.opponents(area)[overlay.opponentSlot]
+    val encounter = Encounters.find(overlay.areaIndex, overlay.opponentSlot)
+    if (encounter == null) {
+        val opponent = PreviewContent.opponents(area)[overlay.opponentSlot]
+        ZDialog(
+            title = "${opponent.label} is a preview",
+            message = "This opponent has no battle yet. Real battles start with Wild Voltmaw at Olympian Foothills; rosters for every area arrive in a later task.",
+            confirm = "OK" to state::dismissOverlay,
+            onDismissRequest = state::dismissOverlay,
+        )
+        return
+    }
+    val lead = state.settings.ownedParty.firstOrNull()
+    val rematch = encounter.id in state.settings.progress.defeated
     ZDialog(
-        title = "Challenge ${opponent.label}?",
-        message = "Opens the battle preview at ${area.name}. No results, rewards or unlocks are recorded.",
-        confirm = "Start preview" to { state.navigate(Route.Battle(overlay.areaIndex, overlay.opponentSlot)) },
+        title = "Challenge ${encounter.label}?",
+        message = buildString {
+            append("${lead?.creature?.name ?: "Your companion"} (Lv ${lead?.level ?: 1}) vs ${encounter.creature.name} (Lv ${encounter.level}) at ${area.name}. ")
+            append(if (rematch) "Rematches are practice and give no XP." else "First victory: +${encounter.firstWinXp} XP.")
+        },
+        confirm = "Battle" to { state.startBattle(encounter) },
         dismiss = "Cancel" to state::dismissOverlay,
         onDismissRequest = state::dismissOverlay,
     )
@@ -84,8 +116,8 @@ fun ConfirmChallengeDialog(state: AppState, overlay: Overlay.ConfirmChallenge) {
 fun ConfirmRetreatDialog(state: AppState) {
     ZDialog(
         title = "Retreat from battle?",
-        message = "You will return to the challenge list. Nothing is lost in the preview.",
-        confirm = "Retreat" to { state.popTo { it is Route.Challenges } },
+        message = "Retreating ends this battle with no rewards. You can challenge again any time.",
+        confirm = "Retreat" to { state.retreatBattle() },
         dismiss = "Keep battling" to state::dismissOverlay,
         onDismissRequest = state::dismissOverlay,
     )

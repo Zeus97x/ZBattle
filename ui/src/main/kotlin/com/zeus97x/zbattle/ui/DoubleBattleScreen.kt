@@ -49,7 +49,7 @@ fun DoubleBattleScreen(state: AppState, areaIndex: Int) {
                         Text("Two creatures per side", style = MaterialTheme.typography.titleMedium, color = p.textPrimary, modifier = Modifier.weight(1f))
                         PreviewBadge()
                     }
-                    Text("Both of your lead creatures act each turn against two opponents. Rules, turn order and rewards are planned for the battle-engine task.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+                    Text("Double battles are deferred. Single battles come first; two-versus-two rules, rewards and progress are not built.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
                 }
             }
         }
@@ -104,7 +104,7 @@ fun DoubleBattleScreen(state: AppState, areaIndex: Int) {
         item {
             PrimaryButton(
                 "Challenge",
-                onClick = { state.show(Overlay.Notice("Double battles are planned", "The double-battle engine is not built yet. This screen previews the layout only; no battle, rewards or progress are recorded.")) },
+                onClick = { state.show(Overlay.Notice("Double battles are deferred", "Double battles are deferred until after single battles. This screen previews the layout only; no battle, rewards or progress are recorded.")) },
                 icon = Icons.Filled.Groups,
                 modifier = Modifier.padding(horizontal = Dimens.screenPadding).fillMaxWidth(),
             )

@@ -15,7 +15,7 @@ class PetMasterTest {
         for (style in MasterStyle.entries) for (gender in MasterGender.entries) for (starter in Starters.creatures) {
             val master = assertNotNull(PetMaster.create(" Zeus97x ", style, gender, starter.id))
             assertEquals("Zeus97x", master.name)
-            assertEquals(listOf(starter), PlayerSettings(master = master).party)
+            assertEquals(listOf(starter), PlayerSettings(master = master).withSeededStarter().party)
             count++
         }
         assertEquals(30, count)
