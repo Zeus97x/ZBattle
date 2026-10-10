@@ -637,3 +637,4 @@ Remaining work:
   - `05-battle` renders checked at 360dp with 100% and 130% text.
   - The item picker is not rendered: it is local UI state the harness cannot open.
 - Next: equipment slot.
+- CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
