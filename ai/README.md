@@ -10,7 +10,7 @@ Claude owns implementation-heavy work. ChatGPT owns design/artwork/coordination.
 
 | Phase | Task | Status |
 |---|---|---|
-| A | [CLAUDE-004](tasks/CLAUDE-004-CONTRACT-AUDIT.md) | Ready: audit/contracts |
+| A | [CLAUDE-004](tasks/CLAUDE-004-CONTRACT-AUDIT.md) | In progress (Claude, branch claude/zbattle-phase-a-contract) |
 | B | [CLAUDE-005](tasks/CLAUDE-005-CORE-PROGRESSION.md) | Queued: core/auto battle/campaign |
 | C | [CLAUDE-006](tasks/CLAUDE-006-BOSS-REWARDS.md) | Queued: economy/tickets/mystical bosses |
 | D | [CLAUDE-007](tasks/CLAUDE-007-CROSS-APP-BRIDGE.md) | Queued: origin/bond/inbox |

@@ -274,3 +274,19 @@ Remaining work:
 - Narrow battle-event delivery proposal supersedes old blanket no-reverse-writes only for approved expedition events; no full ZPet save writes.
 - Verification: docs reconciled with retrieved current source; all create/update responses inspected. Contract examples/schema implementation and executable checks assigned to Phase A; docs-only PR, no new app tests, artwork, deployment, merge or release.
 - Resume: Claude claims CLAUDE-004 against current main/planning branch, finalizes reviewed contract/fixtures and returns Phase A checkpoint before B. ZPet project publishes its own reviewed counterpart copy.
+
+## 2026-10-10 — CLAUDE-004 Phase A claimed; A1 evidence audit (Claude)
+- Status: in progress on `claude/zbattle-phase-a-contract`, based on PR #8 head `a304c72`, which contains main `d2f938d`. Documentation only.
+- Request: Zeus97x asked Claude to start from PR #8, claim CLAUDE-004, complete Phase A, and stop for review before Phase B.
+- A1 work:
+  - Read ZBattle core, battle, save and app storage code.
+  - Cloned ZPet main `1adcedb` read-only and read `WorldState`, `ProgressStore`, `Progression`, `SpeciesCatalog`, `MonsterCatalog`, `PrototypeState`, `AdventureState`, `PortableSave`, `CloudClient`, `BranchPalette`, `StepAccounting`/`StepStore` and `backend/{schema,expansion}.sql`, `index.ts`. No ZPet file was changed.
+  - Wrote `ai/integration/AUDIT-A1.md`: implemented vs missing for both apps, 8 contract gaps (G1–G8), and active PRs with owners.
+- Key findings:
+  - ZPet companion ids are `pet-N` per-save counters and ZBattle ids are `Long` counters, so neither is globally unique.
+  - ZPet has no bond percentage and neither app has element metadata.
+  - Client battles and steps are not server-verified.
+  - ZPet cloud saves are whole-world blobs with optimistic revisions, and ranked play already uses `request_id` idempotency.
+- Correction: `ai/ZCUBES_PLAN.md` wrongly described ZPet `BranchPalette` as species-variant colouring; it tints Branch-B forms only. Fixed.
+- Verification: findings cite source files at the stated commits. The GitHub PR API returned "invalid session", so PR states come from git refs and earlier reports.
+- Next: A2 (schemas, fixtures, authority/error/compatibility tables).

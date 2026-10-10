@@ -1,7 +1,12 @@
 # CLAUDE-004 — Phase A: Audit and finalize shared contract
 Updated 2026-10-10 America/Toronto.
-Owner: Claude (unclaimed). Status: Ready — documentation/fixtures only.
-Claim fields: implementation branch, base commit, start time, subtask owner and current PR — fill before edits.
+Owner: Claude. Status: IN PROGRESS — documentation and fixtures only.
+Claim fields:
+- **Branch:** `claude/zbattle-phase-a-contract`.
+- **Base:** PR #8 head `a304c72` (contains ZBattle main `d2f938d`).
+- **Started:** 2026-10-10 ~00:05 America/Toronto.
+- **Subtasks:** A1, A2 and A3, all by Claude.
+- **PR:** pending.
 
 ## Read first
 AGENTS.md, DEVELOPMENT_LOG.md, ai/README.md, ai/CROSS_APP_ROADMAP.md, ai/integration/CONTRACT-v0.1.md and relevant preceding task summaries. Inspect latest main and active PRs; never overwrite concurrent changes.
@@ -21,3 +26,6 @@ Validation: schema fixture validation, sample old/new migration roundtrips where
 Use focused feature branches and small PRs in the specified order. Record source paths, rule/config revision, actual validation, unavailable device checks, recovery/migration notes and next step in DEVELOPMENT_LOG.md and task status. Link the ZPet counterpart commit/hash where needed.
 ChatGPT exclusively creates/edits artwork after user approval; Claude integrates existing approved assets only. No invented final gameplay data. No cross-repository writes, auto-merge, release or backend deployment without explicit authorization.
 Pause for review at each phase boundary. Later tasks are queued plans, not permission to silently fill unresolved balancing decisions. Return a concise implementation summary for ChatGPT.
+
+## Progress
+- A1 (2026-10-10): evidence audit written in `ai/integration/AUDIT-A1.md`. ZBattle main `d2f938d` and ZPet main `1adcedb` were read; ZPet was cloned read-only. 8 contract gaps found (G1–G8). The BranchPalette description in `ai/ZCUBES_PLAN.md` was corrected.

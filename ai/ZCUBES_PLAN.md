@@ -25,7 +25,7 @@ ChatGPT owns the visual design. The design should read as one family of cubes, w
   | 1 | 65% | 27% | 8% | — |
   | 2–3 | 50% | 32% | 15% | 3% |
 
-- **Visuals:** the variants reuse family art with a colour matrix. ZPet's `BranchPalette.java` now exists in ZPet `main`; it is not yet copied into `ZBattle-ZPet-Assets/reference/`.
+- **Visuals:** the variants reuse family art. ZPet displays them by species name and rarity. ZPet's `BranchPalette.java` tints **Branch-B evolution forms** (display only); it is not the species-variant colouring. Corrected in CLAUDE-004 A1; see `ai/integration/AUDIT-A1.md`.
 
 ## Proposed rules (for approval; not implemented)
 - Catching happens from a won or weakened wild encounter. Bosses cannot be caught.
@@ -37,4 +37,4 @@ ChatGPT owns the visual design. The design should read as one family of cubes, w
 1. The final name of tier 4.
 2. How ZCubes are obtained: shop price, battle drops, or both. This depends on the economy task.
 3. Whether a failed catch ends the encounter.
-4. Whether to use ZPet's species-variant rarity system, which needs `BranchPalette` copied in as a reference.
+4. Whether to use ZPet's species-variant rarity system (species ids `family:rarity`) for caught creatures.
