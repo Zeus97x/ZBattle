@@ -1,0 +1,263 @@
+{
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "note": "Fixture identifiers are synthetic (00000000-0000-4000-8000-...). Reward tiers, quantities, durations and boss ids are illustrative, not approved values.",
+  "records": {
+    "battle-area-group-mismatch": "SCHEMA_VALID",
+    "battle-produced-by-zpet": "SCHEMA_VALID",
+    "battle-victory-settled": "SCHEMA_VALID",
+    "battle-victory-unverified": "SCHEMA_VALID",
+    "boss-state": "SCHEMA_VALID",
+    "companion-bonded-correction-r4": "SCHEMA_VALID",
+    "companion-bonded-r3": "SCHEMA_VALID",
+    "companion-bonded-stale-bond-r5": "SCHEMA_VALID",
+    "companion-duplicate-species-a": "SCHEMA_VALID",
+    "companion-duplicate-species-b": "SCHEMA_VALID",
+    "companion-form-regression-r3": "SCHEMA_VALID",
+    "companion-zbattle-native": "SCHEMA_VALID",
+    "companion-zpet-imported-r1": "SCHEMA_VALID",
+    "companion-zpet-imported-r2": "SCHEMA_VALID",
+    "expedition-running": "SCHEMA_VALID",
+    "invalid-bond-over-100": "REJECT_SCHEMA",
+    "invalid-branch-mismatch": "REJECT_SCHEMA",
+    "invalid-empty-participants": "REJECT_SCHEMA",
+    "invalid-legacy-id-origin-mismatch": "REJECT_SCHEMA",
+    "invalid-lineage-combat-stat": "REJECT_SCHEMA",
+    "invalid-settled-without-ref": "REJECT_SCHEMA",
+    "invalid-species-out-of-range": "REJECT_SCHEMA",
+    "invalid-ticket-without-tier": "REJECT_SCHEMA",
+    "invalid-unknown-record-type": "REJECT_SCHEMA",
+    "invalid-uppercase-uuid": "REJECT_SCHEMA",
+    "lineage-snapshot": "SCHEMA_VALID",
+    "reward-earned": "SCHEMA_VALID",
+    "reward-earned-retry-changed-payload": "SCHEMA_VALID",
+    "reward-redeem-rejected": "SCHEMA_VALID",
+    "reward-redeemed": "SCHEMA_VALID",
+    "unknown-schema-version": "UPDATE_REQUIRED"
+  },
+  "sequences": [
+    {
+      "id": "S1-reward-retry",
+      "purpose": "Retry reuses eventId with a frozen payload; a changed payload under the same eventId is rejected.",
+      "steps": [
+        {
+          "record": "reward-earned",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "reward-earned",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "DUPLICATE_IGNORED"
+        },
+        {
+          "record": "reward-earned-retry-changed-payload",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "REJECT_REPLAY_MISMATCH"
+        }
+      ]
+    },
+    {
+      "id": "S2-stale-revision",
+      "purpose": "An older revision arriving late cannot overwrite a newer one (evolution cannot revert).",
+      "steps": [
+        {
+          "record": "companion-zpet-imported-r2",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "companion-zpet-imported-r1",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "REJECT_STALE_REVISION"
+        }
+      ],
+      "final": {
+        "companions": 1,
+        "companion": {
+          "id": "00000000-0000-4000-8000-0000000c0001",
+          "formIndex": 1,
+          "nickname": "Fixture Nick",
+          "recordRevision": 2
+        }
+      }
+    },
+    {
+      "id": "S3-reimport-same-individual",
+      "purpose": "Reimport updates the same individual; never clones.",
+      "steps": [
+        {
+          "record": "companion-zpet-imported-r1",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "companion-zpet-imported-r2",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        }
+      ],
+      "final": {
+        "companions": 1,
+        "companion": {
+          "id": "00000000-0000-4000-8000-0000000c0001",
+          "formIndex": 1,
+          "nickname": "Fixture Nick",
+          "recordRevision": 2
+        }
+      }
+    },
+    {
+      "id": "S4-foreign-account",
+      "purpose": "accountId in the body must match the authenticated principal.",
+      "steps": [
+        {
+          "record": "companion-zpet-imported-r1",
+          "as": "00000000-0000-4000-8000-0000000a0002",
+          "expect": "REJECT_ACCOUNT_MISMATCH"
+        }
+      ]
+    },
+    {
+      "id": "S5-producer-authority",
+      "purpose": "Only ZBattle produces battle results; snapshots come from their origin app.",
+      "steps": [
+        {
+          "record": "battle-produced-by-zpet",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "REJECT_PRODUCER"
+        }
+      ]
+    },
+    {
+      "id": "S6-duplicate-species-distinct",
+      "purpose": "Two companions of the same species are two individuals.",
+      "steps": [
+        {
+          "record": "companion-duplicate-species-a",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "companion-duplicate-species-b",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        }
+      ],
+      "final": {
+        "companions": 2
+      }
+    },
+    {
+      "id": "S7-bond-correction",
+      "purpose": "A newer bondRevision may lower bondPercent (legitimate correction); an older bondRevision is rejected even under a newer record revision.",
+      "steps": [
+        {
+          "record": "companion-bonded-r3",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "companion-bonded-correction-r4",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "companion-bonded-stale-bond-r5",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "REJECT_STALE_BOND"
+        }
+      ],
+      "final": {
+        "companions": 1,
+        "companion": {
+          "id": "00000000-0000-4000-8000-0000000c0005",
+          "bondPercent": 25,
+          "recordRevision": 4
+        }
+      }
+    },
+    {
+      "id": "S8-form-regression",
+      "purpose": "A newer revision may not lower formIndex (corrections policy pending D-EVOLUTION).",
+      "steps": [
+        {
+          "record": "companion-zpet-imported-r2",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "companion-form-regression-r3",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "REJECT_FORM_REGRESSION"
+        }
+      ]
+    },
+    {
+      "id": "S9-catalogue-consistency",
+      "purpose": "areaId must belong to groupId and match the encounter.",
+      "steps": [
+        {
+          "record": "battle-area-group-mismatch",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "REJECT_CATALOGUE"
+        }
+      ]
+    },
+    {
+      "id": "S10-participation-only",
+      "purpose": "Only actual participants of a qualifying battle are eligible for expedition credit.",
+      "steps": [
+        {
+          "record": "battle-victory-settled",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        }
+      ],
+      "eligibility": {
+        "battle": "battle-victory-settled",
+        "eligible": [
+          "00000000-0000-4000-8000-0000000c0001",
+          "00000000-0000-4000-8000-0000000c0002"
+        ],
+        "notEligible": [
+          "00000000-0000-4000-8000-0000000c0005"
+        ]
+      }
+    },
+    {
+      "id": "S11-unknown-version",
+      "purpose": "Unknown schemaVersion yields an update-needed state, never partial import.",
+      "steps": [
+        {
+          "record": "unknown-schema-version",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "UPDATE_REQUIRED"
+        }
+      ]
+    },
+    {
+      "id": "S12-redeem-then-rejected-duplicate",
+      "purpose": "A second delivery of an already redeemed reward is a rejected redemption with a non-retryable failure.",
+      "steps": [
+        {
+          "record": "reward-earned",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "reward-redeemed",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        },
+        {
+          "record": "reward-redeem-rejected",
+          "as": "00000000-0000-4000-8000-0000000a0001",
+          "expect": "ACCEPTED"
+        }
+      ],
+      "final": {
+        "rewardRedemptions": 1
+      }
+    }
+  ]
+}

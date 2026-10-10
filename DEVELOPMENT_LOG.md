@@ -261,3 +261,76 @@ Remaining work:
   - `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` given an update note, so ChatGPT does not read the old preview/no-art statements as current.
 - Housekeeping noted, not done: PR #3 (CLAUDE-002 docs, included in #5) and PR #4 (artwork, included in #6) are open but redundant; Zeus97x can close them.
 - Build: "Android UI foundation checks" was dispatched on `main` at the user's request and is not monitored by Claude. Result: see the Actions tab.
+
+## 2026-10-10 — Full A–G cross-app roadmap and Claude handoffs
+- Status: planning/docs complete in feature branch ai/chatgpt/cross-app-roadmap; gameplay and backend unchanged.
+- User asked to prepare all phases of the supplied universal coordination command, giving most implementation to Claude.
+- Read current main ai workspace, running log, actual BattleEngine/BattleProgress/Stats/Encounters and ZCube plan; read ZPet SpeciesCatalog/Progression/CloudClient/HANDOFF and code search read-only. ZBattle open-PR check found none; ZPet #2/#3 were active and remain untouched.
+- Actual baseline: CLAUDE-001/002/003 merged via #2/#5/#6; one real encounter, zero-XP practice rematches, scene assets integrated. No new build/device validation claimed.
+- Added ai/CROSS_APP_ROADMAP.md, ai/integration/CONTRACT-v0.1.md, ai/integration/ZPET-COUNTERPART-HANDOFF.md and ai/tasks/CLAUDE-004 through CLAUDE-010; updated ai/README.md including stale artwork integration bullets.
+- Each phase broken into isolated sub-PRs with paths, authority, prerequisites, acceptance and meaningful checks. Claude implements; ChatGPT exclusively creates artwork after approval; no automated Codex delegation.
+- Proposed contract keeps individual companion identity separate from species/form, once-only origin bonus, source-owned bond/evolution, independent battle XP, reward claim transactions and participation-only expedition events. No deployed API claim.
+- Open decisions recorded: rarity mapping, campaign content/replay rewards, independent battle evolution, rounding, guest migration/event verification, exclusive pools, expedition balancing and true rolling vs first-victory-anchored seven-day timers. Cross-device timer/reward guarantees require authoritative infrastructure, not client UUIDs.
+- Narrow battle-event delivery proposal supersedes old blanket no-reverse-writes only for approved expedition events; no full ZPet save writes.
+- Verification: docs reconciled with retrieved current source; all create/update responses inspected. Contract examples/schema implementation and executable checks assigned to Phase A; docs-only PR, no new app tests, artwork, deployment, merge or release.
+- Resume: Claude claims CLAUDE-004 against current main/planning branch, finalizes reviewed contract/fixtures and returns Phase A checkpoint before B. ZPet project publishes its own reviewed counterpart copy.
+
+## 2026-10-10 — CLAUDE-004 Phase A claimed; A1 evidence audit (Claude)
+- Status: in progress on `claude/zbattle-phase-a-contract`, based on PR #8 head `a304c72`, which contains main `d2f938d`. Documentation only.
+- Request: Zeus97x asked Claude to start from PR #8, claim CLAUDE-004, complete Phase A, and stop for review before Phase B.
+- A1 work:
+  - Read ZBattle core, battle, save and app storage code.
+  - Cloned ZPet main `1adcedb` read-only and read `WorldState`, `ProgressStore`, `Progression`, `SpeciesCatalog`, `MonsterCatalog`, `PrototypeState`, `AdventureState`, `PortableSave`, `CloudClient`, `BranchPalette`, `StepAccounting`/`StepStore` and `backend/{schema,expansion}.sql`, `index.ts`. No ZPet file was changed.
+  - Wrote `ai/integration/AUDIT-A1.md`: implemented vs missing for both apps, 8 contract gaps (G1–G8), and active PRs with owners.
+- Key findings:
+  - ZPet companion ids are `pet-N` per-save counters and ZBattle ids are `Long` counters, so neither is globally unique.
+  - ZPet has no bond percentage and neither app has element metadata.
+  - Client battles and steps are not server-verified.
+  - ZPet cloud saves are whole-world blobs with optimistic revisions, and ranked play already uses `request_id` idempotency.
+- Correction: `ai/ZCUBES_PLAN.md` wrongly described ZPet `BranchPalette` as species-variant colouring; it tints Branch-B forms only. Fixed.
+- Verification: findings cite source files at the stated commits. The GitHub PR API returned "invalid session", so PR states come from git refs and earlier reports.
+- Next: A2 (schemas, fixtures, authority/error/compatibility tables).
+
+## 2026-10-10 — CLAUDE-004 A2: contract v0.2 schemas, fixtures and checks (Claude)
+- Status: implemented on `claude/zbattle-phase-a-contract`. Documentation, fixtures and tooling only; no gameplay, save or backend change.
+- Changes:
+  - `ai/integration/CONTRACT-v0.2.md` (new, supersedes v0.1, which gets a pointer): resolutions for audit gaps G1–G8, authority table, acceptance rules R1–R12 with error codes, inbox states, compatibility matrix, migration notes.
+  - `ai/integration/schemas/*.schema.json`: 9 JSON Schemas, draft 2020-12 (common, envelope, 7 payloads). Form/branch consistency, origin/legacy-id prefix, nullable bond pair, server-settled ⇒ `settlementRef`, and no combat fields on lineage are all enforced by the schemas.
+  - `ai/integration/fixtures/records/` (31) and `manifest.json`:
+    - valid cases: imported vs native companions, a duplicate species as two individuals, nickname/form update, bond correction and stale bond, form regression, unverified vs settled battles, reward earn/redeem/rejected, expedition, boss, lineage
+    - 10 schema-invalid cases and 1 unknown-version case
+    - 12 sequence scenarios
+  - Fixture ids are synthetic UUIDs; reward tiers, quantities, durations and boss ids are labelled illustrative.
+  - `ai/integration/fixtures/migration/`: a real `BattleProgress` v1 golden file (`ZBATTLE_UPDATE_GOLDEN=1` regenerates it) plus the proposed `zb-uid-N` → `companionId` mapping, checked by `core/src/test/.../battle/ContractMigrationFixtureTest.kt`.
+  - `tools/validate_contract.py`: schema validation, catalogue coverage against `ZBattle-ZPet-Assets/reference/*.java`, a reference rule engine replaying every sequence, the migration check and the bundle hash.
+  - `tools/check_doc_links.py` (new).
+  - `.github/workflows/android-ui.yml`: CI step "Integration contract fixtures and doc links" (pip jsonschema 4.26.0).
+- Verification:
+  - `python3 tools/validate_contract.py` → OK (31 records, 20 schema-valid, 12 sequences).
+  - Each invalid fixture was confirmed to fail for its intended reason.
+  - `python3 tools/check_doc_links.py` → OK.
+  - `./gradlew -p preview test` → passed, including the new migration fixture test.
+  - A Maven JSON-schema dependency was not added; Maven Central rate-limited this session and the Python validator covers it in CI.
+- Gaps: the ZPet-side `pet-N` save fixture belongs to the ZPet project; the v2 ZBattle save is Phase D1.
+- Next: A3, the hash handoff to ZPet, the decision register with owners, and bounded B–G tasks.
+
+## 2026-10-10 — CLAUDE-004 A3: decisions, ZPet hash handoff, bounded B–G (Claude) — Phase A returned for review
+- Status: Phase A complete on the ZBattle side and returned as a PR. CLAUDE-004 → REVIEW. The phase gate is open until Zeus97x and the ZPet owner accept the contract (D-CONTRACT-ACCEPT). Claude stops here before Phase B, as instructed.
+- Changes:
+  - `ai/integration/DECISIONS.md` (new): 20 open decisions, each with evidence, a proposal where justified, an owner and the phases it blocks. No gameplay values were invented.
+  - `ai/integration/CONTRACT-BUNDLE.sha256`: `afc3a8de1367e1ffa0d684463ed81ddb020ccc18cbbc51f36146e6202a83e2c4` over 44 files (contract v0.2, schemas, fixtures); verified by `tools/validate_contract.py`.
+  - `ai/integration/ZPET-HANDOFF-A3.md` (new): what the ZPet owner must do — mirror byte-identical, confirm the hash, add a real ZPet `pet-N` migration fixture, answer the ZPet-owned decisions, report back the commit and hash.
+  - `ai/tasks/CLAUDE-005` to `CLAUDE-010`: "Phase A outcome" sections with blocking decisions, bounded scope and contract impact.
+  - `ai/tasks/CLAUDE-004`: progress and acceptance table.
+  - `ai/CROSS_APP_ROADMAP.md`: pointer to the register and contract v0.2.
+  - `ai/README.md`: links and status.
+  - CONTRACT-v0.2 now links `DECISIONS.md`.
+- Verification:
+  - `python3 tools/validate_contract.py` → OK, bundle hash matches.
+  - `python3 tools/check_doc_links.py` → OK.
+  - `./gradlew -p preview test` → passed.
+  - No device checks were needed (docs and fixtures only).
+- Not done or blocked:
+  - No ZPet copy or ZPet commit exists; ZPet is not writable from this task.
+  - No GitHub PR state API (session errors during the audit).
+- Next step: Zeus97x reviews the Phase A PR and the decision register, and the ZPet owner mirrors the bundle. After D-CONTRACT-ACCEPT and the B decisions (D-AUTO-FIGHT first), Claude starts CLAUDE-005 B1.

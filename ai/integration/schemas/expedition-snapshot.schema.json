@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/expedition-snapshot.schema.json",
+  "title": "ExpeditionSnapshot payload",
+  "description": "ZPet-owned. ZBattle reads/displays it. Durations, acceleration and caps are unapproved proposals (Phase E).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["expeditionId", "companionId", "durationSeconds", "startedAtUtc", "eligibleEventIds", "creditedProgressSeconds", "capRevision", "status", "claimId"],
+  "properties": {
+    "expeditionId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "companionId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "durationSeconds": { "type": "integer", "minimum": 1 },
+    "startedAtUtc": { "$ref": "common.schema.json#/$defs/utcTimestamp" },
+    "eligibleEventIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/uuid" }, "uniqueItems": true },
+    "creditedProgressSeconds": { "type": "integer", "minimum": 0 },
+    "capRevision": { "type": "string", "pattern": "^[a-z0-9-]+-r[0-9]+$" },
+    "status": { "enum": ["running", "completed", "claimed", "cancelled"] },
+    "claimId": { "anyOf": [{ "$ref": "common.schema.json#/$defs/uuid" }, { "type": "null" }] }
+  },
+  "if": { "properties": { "status": { "const": "claimed" } } },
+  "then": { "properties": { "claimId": { "$ref": "common.schema.json#/$defs/uuid" } } }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/envelope.schema.json",
+  "title": "Record/event envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "contractRevision", "eventId", "accountId", "sourceApp", "sourceDeviceId", "recordType", "recordId", "recordRevision", "createdAtUtc", "payload"],
+  "properties": {
+    "schemaVersion": { "const": 1, "description": "Unknown versions produce UPDATE_REQUIRED, never partial import." },
+    "contractRevision": { "const": "zb-zp-contract-0.2-draft" },
+    "eventId": { "$ref": "common.schema.json#/$defs/uuid", "description": "Reused verbatim on retry with a frozen payload." },
+    "accountId": { "$ref": "common.schema.json#/$defs/uuid", "description": "Must equal the authenticated principal; never trusted from the body alone." },
+    "sourceApp": { "$ref": "common.schema.json#/$defs/appId" },
+    "sourceDeviceId": { "$ref": "common.schema.json#/$defs/uuid", "description": "Pseudonymous per-install id; not a hardware identifier." },
+    "recordType": { "enum": ["CompanionSnapshot", "BattleCompleted", "RewardEarned", "RewardRedeemed", "ExpeditionSnapshot", "BossState", "LineageSnapshot"] },
+    "recordId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "recordRevision": { "$ref": "common.schema.json#/$defs/revision" },
+    "createdAtUtc": { "$ref": "common.schema.json#/$defs/utcTimestamp" },
+    "acceptedAtUtc": { "$ref": "common.schema.json#/$defs/utcTimestamp", "description": "Server-added only." },
+    "authoritativeRevision": { "$ref": "common.schema.json#/$defs/revision", "description": "Server-added only." },
+    "payload": { "type": "object" }
+  },
+  "allOf": [
+    { "if": { "properties": { "recordType": { "const": "CompanionSnapshot" } } }, "then": { "properties": { "payload": { "$ref": "companion-snapshot.schema.json" } } } },
+    { "if": { "properties": { "recordType": { "const": "BattleCompleted" } } }, "then": { "properties": { "payload": { "$ref": "battle-completed.schema.json" } } } },
+    { "if": { "properties": { "recordType": { "const": "RewardEarned" } } }, "then": { "properties": { "payload": { "$ref": "reward-earned.schema.json" } } } },
+    { "if": { "properties": { "recordType": { "const": "RewardRedeemed" } } }, "then": { "properties": { "payload": { "$ref": "reward-redeemed.schema.json" } } } },
+    { "if": { "properties": { "recordType": { "const": "ExpeditionSnapshot" } } }, "then": { "properties": { "payload": { "$ref": "expedition-snapshot.schema.json" } } } },
+    { "if": { "properties": { "recordType": { "const": "BossState" } } }, "then": { "properties": { "payload": { "$ref": "boss-state.schema.json" } } } },
+    { "if": { "properties": { "recordType": { "const": "LineageSnapshot" } } }, "then": { "properties": { "payload": { "$ref": "lineage-snapshot.schema.json" } } } }
+  ]
+}

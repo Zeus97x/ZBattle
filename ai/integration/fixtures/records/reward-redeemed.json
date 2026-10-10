@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "eventId": "00000000-0000-4000-8000-0000000e001f",
+  "accountId": "00000000-0000-4000-8000-0000000a0001",
+  "sourceApp": "zbattle",
+  "sourceDeviceId": "00000000-0000-4000-8000-0000000d0002",
+  "recordType": "RewardRedeemed",
+  "recordId": "00000000-0000-4000-8000-0000000f1001",
+  "recordRevision": 1,
+  "createdAtUtc": "2026-10-10T04:00:00Z",
+  "payload": {
+    "rewardId": "00000000-0000-4000-8000-0000000f0001",
+    "deliveryId": "00000000-0000-4000-8000-0000000f1001",
+    "inventoryTransactionId": "00000000-0000-4000-8000-0000000f2001",
+    "destinationApp": "zbattle",
+    "state": "redeemed"
+  }
+}

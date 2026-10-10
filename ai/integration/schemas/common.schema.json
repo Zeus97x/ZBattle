@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/common.schema.json",
+  "title": "Shared definitions (zb-zp-contract-0.2-draft)",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "description": "Lower-case RFC 9562 UUID."
+    },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?Z$",
+      "description": "UTC instant, always with a trailing Z."
+    },
+    "appId": { "enum": ["zpet", "zbattle"] },
+    "revision": { "type": "integer", "minimum": 1, "description": "Monotonic per record; higher wins." },
+    "speciesId": {
+      "type": "string",
+      "pattern": "^([0-9]|1[01]):[0-3]$",
+      "description": "ZPet canonical family:rarity (SpeciesCatalog). Family 0-11, rarity 0=Common 1=Heroic 2=Mythic 3=Celestial."
+    },
+    "groupId": { "type": "string", "pattern": "^group-([0-9]|1[01])$" },
+    "areaId": { "type": "string", "pattern": "^area-([0-3][0-9]|4[0-7])$" },
+    "formIndex": { "type": "integer", "minimum": 0, "maximum": 5, "description": "MonsterCatalog form index within the family." },
+    "branch": { "enum": ["none", "A", "B"], "description": "ZPet Progression.branch 0/1/2." },
+    "nickname": { "type": "string", "minLength": 1, "maxLength": 24 },
+    "elementId": {
+      "type": ["string", "null"],
+      "pattern": "^[a-z][a-z0-9-]{1,31}$",
+      "description": "PENDING decision D-ELEMENT: no element metadata exists in either app; null until approved."
+    },
+    "verification": {
+      "enum": ["unverified-client", "server-settled"],
+      "description": "Client UUIDs deduplicate but never prove authenticity (contract G7)."
+    },
+    "artKey": { "type": ["string", "null"], "pattern": "^[a-z]+(/[a-z0-9-]+)+$" }
+  }
+}

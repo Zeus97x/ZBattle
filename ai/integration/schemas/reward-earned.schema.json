@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/reward-earned.schema.json",
+  "title": "RewardEarned payload",
+  "description": "Produced by the earning app (ZPet for care/steps/expeditions). The reward payload is fixed at earn time and never re-rolled.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rewardId", "sourceActivityId", "earningRuleRevision", "reward", "eligibilityEvidence"],
+  "properties": {
+    "rewardId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "sourceActivityId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "earningRuleRevision": { "type": "string", "pattern": "^[a-z0-9-]+-r[0-9]+$" },
+    "reward": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "quantity"],
+      "properties": {
+        "kind": { "enum": ["ticket", "coins", "item"] },
+        "ticketTier": { "enum": ["rare", "epic", "legendary"], "description": "Tier names from roadmap C2; rarity mapping pending (D-RARITY)." },
+        "itemKey": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "quantity": { "type": "integer", "minimum": 1 }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "ticket" } } }, "then": { "required": ["ticketTier"] } },
+        { "if": { "properties": { "kind": { "const": "item" } } }, "then": { "required": ["itemKey"] } }
+      ]
+    },
+    "eligibilityEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": { "enum": ["daily-check-in", "step-milestone", "streak", "achievement", "expedition-claim"] },
+        "ref": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    }
+  }
+}

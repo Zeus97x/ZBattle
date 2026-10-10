@@ -1,0 +1,8 @@
+{
+  "source": "ZBattle BattleProgress schema v1 (core/.../battle/BattleProgressCodec.kt, VERSION = 1), golden file zbattle-battleprogress-v1.b64",
+  "rule": "Phase D1 proposal: on first launch of a v2-capable build, each OwnedCreature gets one companionId (UUID v4, generated once and persisted in the save; never regenerated, never derived from uid). legacyLocalId keeps the old uid for traceability. Battle XP stays ZBattle-owned. speciesId follows D-NATIVE-SPECIES (family:0) - pending approval.",
+  "status": "old side real; new v2 save not implemented (Phase D1)",
+  "companions": [
+    {"legacyLocalId": "zb-uid-1", "companionId": "00000000-0000-4000-8000-0000000c0002", "speciesId": "2:0", "formIndex": 0, "xp": 60}
+  ]
+}

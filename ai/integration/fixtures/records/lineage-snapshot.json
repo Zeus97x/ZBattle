@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "eventId": "00000000-0000-4000-8000-0000000e003c",
+  "accountId": "00000000-0000-4000-8000-0000000a0001",
+  "sourceApp": "zpet",
+  "sourceDeviceId": "00000000-0000-4000-8000-0000000d0001",
+  "recordType": "LineageSnapshot",
+  "recordId": "00000000-0000-4000-8000-00000001a001",
+  "recordRevision": 1,
+  "createdAtUtc": "2026-10-10T04:00:00Z",
+  "payload": {
+    "lineageId": "00000000-0000-4000-8000-00000001a001",
+    "generation": 1,
+    "founderCompanionIds": [
+      "00000000-0000-4000-8000-0000000c0005"
+    ],
+    "successorCompanionId": null,
+    "elementId": null,
+    "cosmeticAssetKey": null,
+    "sourceRevision": 1
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "eventId": "00000000-0000-4000-8000-0000000e0008",
+  "accountId": "00000000-0000-4000-8000-0000000a0001",
+  "sourceApp": "zpet",
+  "sourceDeviceId": "00000000-0000-4000-8000-0000000d0001",
+  "recordType": "CompanionSnapshot",
+  "recordId": "00000000-0000-4000-8000-0000000c0005",
+  "recordRevision": 5,
+  "createdAtUtc": "2026-10-10T07:00:00Z",
+  "payload": {
+    "companionId": "00000000-0000-4000-8000-0000000c0005",
+    "originApp": "zpet",
+    "legacyLocalId": "pet-4",
+    "speciesId": "1:0",
+    "formIndex": 2,
+    "branch": "A",
+    "nickname": null,
+    "elementId": null,
+    "provenance": "imported",
+    "sourceRevision": 5,
+    "bondPercent": 75,
+    "bondRevision": 2
+  }
+}

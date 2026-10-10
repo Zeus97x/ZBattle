@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/companion-snapshot.schema.json",
+  "title": "CompanionSnapshot payload",
+  "description": "One individual companion. recordId must equal companionId. Identity is never species, name or ordinal.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["companionId", "originApp", "legacyLocalId", "speciesId", "formIndex", "branch", "nickname", "elementId", "provenance", "sourceRevision", "bondPercent", "bondRevision"],
+  "properties": {
+    "companionId": { "$ref": "common.schema.json#/$defs/uuid", "description": "Assigned once by the origin app's migration; survives backup/restore and reimport." },
+    "originApp": { "$ref": "common.schema.json#/$defs/appId" },
+    "legacyLocalId": { "type": "string", "pattern": "^(pet-[1-9][0-9]*|zb-uid-[1-9][0-9]*)$", "description": "Pre-UUID local id kept for traceability only (ZPet WorldState pet-N, ZBattle OwnedCreature uid)." },
+    "speciesId": { "$ref": "common.schema.json#/$defs/speciesId" },
+    "formIndex": { "$ref": "common.schema.json#/$defs/formIndex" },
+    "branch": { "$ref": "common.schema.json#/$defs/branch" },
+    "nickname": { "anyOf": [{ "$ref": "common.schema.json#/$defs/nickname" }, { "type": "null" }], "description": "null = show species name." },
+    "elementId": { "$ref": "common.schema.json#/$defs/elementId" },
+    "provenance": { "enum": ["native", "imported"] },
+    "sourceRevision": { "$ref": "common.schema.json#/$defs/revision" },
+    "bondPercent": { "type": ["integer", "null"], "minimum": 0, "maximum": 100, "description": "ZPet-owned; null until the ZPet bond producer exists (gap G4) - no bonus applied." },
+    "bondRevision": { "type": ["integer", "null"], "minimum": 1 }
+  },
+  "allOf": [
+    { "if": { "properties": { "formIndex": { "enum": [0, 1] } } }, "then": { "properties": { "branch": { "const": "none" } } } },
+    { "if": { "properties": { "formIndex": { "enum": [2, 3] } } }, "then": { "properties": { "branch": { "const": "A" } } } },
+    { "if": { "properties": { "formIndex": { "enum": [4, 5] } } }, "then": { "properties": { "branch": { "const": "B" } } } },
+    { "if": { "properties": { "bondPercent": { "type": "null" } } }, "then": { "properties": { "bondRevision": { "type": "null" } } }, "else": { "properties": { "bondRevision": { "type": "integer" } } } },
+    { "if": { "properties": { "originApp": { "const": "zpet" } } }, "then": { "properties": { "legacyLocalId": { "pattern": "^pet-" } } }, "else": { "properties": { "legacyLocalId": { "pattern": "^zb-uid-" } } } }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "eventId": "00000000-0000-4000-8000-0000000e001e",
+  "accountId": "00000000-0000-4000-8000-0000000a0001",
+  "sourceApp": "zpet",
+  "sourceDeviceId": "00000000-0000-4000-8000-0000000d0001",
+  "recordType": "RewardEarned",
+  "recordId": "00000000-0000-4000-8000-0000000f0001",
+  "recordRevision": 1,
+  "createdAtUtc": "2026-10-10T04:00:00Z",
+  "payload": {
+    "rewardId": "00000000-0000-4000-8000-0000000f0001",
+    "sourceActivityId": "daily-check-in/2026-10-10",
+    "earningRuleRevision": "daily-check-in-r1",
+    "reward": {
+      "kind": "ticket",
+      "quantity": 1
+    },
+    "eligibilityEvidence": {
+      "kind": "daily-check-in",
+      "ref": "2026-10-10"
+    }
+  }
+}
