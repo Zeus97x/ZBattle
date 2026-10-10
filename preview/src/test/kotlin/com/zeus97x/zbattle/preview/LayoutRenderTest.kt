@@ -21,6 +21,7 @@ import com.zeus97x.zbattle.core.StageFilter
 import com.zeus97x.zbattle.core.Tab
 import com.zeus97x.zbattle.core.battle.BattleAction
 import com.zeus97x.zbattle.core.battle.OwnedCreature
+import com.zeus97x.zbattle.core.battle.RepeatEnd
 import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.Outcome
 import com.zeus97x.zbattle.ui.AppState
@@ -97,6 +98,13 @@ class LayoutRenderTest {
         Triple("17-edit-master", NavState(listOf(Route.Profile), Overlay.EditMaster), visitedSettings),
     )
 
+    /** CLAUDE-005 B5: a won replay (the results screen offers repeat sessions). */
+    private val afterReplay = afterWin.copy(progress = afterWin.progress.dismissResult().startBattle(encounter).let { p ->
+        var q = p
+        while (q.active != null) q = q.act(if (q.active!!.skillReady) BattleAction.Skill else BattleAction.Attack)
+        q
+    })
+
     /** CLAUDE-005 B2: three owned creatures (all with created art). */
     private val trio = sliceArea.copy(progress = sliceArea.progress.let {
         it.copy(creatures = it.creatures + OwnedCreature(it.nextUid, "sparklit", 120) + OwnedCreature(it.nextUid + 1, "inkling", 40), nextUid = it.nextUid + 2)
@@ -117,6 +125,7 @@ class LayoutRenderTest {
         Triple("23-party-replacement", battleNav, trioFainted),
         Triple("24-party-result", battleNav, trioWon),
         Triple("25-party-detail", NavState(listOf(Route.Home), Overlay.CreatureDetail("inkling")), trio),
+        Triple("26-replay-result", battleNav, afterReplay),
     )
 
     @Test
@@ -133,6 +142,40 @@ class LayoutRenderTest {
         val fresh = AppState(InMemorySettingsStore(), newCompanionId = ids)
         fresh.completeSetup(PetMaster("Zeus", MasterStyle.Knight, MasterGender.Male, "inkling"))
         assertEquals("00000000-0000-4000-8000-000000000002", fresh.settings.progress.lead!!.companionId)
+    }
+
+    @Test
+    fun repeatSessionRunsBoundedAutoReplaysAndStopsOnInterruption() {
+        val store = InMemorySettingsStore(afterWin.copy(progress = afterWin.progress.dismissResult()))
+        val state = AppState(store, NavState(listOf(Route.Home, Route.Challenges(0))))
+        val xpBefore = store.load().progress.lead!!.xp
+        state.startRepeat(encounter, 3)
+        assertEquals(true, state.autoFight)
+        assertEquals(Route.Battle(0, 0), state.nav.current)
+        var guard = 0
+        while (state.repeat!!.running && guard++ < 500) state.autoFightStep(state.settings.progress.active!!)
+        val r = state.repeat!!
+        assertEquals(RepeatEnd.Completed, r.end)
+        assertEquals(3, r.played)
+        assertEquals(3, r.wins)
+        assertEquals(false, state.autoFight)
+        assertEquals(4, store.load().progress.wins[encounter.id], "1 first clear + 3 replays")
+        assertEquals(xpBefore, store.load().progress.lead!!.xp, "replays pay 0 until quantities are approved")
+
+        state.finishBattle()
+        assertEquals(null, state.repeat)
+        state.startRepeat(encounter, 5)
+        state.autoFightStep(state.settings.progress.active!!)
+        state.battleAction(BattleAction.Attack) // the player takes control: the session ends
+        assertEquals(RepeatEnd.Interrupted, state.repeat!!.end)
+        assertEquals(false, state.autoFight)
+        assertEquals(null, AppState(store).repeat, "not saved: restart explicitly")
+
+        // Only already-cleared encounters can be repeated.
+        val fresh = AppState(InMemorySettingsStore(sliceArea), NavState(listOf(Route.Home, Route.Challenges(0))))
+        fresh.startRepeat(encounter, 3)
+        assertEquals(null, fresh.repeat)
+        assertEquals(null, fresh.settings.progress.active)
     }
 
     @Test
@@ -164,6 +207,9 @@ class LayoutRenderTest {
         }
         for (phone in phones + largeText) written += render(phone, "05c-battle-auto", battleNav, midBattle) { it.startAutoFight() }
         for (phone in phones + largeText) for ((name, nav, settings) in partyCases) written += render(phone, name, nav, settings)
+        for (phone in phones + largeText) written += render(phone, "27-repeat-running", battleNav, afterWin.copy(progress = afterWin.progress.dismissResult())) {
+            it.startRepeat(encounter, 5)
+        }
         written += render(phones[0], "18-home-light", NavState(), visitedSettings.copy(darkMode = false))
         written += render(phones[0], "19-profile-light", NavState(listOf(Route.Profile)), visitedSettings.copy(darkMode = false))
         written += render(

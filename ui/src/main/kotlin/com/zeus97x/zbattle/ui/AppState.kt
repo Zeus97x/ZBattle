@@ -19,6 +19,7 @@ import com.zeus97x.zbattle.core.battle.BattleProgress
 import com.zeus97x.zbattle.core.battle.BattleState
 import com.zeus97x.zbattle.core.battle.Encounter
 import com.zeus97x.zbattle.core.battle.Encounters
+import com.zeus97x.zbattle.core.battle.RepeatSession
 import com.zeus97x.zbattle.core.battle.autoStep
 import com.zeus97x.zbattle.core.battle.withCompanionIds
 
@@ -41,6 +42,10 @@ class AppState(
      * leaving the battle turns it off, and the player restarts it explicitly.
      */
     var autoFight by mutableStateOf(false)
+        private set
+
+    /** Repeat session (CLAUDE-005 B5): in memory only, like auto-fight. Kept after it ends for the summary. */
+    var repeat by mutableStateOf<RepeatSession?>(null)
         private set
 
     fun navigate(route: Route) { nav = nav.push(route) }
@@ -102,6 +107,7 @@ class AppState(
 
     /** Starts (or resumes) the real battle for [encounter] and opens the battle screen. */
     fun startBattle(encounter: Encounter) {
+        if (repeat?.running != true) repeat = null
         val active = settings.progress.active
         if (active == null) updateProgress { it.startBattle(encounter) }
         else if (active.encounterId != encounter.id) return
@@ -132,7 +138,24 @@ class AppState(
 
     fun startAutoFight() { if (settings.progress.active != null) autoFight = true }
 
-    fun stopAutoFight() { autoFight = false }
+    /** Stops auto-fight; a running repeat session ends as interrupted (the player restarts it explicitly). */
+    fun stopAutoFight() {
+        autoFight = false
+        repeat = repeat?.interrupted()
+    }
+
+    /**
+     * Starts [count] back-to-back replays of an already-cleared encounter, played by auto-fight.
+     * Each battle is a separate encounter at full HP; a defeat, retreat or any interruption ends it.
+     */
+    fun startRepeat(encounter: Encounter, count: Int) {
+        val progress = settings.progress
+        if (progress.active != null || encounter.id !in progress.defeated || count !in 1..RepeatSession.MAX_BATTLES) return
+        repeat = RepeatSession(encounter.id, count)
+        updateProgress { it.dismissResult().startBattle(encounter) }
+        nav = nav.popTo { it is Route.Challenges }.push(Route.Battle(encounter.area.index, encounter.slot))
+        autoFight = true
+    }
 
     /**
      * One scheduled auto move for the battle exactly as it was when scheduled. Ignored when auto is
@@ -141,12 +164,21 @@ class AppState(
     fun autoFightStep(expected: BattleState) {
         if (!autoFight || nav.overlay != null) return
         updateProgress { it.autoStep(expected) }
-        if (settings.progress.active == null) autoFight = false
+        if (settings.progress.active != null) return
+        // The battle settled. A running repeat session records it and starts the next one.
+        val session = repeat?.takeIf { it.running }
+        val result = settings.progress.lastResult
+        if (session == null || result == null) { autoFight = false; return }
+        val next = session.record(result)
+        repeat = next
+        val encounter = Encounters.byId(session.encounterId)
+        if (next.running && encounter != null) updateProgress { it.dismissResult().startBattle(encounter) } else autoFight = false
     }
 
     /** Retreat grants nothing and returns to the challenge list. */
     fun retreatBattle() {
         stopAutoFight()
+        repeat = null
         if (settings.progress.active != null) updateProgress { it.retreat().dismissResult() }
         nav = nav.popTo { it is Route.Challenges }
     }
@@ -154,6 +186,7 @@ class AppState(
     /** Leaves the results screen. Rewards were already applied when the battle ended. */
     fun finishBattle() {
         stopAutoFight()
+        repeat = null
         updateProgress { it.dismissResult() }
         nav = nav.popTo { it is Route.Challenges }
     }

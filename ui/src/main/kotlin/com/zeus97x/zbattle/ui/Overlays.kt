@@ -142,7 +142,7 @@ fun ConfirmChallengeDialog(state: AppState, overlay: Overlay.ConfirmChallenge) {
             append("${lead?.creature?.name ?: "Your companion"} (Lv ${lead?.level ?: 1})")
             if (others > 0) append(" + $others in reserve")
             append(" vs ${encounter.creature.name} (Lv ${encounter.level}) at ${area.name}. ")
-            append(if (rematch) "Rematches are practice and give no XP." else "First victory: +${encounter.firstWinXp} XP.")
+            append(if (rematch) "Replay: reduced rewards, awaiting approval (0 XP for now). No first-clear rewards repeat." else "First victory: +${encounter.firstWinXp} XP.")
         },
         confirm = "Battle" to { state.startBattle(encounter) },
         dismiss = "Cancel" to state::dismissOverlay,

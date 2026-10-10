@@ -20,9 +20,11 @@ import java.util.Base64
  * - v3 (CLAUDE-005 B3): companion identity (companionId, rarity, nickname, origin, source revision)
  *   and the evolution ledger. Older saves read with no companionId (assigned once by the app and
  *   saved), rarity 0 (D-NATIVE-SPECIES), ZBattle origin and an empty ledger.
+ * - v4 (CLAUDE-005 B5): `settledThrough`. Older saves derive it: every id below the active battle
+ *   (or below `nextBattleId` when idle) was already settled.
  */
 object BattleProgressCodec {
-    const val VERSION = 3
+    const val VERSION = 4
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -56,6 +58,7 @@ object BattleProgressCodec {
             ledger.claims.forEach { d.writeUTF(it.companionId); d.writeInt(it.stage); d.writeUTF(it.source.name) }
             d.writeInt(ledger.outbound.size)
             ledger.outbound.forEach { writeUnlock(d, it) }
+            d.writeLong(progress.settledThrough)
         }
         return Base64.getEncoder().encodeToString(bytes.toByteArray())
     }
@@ -95,7 +98,9 @@ object BattleProgressCodec {
                 claims = List(count(d, 10_000)) { ChallengeClaim(d.readUTF(), d.readInt(), UnlockSource.valueOf(d.readUTF())) },
                 outbound = List(count(d, 10_000)) { readUnlock(d) },
             ) else EvolutionLedger()
+            val settledThrough = if (version >= 4) d.readLong() else (active?.battleId ?: nextBattleId) - 1
             if (d.available() != 0) throw IOException("Trailing data")
+            if (settledThrough < 0 || settledThrough >= nextBattleId || (active != null && active.battleId <= settledThrough)) throw IOException("Invalid settlement marker")
             if (nextUid < 1 || nextBattleId < 1) throw IOException("Invalid counters")
             val uids = creatures.map { it.uid }
             if (uids.any { it >= nextUid } || uids.toSet().size != uids.size) throw IOException("Invalid creature ids")
@@ -106,7 +111,7 @@ object BattleProgressCodec {
             val ids = creatures.mapNotNull { it.companionId }
             if (ids.toSet().size != ids.size) throw IOException("Duplicate companion ids")
             if (ledger.outbound.any { !it.validated || it.toForm !in 0..5 }) throw IOException("Invalid outbound unlock")
-            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party, ledger)
+            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party, ledger, settledThrough)
         }
     } catch (e: Exception) {
         throw IllegalStateException("Battle save unreadable; raw data retained for recovery", e)
