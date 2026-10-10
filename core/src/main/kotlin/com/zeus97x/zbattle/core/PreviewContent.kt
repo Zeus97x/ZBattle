@@ -5,13 +5,12 @@ package com.zeus97x.zbattle.core
  * economy, events). Nothing here is canon: no names, prices, rewards or rosters are approved.
  * Kept apart from catalogue models so it can be deleted when real systems land.
  */
+/** Shop sections (real since CLAUDE-006; items live in `economy.ItemCatalog`). */
 enum class ShopCategory(val label: String, val subtitle: String) {
-    Equipment("Equipment", "Gear for your party · preview"),
-    Consumables("Consumables", "Single-use battle items · preview"),
-    Cosmetics("Cosmetics", "Trainer and party styles · preview"),
+    Equipment("Equipment", "Charms for your party"),
+    Consumables("Consumables", "Battle items and ZCubes"),
+    Cosmetics("Cosmetics", "Trainer and party styles"),
 }
-
-data class DemoShopItem(val id: String, val label: String, val category: ShopCategory)
 
 data class PreviewOpponent(
     val slot: Int,
@@ -25,10 +24,6 @@ data class PreviewOpponent(
 
 object PreviewContent {
     const val BOSS_SLOT = 3
-
-    val shopItems: List<DemoShopItem> = ShopCategory.entries.flatMap { category ->
-        (1..4).map { n -> DemoShopItem("demo-${category.name.lowercase()}-$n", "Demo ${category.label.removeSuffix("s")} $n", category) }
-    }
 
     fun opponents(area: Area): List<PreviewOpponent> = (0..BOSS_SLOT).map { slot ->
         val isBoss = slot == BOSS_SLOT

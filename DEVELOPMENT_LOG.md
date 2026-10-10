@@ -587,4 +587,28 @@ Remaining work:
   - Render `26-replay-result` (360dp, 130% text) shows "+15 XP · +5 coins".
   - No playable boss exists yet, so the ticket pill is unit-tested but not rendered.
 - Next: shop purchases.
+
+## 2026-10-10 — CLAUDE-006: shop purchases (Claude)
+- Branch: `claude/zbattle-c-shop` (stacked on C2). Decision basis: D-SHOP (batch 2).
+- Changes:
+  - New `core/.../economy/Shop.kt`:
+    - Category → items mapping (Consumables includes Basic/Great/Ultra ZCubes).
+    - `check` and `buy`: one `buy-<n>` transaction moves coins out and the item in together. Refusals are NotForSale, Unavailable, NotEnoughCoins and AtCap.
+  - `Items.kt`:
+    - Consumables are marked "Battle items arrive in the next update" and equipment "Equipping arrives in the next update", so nothing unusable can be bought. The item-action and equipment PRs lift these.
+    - ZCubes stay gated until catching exists.
+    - Cosmetics can be bought now.
+  - Demo shop items (`DemoShopItem`, `PreviewContent.shopItems`) are removed. `ShopCategory` subtitles are no longer "preview".
+  - UI:
+    - Item cards show real names, effect or bonus text from the engine constants, price, owned count, and why an item can't be bought.
+    - New `Overlay.ConfirmPurchase` dialog; when the purchase is refused it shows an OK-only explanation instead.
+    - `AppState.buy`.
+- Tests:
+  - New `ShopTest` (3).
+  - `LayoutRenderTest.purchaseThroughAppStateIsSavedOnce`.
+  - Renders `07b` (consumables), `07c` (confirm) and `07d` (cannot afford).
+- Verification:
+  - `./gradlew -p preview test` (local mirror) → 118 tests, 0 failures.
+  - Renders checked at 360dp. Fixed: Potion was not gated (its id is a constant, so the bulk edit missed it), the dialog offered Buy when the player couldn't afford the item, and long names were cut off.
+- Next: battle item action.
 - CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
