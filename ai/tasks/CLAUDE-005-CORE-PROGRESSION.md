@@ -38,7 +38,7 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 | Step | Status | Notes |
 |---|---|---|
 | B1 auto-fight | REVIEW | Built on the proposed D-AUTO-FIGHT scope (foreground only, no items, stops on interruption). Zeus97x still has to confirm that scope. |
-| B2 party/switching | READY | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
+| B2 party/switching | REVIEW | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
 | B3 evolution | READY | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
 | B4 campaign | READY (proposal) | D-CAMPAIGN: proposal + inactive validated config only. |
 | B5 repeat battles | READY | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
@@ -53,3 +53,28 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
   - `core/.../AutoFightTest.kt` (6): legal moves only, the same result and rewards as manual play, deterministic, ends within the turn limit, stale or duplicate steps ignored, no action after settlement, manual take-over.
   - `LayoutRenderTest.autoFightThroughAppStateIsForegroundOnlyAndSettlesOnce`.
   - `05c-battle-auto` renders at 412dp, 360dp and 360dp with 130% text.
+
+### B2 implementation (branch `claude/zbattle-b2-party`)
+- **Rules (D-PARTY), in `core/.../battle/BattleEngine.kt`:**
+  - The party is up to 3, and the lead fights first; everyone starts at full HP.
+  - `switch` uses the turn: the opponent then takes one normal turn against the incoming creature, and Burn ticks at the end of that turn.
+  - `replace` after a faint is free: no turn passes and the opponent does not act.
+  - Defeat comes only when the whole party is down.
+  - A creature knocked out before it moves spends no cooldown and applies no effect.
+  - `RULES_REVISION` = `zbattle-rules-2`.
+- **Proposal behaviours, flagged:**
+  - D-SWITCH-COOLDOWN: Skill cooldown is per creature and frozen while benched.
+  - D-PARTY-XP: `PartyXp.share` splits first-win XP evenly between actual participants, with the remainder to the finisher. A single fighter still gets the full 60.
+- **Participants (D-PARTICIPATION):** creatures that attacked, used a Skill or were switched in during a resolved turn. These are the only ones paid, and they are listed in `BattleResult.gains`.
+- **Party selection:** `BattleProgress.party` with `toggleParty` and `makeLead`, locked during a battle. The creature detail sheet has Make lead / Remove / Add buttons, and Home shows "My Party n/3".
+- **Battle UI:** team HP strip, switch picker, replacement prompt, and per-member XP on the results screen.
+- **Auto-fight:** it now guards on the exact battle state and sends in the next standing member after a faint. It never switches voluntarily.
+- **Save v2:**
+  - `BattleProgressCodec` v2 stores the party, team battles and per-participant results.
+  - v1 saves migrate on read. The frozen v1 golden file decodes to the same progress the current engine produces (`ContractMigrationFixtureTest`).
+- **Tests:**
+  - `PartyBattleTest` (10).
+  - `AutoFightTest` (7, adds the replacement case).
+  - `LayoutRenderTest.partyFlowThroughAppState`.
+  - Renders 21–25 at 412dp, 360dp and 360dp with 130% text.
+  - Total: 81 tests, 0 failures (`./gradlew -p preview test`).

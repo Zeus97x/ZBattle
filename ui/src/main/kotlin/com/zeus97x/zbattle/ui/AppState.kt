@@ -16,6 +16,7 @@ import com.zeus97x.zbattle.core.SettingsStore
 import com.zeus97x.zbattle.core.Tab
 import com.zeus97x.zbattle.core.battle.BattleAction
 import com.zeus97x.zbattle.core.battle.BattleProgress
+import com.zeus97x.zbattle.core.battle.BattleState
 import com.zeus97x.zbattle.core.battle.Encounter
 import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.autoStep
@@ -96,17 +97,33 @@ class AppState(private val store: SettingsStore, initialNav: NavState? = null) {
         if (settings.progress.active != null) updateProgress { it.act(action) }
     }
 
+    /** Manual switch (costs the turn). Like any tapped move it takes control back from auto. */
+    fun switchTo(index: Int) {
+        stopAutoFight()
+        if (settings.progress.active?.canSwitch == true) updateProgress { it.switchTo(index) }
+    }
+
+    /** Free replacement after a faint. */
+    fun replaceWith(index: Int) {
+        stopAutoFight()
+        if (settings.progress.active?.awaitingReplacement == true) updateProgress { it.replaceWith(index) }
+    }
+
+    fun toggleParty(uid: Long) { if (settings.progress.active == null) updateProgress { it.toggleParty(uid) } }
+
+    fun makeLead(uid: Long) { if (settings.progress.active == null) updateProgress { it.makeLead(uid) } }
+
     fun startAutoFight() { if (settings.progress.active != null) autoFight = true }
 
     fun stopAutoFight() { autoFight = false }
 
     /**
-     * One scheduled auto move for [battleId] at [turn]. Ignored when auto is off, a dialog is open,
-     * or the battle has moved on (see [autoStep]); stops itself once the battle settles.
+     * One scheduled auto move for the battle exactly as it was when scheduled. Ignored when auto is
+     * off, a dialog is open, or the battle has moved on (see [autoStep]); stops once it settles.
      */
-    fun autoFightStep(battleId: Long, turn: Int) {
+    fun autoFightStep(expected: BattleState) {
         if (!autoFight || nav.overlay != null) return
-        updateProgress { it.autoStep(battleId, turn) }
+        updateProgress { it.autoStep(expected) }
         if (settings.progress.active == null) autoFight = false
     }
 

@@ -393,3 +393,21 @@ Remaining work:
   - The four-participant fixture fails on the array length.
   - Doc links OK.
 - ZPet: not written. ZPet Claude adopts per Q3 and must report incompatibilities before accepting.
+
+## 2026-10-10 — CLAUDE-005 B2: party of 3 and switching (Claude)
+- Branch: `claude/zbattle-b2-party` (stacked on the contract-amendment branch).
+- Decision basis: D-PARTY (Q4). Two proposals were needed to finish the rules and are recorded as open items in DECISIONS.md: D-SWITCH-COOLDOWN (per-creature cooldown, frozen while benched) and D-PARTY-XP (even split between participants).
+- Changed paths:
+  - `core/.../battle/{BattleEngine,BattleProgress,BattleProgressCodec,AutoFight}.kt`
+  - `core/.../Profile.kt`
+  - `ui/{AppState,BattleScreen,Overlays,HomeScreen}.kt`
+  - Tests: `core/src/test/.../battle/{PartyBattleTest,TestStates,AutoFightTest,BattleEngineTest,BattleProgressTest,ContractMigrationFixtureTest}.kt` and `preview/.../LayoutRenderTest.kt`
+- Save migration:
+  - Codec v2. v1 saves migrate on read: one fighter becomes a one-member team, and the old result is credited to the lead.
+  - The frozen v1 golden file is verified to migrate exactly.
+  - The golden file can no longer be regenerated, by design.
+- Verification:
+  - `./gradlew -p preview test` → 81 tests, 0 failures.
+  - New renders 21–25 checked by eye. Fixed: team strip wrapping at 130% text, stacked party buttons, and the stat pills on the detail sheet.
+  - Android assemble and lint not run locally (dl.google.com is blocked); CI runs them on the PR.
+- Next: B3 evolution identity.

@@ -13,25 +13,30 @@ class AutoFightTest {
     private fun fresh(starter: String = "sparklit") = BattleProgress().withStarter(starter).startBattle(encounter)
 
     /** Runs auto steps until the battle settles; returns the final progress and the moves played. */
-    private fun runAuto(start: BattleProgress): Pair<BattleProgress, List<BattleAction>> {
+    private fun runAuto(start: BattleProgress): Pair<BattleProgress, List<AutoMove>> {
         var p = start
-        val moves = mutableListOf<BattleAction>()
+        val moves = mutableListOf<AutoMove>()
         while (p.active != null) {
             val battle = p.active!!
             moves += AutoFight.choose(battle)!!
-            p = p.autoStep(battle.battleId, battle.turn)
+            p = p.autoStep(battle)
         }
         return p to moves
+    }
+
+    private fun BattleProgress.play(move: AutoMove) = when (move) {
+        is AutoMove.Act -> act(move.action)
+        is AutoMove.Replace -> replaceWith(move.index)
     }
 
     @Test
     fun policyOnlyPicksLegalMoves() {
         var b = fresh().active!!
         while (!b.over) {
-            val move = AutoFight.choose(b)!!
-            if (move == BattleAction.Skill) assertTrue(b.skillReady)
-            if (!b.skillReady) assertEquals(BattleAction.Attack, move)
-            b = BattleEngine.act(b, move)
+            val move = AutoFight.choose(b) as AutoMove.Act
+            if (move.action == BattleAction.Skill) assertTrue(b.skillReady)
+            if (!b.skillReady) assertEquals(BattleAction.Attack, move.action)
+            b = BattleEngine.act(b, move.action)
         }
         assertNull(AutoFight.choose(b))
     }
@@ -41,7 +46,7 @@ class AutoFightTest {
         for (starter in listOf("sparklit", "inkling", "cindlet")) {
             val (auto, moves) = runAuto(fresh(starter))
             var manual = fresh(starter)
-            moves.forEach { manual = manual.act(it) }
+            moves.forEach { manual = manual.play(it) }
             assertEquals(manual, auto, "auto/manual diverged for $starter")
             assertNotNull(auto.lastResult)
         }
@@ -59,30 +64,46 @@ class AutoFightTest {
     fun staleOrDuplicateStepsAreIgnored() {
         val start = fresh()
         val battle = start.active!!
-        val once = start.autoStep(battle.battleId, battle.turn)
-        // Same timer firing again for the old turn: no second action.
-        assertSame(once, once.autoStep(battle.battleId, battle.turn))
-        // Wrong battle id: ignored.
-        assertSame(start, start.autoStep(battle.battleId + 1, battle.turn))
+        val once = start.autoStep(battle)
+        // Same timer firing again for the old state: no second action.
+        assertSame(once, once.autoStep(battle))
+        // A different battle: ignored.
+        assertSame(start, start.autoStep(battle.copy(battleId = battle.battleId + 1)))
     }
 
     @Test
     fun noActionAfterSettlement() {
-        val (done, _) = runAuto(fresh())
-        val settledId = done.lastResult!!.battleId
+        val start = fresh()
+        val firstState = start.active!!
+        val (done, _) = runAuto(start)
         assertNull(done.active)
-        assertSame(done, done.autoStep(settledId, 0))
-        assertEquals(done.wins, done.autoStep(settledId, 5).wins)
+        assertSame(done, done.autoStep(firstState))
     }
 
     @Test
     fun manualTakeOverMidFightContinuesSameBattle() {
         var p = fresh()
-        val id = p.active!!.battleId
-        p = p.autoStep(id, 0)
+        val turn0 = p.active!!
+        p = p.autoStep(turn0)
+        val turn1 = p.active!!
         p = p.act(BattleAction.Attack) // the player takes control
         assertEquals(2, p.active!!.turn)
         // A late auto timer for turn 1 must not act on top of the manual move.
-        assertSame(p, p.autoStep(id, 1))
+        assertSame(p, p.autoStep(turn1))
+    }
+
+    @Test
+    fun autoSendsInTheNextStandingMemberAfterAFaint() {
+        val party = BattleProgress().withStarter("sparklit")
+            .let { it.copy(creatures = it.creatures + OwnedCreature(2, "inkling", 0) + OwnedCreature(3, "cindlet", 0), nextUid = 4) }
+            .startBattle(encounter)
+        val knocked = party.copy(active = party.active!!.withPlayer { it.copy(hp = 1) })
+        var p = knocked.autoStep(knocked.active!!)
+        val b = p.active!!
+        assertTrue(b.awaitingReplacement)
+        assertEquals(AutoMove.Replace(1), AutoFight.choose(b))
+        p = p.autoStep(b)
+        assertEquals(1, p.active!!.activeIndex)
+        assertEquals(b.turn, p.active!!.turn, "replacement costs no turn")
     }
 }

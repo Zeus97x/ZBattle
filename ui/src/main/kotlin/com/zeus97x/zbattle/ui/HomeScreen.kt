@@ -77,7 +77,7 @@ fun HomeScreen(state: AppState) {
             }
         }
         item {
-            SectionHeading("My Party", Modifier.padding(horizontal = Dimens.screenPadding), trailing = "${party.size}")
+            SectionHeading("My Party", Modifier.padding(horizontal = Dimens.screenPadding), trailing = "${party.size}/3")
         }
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = Dimens.screenPadding), horizontalArrangement = Arrangement.spacedBy(Dimens.gapSmall)) {

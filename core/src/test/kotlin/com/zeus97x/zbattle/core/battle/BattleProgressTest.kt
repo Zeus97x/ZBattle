@@ -69,7 +69,7 @@ class BattleProgressTest {
         assertEquals(0, retreated.lead!!.xp)
         assertTrue(retreated.defeated.isEmpty())
 
-        val doomed = started.copy(active = started.active!!.let { it.copy(player = it.player.copy(hp = 1)) })
+        val doomed = started.copy(active = started.active!!.withPlayer { it.copy(hp = 1) })
         val lost = doomed.act(BattleAction.Attack)
         assertEquals(Outcome.Defeat, lost.lastResult!!.outcome)
         assertEquals(0, lost.lead!!.xp)
@@ -86,8 +86,8 @@ class BattleProgressTest {
     fun levelUpIsReported() {
         val near = fresh().copy(creatures = listOf(OwnedCreature(1, "sparklit", 70)))
         val won = winOnce(near)
-        assertEquals(1, won.lastResult!!.levelBefore)
-        assertEquals(2, won.lastResult!!.levelAfter)
+        assertEquals(1, won.lastResult!!.gainFor(1)!!.levelBefore)
+        assertEquals(2, won.lastResult!!.gainFor(1)!!.levelAfter)
     }
 
     @Test
