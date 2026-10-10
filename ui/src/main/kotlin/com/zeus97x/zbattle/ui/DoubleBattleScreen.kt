@@ -83,13 +83,20 @@ fun DoubleBattleScreen(state: AppState, areaIndex: Int) {
                 }
             }
         }
-        item { SectionHeading("Your party", Modifier.padding(horizontal = Dimens.screenPadding), trailing = "Ready · preview") }
+        item { SectionHeading("Your party", Modifier.padding(horizontal = Dimens.screenPadding), trailing = "Needs 2 companions") }
         item {
-            Row(Modifier.padding(horizontal = Dimens.screenPadding), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                PreviewContent.party.forEachIndexed { i, creature ->
+            val party = state.settings.party
+            Row(Modifier.padding(horizontal = Dimens.screenPadding), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                party.forEach { creature ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircleThumb(creature, 60.dp, ring = if (i < 2) p.accent else null)
-                        Text(if (i < 2) "Lead" else "Reserve", style = MaterialTheme.typography.labelSmall, color = p.textSecondary)
+                        CircleThumb(creature, 60.dp, ring = p.accent)
+                        Text("Lead", style = MaterialTheme.typography.labelSmall, color = p.textSecondary)
+                    }
+                }
+                repeat((2 - party.size).coerceAtLeast(0)) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        ArtPlaceholder(com.zeus97x.zbattle.core.PlaceholderStyle.Creature, contentDescription = "Open slot", label = null, modifier = Modifier.size(60.dp).clip(androidx.compose.foundation.shape.CircleShape))
+                        Text("Open slot", style = MaterialTheme.typography.labelSmall, color = p.textSecondary)
                     }
                 }
             }

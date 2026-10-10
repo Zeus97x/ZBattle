@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import com.zeus97x.zbattle.core.Area
 import com.zeus97x.zbattle.core.ArtKey
 import com.zeus97x.zbattle.core.Overlay
-import com.zeus97x.zbattle.core.PreviewContent
 import com.zeus97x.zbattle.core.RegionCatalog
 import com.zeus97x.zbattle.core.Route
 
@@ -62,6 +61,7 @@ import com.zeus97x.zbattle.core.Route
 fun HomeScreen(state: AppState) {
     val p = Z.colors
     val area = state.settings.currentArea
+    val party = state.settings.party
     LazyColumn(
         state = rememberLazyListState(),
         modifier = Modifier.fillMaxSize(),
@@ -77,26 +77,23 @@ fun HomeScreen(state: AppState) {
             }
         }
         item {
-            Row(Modifier.padding(horizontal = Dimens.screenPadding), verticalAlignment = Alignment.CenterVertically) {
-                SectionHeading("My Party", Modifier.weight(1f), trailing = "${PreviewContent.party.size} ")
-                PreviewBadge()
-            }
+            SectionHeading("My Party", Modifier.padding(horizontal = Dimens.screenPadding), trailing = "${party.size}")
         }
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = Dimens.screenPadding), horizontalArrangement = Arrangement.spacedBy(Dimens.gapSmall)) {
-                items(PreviewContent.party, key = { it.id }) { creature ->
+                items(party, key = { it.id }) { creature ->
                     CreatureCard(
                         creature,
                         modifier = Modifier.width(144.dp),
                         onClick = { state.show(Overlay.CreatureDetail(creature.id)) },
-                        caption = creature.family.label,
+                        caption = "Starter companion · Lv 1",
                     )
                 }
             }
         }
         item {
             Text(
-                "Party shows existing ZPet creatures as a preview. Ownership, levels and imports from ZPet arrive in a later task.",
+                "More companions arrive with encounters and the planned one-way ZPet import. Battle progress never returns to ZPet.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = p.textSecondary,
                 modifier = Modifier.padding(horizontal = Dimens.screenPadding),
@@ -127,7 +124,12 @@ private fun HomeHeader(state: AppState) {
                 modifier = Modifier.semantics { heading() },
             )
         }
-        Text("Welcome, ${state.settings.displayName}", style = MaterialTheme.typography.titleMedium, color = p.onAccent, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Column {
+            Text("Welcome, ${state.settings.displayName}", style = MaterialTheme.typography.titleMedium, color = p.onAccent, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            state.settings.master?.let { master ->
+                Text("${master.appearanceLabel} · Level 1", style = MaterialTheme.typography.bodyMedium, color = p.onAccent.copy(alpha = 0.92f))
+            }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             // New local profile: nothing earned yet. Real values arrive with the progression/economy tasks.
             StatChip(Icons.Filled.Star, "0", "XP")

@@ -3,6 +3,10 @@ package com.zeus97x.zbattle.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import com.zeus97x.zbattle.core.ArtKey
 import com.zeus97x.zbattle.core.CreatureCatalog
 import com.zeus97x.zbattle.core.Overlay
-import com.zeus97x.zbattle.core.PlayerSettings
+import com.zeus97x.zbattle.core.MasterGender
+import com.zeus97x.zbattle.core.MasterStyle
+import com.zeus97x.zbattle.core.PetMaster
 import com.zeus97x.zbattle.core.PreviewContent
 import com.zeus97x.zbattle.core.RegionCatalog
 import com.zeus97x.zbattle.core.Route
@@ -101,30 +107,43 @@ fun NoticeDialog(state: AppState, overlay: Overlay.Notice) {
     ZDialog(overlay.title, overlay.message, confirm = "OK" to state::dismissOverlay, onDismissRequest = state::dismissOverlay)
 }
 
+/** Name and cosmetic appearance can change; the starter companion stays as chosen at setup. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun EditNameDialog(state: AppState) {
+fun EditMasterDialog(state: AppState) {
     val p = Z.colors
-    var text by rememberSaveable { mutableStateOf(state.settings.displayName) }
-    val valid = PlayerSettings.validName(text)
+    val current = state.settings.master ?: return
+    var text by rememberSaveable { mutableStateOf(current.name) }
+    var style by rememberSaveable { mutableStateOf(current.style) }
+    var gender by rememberSaveable { mutableStateOf(current.gender) }
+    val updated = PetMaster.create(text, style, gender, current.starterId)
     AlertDialog(
         onDismissRequest = state::dismissOverlay,
         containerColor = p.surface,
-        title = { Text("Display name", color = p.textPrimary) },
+        title = { Text("Edit Pet Master", color = p.textPrimary) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = text, onValueChange = { text = it.take(PlayerSettings.MAX_NAME_LENGTH + 1) }, singleLine = true, isError = valid == null)
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(value = text, onValueChange = { text = it.take(PetMaster.MAX_NAME_LENGTH + 1) }, singleLine = true, isError = updated == null, label = { Text("Name") })
                 Text(
-                    if (valid == null) "Use 1–${PlayerSettings.MAX_NAME_LENGTH} characters." else "Saved on this device only.",
+                    if (updated == null) "Use 1–${PetMaster.MAX_NAME_LENGTH} characters." else "Saved on this device only.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (valid == null) MaterialTheme.colorScheme.error else p.textSecondary,
+                    color = if (updated == null) MaterialTheme.colorScheme.error else p.textSecondary,
                 )
+                Text("Style", style = MaterialTheme.typography.labelLarge, color = p.textSecondary)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    MasterStyle.entries.forEach { s -> ZFilterChip(s.label, s == style) { style = s } }
+                }
+                Text("Gender", style = MaterialTheme.typography.labelLarge, color = p.textSecondary)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    MasterGender.entries.forEach { g -> ZFilterChip(g.label, g == gender) { gender = g } }
+                }
             }
         },
         confirmButton = {
-            TextButton(enabled = valid != null, onClick = {
-                valid?.let { name -> state.updateSettings { it.copy(displayName = name) } }
+            TextButton(enabled = updated != null, onClick = {
+                updated?.let { m -> state.updateSettings { it.copy(master = m) } }
                 state.dismissOverlay()
-            }) { Text("Save", color = if (valid != null) p.accent else p.textSecondary) }
+            }) { Text("Save", color = if (updated != null) p.accent else p.textSecondary) }
         },
         dismissButton = { TextButton(onClick = state::dismissOverlay) { Text("Cancel", color = p.textPrimary) } },
     )

@@ -19,7 +19,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Construction
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.SyncAlt
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.MusicNote
@@ -60,13 +63,21 @@ fun ProfileScreen(state: AppState) {
         item {
             ZCard(Modifier.padding(horizontal = Dimens.screenPadding).fillMaxWidth()) {
                 Row(Modifier.padding(Dimens.cardPadding), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    ArtworkSlot(ArtKey.Avatar("default"), contentDescription = "Avatar", modifier = Modifier.size(72.dp).clip(CircleShape).border(2.dp, p.accent, CircleShape))
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    ArtworkSlot(
+                        settings.master?.avatarKey ?: ArtKey.Avatar("default"),
+                        contentDescription = "Pet Master avatar",
+                        modifier = Modifier.size(72.dp).clip(CircleShape).border(2.dp, p.accent, CircleShape),
+                    )
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text(settings.displayName, style = MaterialTheme.typography.headlineSmall, color = p.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        settings.master?.let { m ->
+                            Text("${m.appearanceLabel} · Level 1", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text("First companion: ${m.starter.name}", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
                         Text("Current: ${settings.currentArea.name}", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
-                    IconButton(onClick = { state.show(Overlay.EditName) }) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Edit display name", tint = p.accent)
+                    IconButton(onClick = { state.show(Overlay.EditMaster) }) {
+                        Icon(Icons.Filled.Edit, contentDescription = "Edit Pet Master", tint = p.accent)
                     }
                 }
             }
@@ -106,7 +117,15 @@ fun ProfileScreen(state: AppState) {
         }
         item {
             ZCard(Modifier.padding(horizontal = Dimens.screenPadding).fillMaxWidth()) {
-                SettingsRow(Icons.Filled.EmojiEvents, "Achievements", "Planned list", onClick = { state.navigate(Route.Achievements) })
+                Column {
+                    SettingsRow(Icons.Filled.EmojiEvents, "Achievements", "Planned list", onClick = { state.navigate(Route.Achievements) })
+                    Hairline()
+                    SettingsRow(Icons.Filled.Construction, "Skills and equipment", "Planned · every style shares the same skills and equipment")
+                    Hairline()
+                    SettingsRow(Icons.Filled.Pets, "Pet Master tasks", "Planned · gathering, crafting and companion expeditions; no AFK rewards yet")
+                    Hairline()
+                    SettingsRow(Icons.Filled.SyncAlt, "ZPet connection", "Planned · copy a pet from ZPet with separate battle progress. ZBattle rewards never return to ZPet.")
+                }
             }
         }
         item { SectionHeading("Settings", Modifier.padding(horizontal = Dimens.screenPadding)) }
@@ -123,7 +142,7 @@ fun ProfileScreen(state: AppState) {
         }
         item {
             ZCard(Modifier.padding(horizontal = Dimens.screenPadding).fillMaxWidth()) {
-                SettingsRow(Icons.Filled.AccountCircle, "Account", "Local profile only · no sign-in required. ZPet import is planned and one-way.")
+                SettingsRow(Icons.Filled.AccountCircle, "Account", "Local profile only · no sign-in required.")
             }
         }
     }

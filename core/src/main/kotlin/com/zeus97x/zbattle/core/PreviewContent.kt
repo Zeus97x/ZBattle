@@ -26,9 +26,6 @@ data class PreviewOpponent(
 object PreviewContent {
     const val BOSS_SLOT = 3
 
-    /** Preview party: the first created form of four families. Ownership arrives with ZPet import. */
-    val party: List<Creature> = listOf("sparklit", "inkling", "cindlet", "wispkit").map(CreatureCatalog::require)
-
     val shopItems: List<DemoShopItem> = ShopCategory.entries.flatMap { category ->
         (1..4).map { n -> DemoShopItem("demo-${category.name.lowercase()}-$n", "Demo ${category.label.removeSuffix("s")} $n", category) }
     }

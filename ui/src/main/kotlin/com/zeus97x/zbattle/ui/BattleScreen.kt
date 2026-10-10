@@ -58,7 +58,7 @@ fun BattleScreen(state: AppState, areaIndex: Int, opponentSlot: Int) {
     val p = Z.colors
     val area = RegionCatalog.area(areaIndex)
     val opponent = PreviewContent.opponents(area)[opponentSlot]
-    val party = PreviewContent.party
+    val party = state.settings.party
     var activeIndex by rememberSaveable { mutableStateOf(0) }
     var switching by rememberSaveable { mutableStateOf(false) }
     var status by rememberSaveable { mutableStateOf("Preview battle · the battle engine is not built yet, so actions change nothing.") }
@@ -131,7 +131,10 @@ fun BattleScreen(state: AppState, areaIndex: Int, opponentSlot: Int) {
                 ActionButton("Skill", Icons.Filled.AutoAwesome, Modifier.weight(1f), primary = true) { previewAction("Skill") }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ActionButton("Switch", Icons.Filled.SwapHoriz, Modifier.weight(1f)) { switching = !switching }
+                ActionButton("Switch", Icons.Filled.SwapHoriz, Modifier.weight(1f)) {
+                    if (party.size > 1) switching = !switching
+                    else status = "Only one companion so far · more arrive with encounters and ZPet import."
+                }
                 ActionButton("Retreat", Icons.Filled.DirectionsRun, Modifier.weight(1f)) { state.show(Overlay.ConfirmRetreat) }
             }
         }

@@ -26,7 +26,8 @@ sealed interface Overlay {
     data object ConfirmRetreat : Overlay
     data class LockedArea(val areaIndex: Int) : Overlay
     data class Notice(val title: String, val message: String) : Overlay
-    data object EditName : Overlay
+    /** Edit name and cosmetic appearance; the starter choice is fixed after setup. */
+    data object EditMaster : Overlay
 }
 
 /**

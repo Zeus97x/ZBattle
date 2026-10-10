@@ -1,28 +1,25 @@
 package com.zeus97x.zbattle.core
 
-/** Locally persisted player preferences. No cloud account, no ZPet write-back. */
+/** Locally persisted player state. No cloud account, no ZPet write-back. */
 data class PlayerSettings(
-    val displayName: String = DEFAULT_NAME,
+    /** Null until first-run setup ("Begin your journey") is completed. */
+    val master: PetMaster? = null,
     val darkMode: Boolean = true,
     /** Saved preference only; audio is not implemented yet. */
     val music: Boolean = true,
-    /** Controls the local preview animations (battle hit shake, creature idle bob). */
+    /** Controls the local preview animations (battle hit shake). */
     val battleAnimations: Boolean = true,
     val currentAreaIndex: Int = 0,
     val visitedAreas: Set<Int> = setOf(0),
 ) {
     val currentArea: Area get() = RegionCatalog.area(currentAreaIndex)
+    val displayName: String get() = master?.name ?: "Pet Master"
+
+    /** Companions the player actually has: the chosen starter. More arrive with encounters/ZPet import. */
+    val party: List<Creature> get() = listOfNotNull(master?.starter)
 
     fun travelTo(area: Area): PlayerSettings =
         copy(currentAreaIndex = area.index, visitedAreas = visitedAreas + area.index)
-
-    companion object {
-        const val DEFAULT_NAME = "Trainer"
-        const val MAX_NAME_LENGTH = 24
-
-        /** Returns the trimmed name, or null when it is empty or too long. */
-        fun validName(raw: String): String? = raw.trim().takeIf { it.isNotEmpty() && it.length <= MAX_NAME_LENGTH }
-    }
 }
 
 interface SettingsStore {

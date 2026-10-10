@@ -9,9 +9,9 @@ import kotlin.test.assertTrue
 class ProfileTest {
     @Test
     fun nameValidation() {
-        assertEquals("Zeus", PlayerSettings.validName("  Zeus "))
-        assertNull(PlayerSettings.validName("   "))
-        assertNull(PlayerSettings.validName("x".repeat(25)))
+        assertEquals("Zeus", PetMaster.validName("  Zeus "))
+        assertNull(PetMaster.validName("   "))
+        assertNull(PetMaster.validName("x".repeat(25)))
     }
 
     @Test

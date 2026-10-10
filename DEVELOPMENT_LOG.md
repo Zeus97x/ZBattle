@@ -92,3 +92,20 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Next step: open the PR, read CI, fix any Android compile/lint differences between Compose 1.5 (harness) and BOM 2024.12.01 (app).
 - CI fix (same day): first run of `verify` failed in `android-actions/setup-android@v3` ("Failed to find package 'tools'") before Gradle started. Removed that step from `.github/workflows/android-ui.yml`; GitHub's ubuntu-latest image already provides the Android SDK via `ANDROID_HOME`.
 - Build paused (same day): user said "Dont build the app yet". Cancelled Actions run 38008122340 and changed `.github/workflows/android-ui.yml` to `workflow_dispatch` only, so pushes no longer build the APK. Android compile, lint and APK are therefore still unverified. Next step when the user approves: run "Android UI foundation checks" manually from the Actions tab on `claude/zbattle-ui-foundation` and fix anything it reports.
+
+## 2026-10-09 (evening) — CLAUDE-001: integrate PR #1 Pet Master foundation
+- Status: implemented; Android build still paused by the user (workflow manual-only).
+- Request: user clarified that Codex's PR #1 (`ai/codex/zbattle-foundation`, ZB-002) was guidance for this work, not a competing implementation.
+- Read from PR #1: `MasterProfile.java` (name 1–24 trimmed; styles Ranger, Dragon Disciple, Knight, Mystic, Artificer; Male/Female; starters Sparklit, Inkling, Cindlet), `MainActivity.java` setup/Camp/Master content, `MasterProfileTest.java`, `.github/ai/ROADMAP.md`, `ADR-001.md`, ZB-002/003/004 task files.
+- Changes:
+  - `core/.../PetMaster.kt` (new): `MasterStyle`, `MasterGender`, `Starters`, validated `PetMaster` with `avatar/<style>-<gender>` art key (the ten pending Pet Master illustrations).
+  - `core/.../Profile.kt`: `PlayerSettings.master` replaces the free display name; `party` is the chosen starter (real data) instead of a four-creature preview party. `PreviewContent.party` removed.
+  - `core/.../Navigation.kt`: `Overlay.EditName` → `Overlay.EditMaster`.
+  - `ui/.../SetupScreen.kt` (new): "Begin your journey" first-run screen; app shows it with no tabs until a Pet Master is saved (`ZBattleApp.kt`, `AppState.completeSetup`).
+  - Home header shows appearance · Level 1; My Party shows the starter. Battle Switch explains one companion; Double Battle shows the lead plus an open slot.
+  - Profile shows avatar slot, appearance, first companion, and planned rows for shared skills/equipment, Pet Master tasks (gathering/crafting/expeditions, no AFK rewards) and the one-way ZPet connection. `EditMasterDialog` edits name/style/gender; the starter stays fixed.
+  - `app/.../PrefsSettingsStore.kt`: persists master name/style/gender/starter; an invalid or partial save returns to setup.
+  - Tests: `core/.../PetMasterTest.kt` (30 valid combinations, invalid inputs, 10 distinct avatar keys, starters have art); `LayoutRenderTest` adds the setup screen and setup → party flow.
+- Not adopted: PR #1's Camp/Adventure/Tasks/Master tabs (the newer `ai/UI_LAYOUT_SPEC.md` on main specifies Collection/Shop/Home/Events/Profile); its Java Views shell; `.github/ai/**` workspace (left in PR #1 for the user to merge separately).
+- Verification: `./gradlew -p preview test` — 28 tests passed; 47 renders inspected (setup at 360dp/412dp/1.3× font, Home, Profile, Edit Pet Master, Double Battle). `docs/screenshots/claude-001/` refreshed (27 images). Android compile not run (paused by user; also blocked locally).
+- Next step: on user approval, run the manual "Android UI foundation checks" workflow and fix anything it reports.

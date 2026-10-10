@@ -8,6 +8,7 @@ import com.zeus97x.zbattle.core.Area
 import com.zeus97x.zbattle.core.CollectionQuery
 import com.zeus97x.zbattle.core.NavState
 import com.zeus97x.zbattle.core.Overlay
+import com.zeus97x.zbattle.core.PetMaster
 import com.zeus97x.zbattle.core.PlayerSettings
 import com.zeus97x.zbattle.core.Route
 import com.zeus97x.zbattle.core.SettingsStore
@@ -41,6 +42,12 @@ class AppState(private val store: SettingsStore, initialNav: NavState = NavState
             settings = next
             store.save(next)
         }
+    }
+
+    /** Saves the first-run Pet Master and opens Home. */
+    fun completeSetup(master: PetMaster) {
+        updateSettings { it.copy(master = master) }
+        nav = NavState()
     }
 
     /** Travel confirms an area, then returns Home showing it. */

@@ -10,6 +10,9 @@ import com.zeus97x.zbattle.core.CreatureCatalog
 import com.zeus97x.zbattle.core.InMemorySettingsStore
 import com.zeus97x.zbattle.core.NavState
 import com.zeus97x.zbattle.core.Overlay
+import com.zeus97x.zbattle.core.MasterGender
+import com.zeus97x.zbattle.core.MasterStyle
+import com.zeus97x.zbattle.core.PetMaster
 import com.zeus97x.zbattle.core.PlayerSettings
 import com.zeus97x.zbattle.core.RegionCatalog
 import com.zeus97x.zbattle.core.Route
@@ -41,9 +44,14 @@ class LayoutRenderTest {
     private val phones = listOf(Phone("412dp", 412, 915), Phone("360dp", 360, 780))
     private val largeText = Phone("360dp-font130", 360, 780, 1.3f)
 
-    private val visitedSettings = PlayerSettings(displayName = "Zeus", currentAreaIndex = 13, visitedAreas = setOf(0, 12, 13))
+    private val visitedSettings = PlayerSettings(
+        master = PetMaster("Zeus", MasterStyle.DragonDisciple, MasterGender.Female, "cindlet"),
+        currentAreaIndex = 13,
+        visitedAreas = setOf(0, 12, 13),
+    )
 
     private val cases: List<Triple<String, NavState, PlayerSettings>> = listOf(
+        Triple("00-setup", NavState(), PlayerSettings()),
         Triple("01-home", NavState(), visitedSettings),
         Triple("02-collection", NavState(listOf(Route.Collection)), visitedSettings),
         Triple("03-travel", NavState(listOf(Route.Home, Route.Travel(3))), visitedSettings),
@@ -60,7 +68,7 @@ class LayoutRenderTest {
         Triple("14-confirm-challenge", NavState(listOf(Route.Home, Route.Challenges(13)), Overlay.ConfirmChallenge(13, 3)), visitedSettings),
         Triple("15-locked-area", NavState(listOf(Route.Home, Route.Travel(6)), Overlay.LockedArea(26)), visitedSettings),
         Triple("16-retreat", NavState(listOf(Route.Home, Route.Challenges(13), Route.Battle(13, 0)), Overlay.ConfirmRetreat), visitedSettings),
-        Triple("17-edit-name", NavState(listOf(Route.Profile), Overlay.EditName), visitedSettings),
+        Triple("17-edit-master", NavState(listOf(Route.Profile), Overlay.EditMaster), visitedSettings),
     )
 
     @Test
@@ -68,7 +76,7 @@ class LayoutRenderTest {
         preloadCreatures()
         val written = mutableListOf<File>()
         for (phone in phones) for ((name, nav, settings) in cases) written += render(phone, name, nav, settings)
-        for ((name, nav, settings) in cases.filter { it.first in setOf("01-home", "02-collection", "03-travel", "05-battle", "09-profile") }) {
+        for ((name, nav, settings) in cases.filter { it.first in setOf("00-setup", "01-home", "02-collection", "03-travel", "05-battle", "09-profile") }) {
             written += render(largeText, name, nav, settings)
         }
         written += render(phones[0], "18-home-light", NavState(), visitedSettings.copy(darkMode = false))
@@ -88,13 +96,17 @@ class LayoutRenderTest {
         assertEquals(expected, routes)
         val overlays = cases.mapNotNull { it.second.overlay?.let { o -> o::class } }.toSet()
         assertTrue(overlays.containsAll(setOf(Overlay.ShopSheet::class, Overlay.CreatureDetail::class, Overlay.ConfirmChallenge::class,
-            Overlay.ConfirmRetreat::class, Overlay.LockedArea::class, Overlay.EditName::class)))
+            Overlay.ConfirmRetreat::class, Overlay.LockedArea::class, Overlay.EditMaster::class)))
     }
 
     @Test
     fun appStateFlowsTravelAndSettingsThroughStore() {
         val store = InMemorySettingsStore()
         val state = AppState(store)
+        assertEquals(null, state.settings.master)
+        state.completeSetup(PetMaster("Zeus", MasterStyle.Knight, MasterGender.Male, "inkling"))
+        assertEquals("inkling", store.load().master?.starterId)
+        assertEquals(listOf("Inkling"), state.settings.party.map { it.name })
         state.navigate(Route.Travel(5))
         state.travelTo(RegionCatalog.area(20))
         assertEquals(Route.Home, state.nav.current)

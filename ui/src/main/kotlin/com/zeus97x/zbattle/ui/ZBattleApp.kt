@@ -62,20 +62,25 @@ fun ZBattleApp(state: AppState) {
         val p = Z.colors
         val holder = rememberSaveableStateHolder()
         Box(Modifier.fillMaxSize().background(p.background)) {
-            Column(Modifier.fillMaxSize().imePadding()) {
-                Box(Modifier.weight(1f).fillMaxWidth()) {
-                    val route = state.nav.current
-                    // Keeps each destination's scroll position while it stays reachable.
-                    holder.SaveableStateProvider(route.toString()) {
-                        RouteContent(route, state)
+            if (state.settings.master == null) {
+                // First run: no tabs until the Pet Master exists.
+                Box(Modifier.fillMaxSize().imePadding()) { SetupScreen(state) }
+            } else {
+                Column(Modifier.fillMaxSize().imePadding()) {
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                        val route = state.nav.current
+                        // Keeps each destination's scroll position while it stays reachable.
+                        holder.SaveableStateProvider(route.toString()) {
+                            RouteContent(route, state)
+                        }
+                    }
+                    // Battle is immersive: the header back arrow / Retreat exit it, so the bar is hidden.
+                    if (state.nav.current !is Route.Battle) {
+                        BottomBar(selected = state.nav.selectedTab, onSelect = state::selectTab)
                     }
                 }
-                // Battle is immersive: the header back arrow / Retreat exit it, so the bar is hidden.
-                if (state.nav.current !is Route.Battle) {
-                    BottomBar(selected = state.nav.selectedTab, onSelect = state::selectTab)
-                }
+                OverlayHost(state)
             }
-            OverlayHost(state)
         }
     }
 }
@@ -106,7 +111,7 @@ private fun OverlayHost(state: AppState) {
         Overlay.ConfirmRetreat -> ConfirmRetreatDialog(state)
         is Overlay.LockedArea -> LockedAreaDialog(state, overlay.areaIndex)
         is Overlay.Notice -> NoticeDialog(state, overlay)
-        Overlay.EditName -> EditNameDialog(state)
+        Overlay.EditMaster -> EditMasterDialog(state)
     }
 }
 
