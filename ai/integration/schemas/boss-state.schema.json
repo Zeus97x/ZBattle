@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/boss-state.schema.json",
+  "title": "BossState payload",
+  "description": "ZBattle-owned, settled by a trusted authority. Window semantics pending D-WEEK-WINDOW (anchored 168h vs trailing 7 days).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bossId", "nextEligibleAtUtc", "windowStartAtUtc", "victoryTimestampsUtc", "victoryCount", "settlementIds", "rewardState"],
+  "properties": {
+    "bossId": { "type": "string", "pattern": "^boss/[a-z0-9-]+$" },
+    "nextEligibleAtUtc": { "anyOf": [{ "$ref": "common.schema.json#/$defs/utcTimestamp" }, { "type": "null" }] },
+    "windowStartAtUtc": { "anyOf": [{ "$ref": "common.schema.json#/$defs/utcTimestamp" }, { "type": "null" }] },
+    "victoryTimestampsUtc": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/utcTimestamp" } },
+    "victoryCount": { "type": "integer", "minimum": 0 },
+    "settlementIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/uuid" }, "uniqueItems": true },
+    "rewardState": { "enum": ["none", "pending", "settled"] }
+  }
+}

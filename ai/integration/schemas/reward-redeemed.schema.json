@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/reward-redeemed.schema.json",
+  "title": "RewardRedeemed payload",
+  "description": "Produced by ZBattle when an inbox reward is redeemed atomically (consume + inventory + outcome in one transaction).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rewardId", "deliveryId", "inventoryTransactionId", "destinationApp", "state"],
+  "properties": {
+    "rewardId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "deliveryId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "inventoryTransactionId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "destinationApp": { "const": "zbattle" },
+    "state": { "enum": ["pending", "accepted", "rejected", "redeemed", "acknowledged"] },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "retryable"],
+      "properties": { "code": { "type": "string", "pattern": "^[A-Z_]+$" }, "retryable": { "type": "boolean" } }
+    }
+  },
+  "if": { "properties": { "state": { "const": "rejected" } } },
+  "then": { "required": ["failure"] }
+}

@@ -29,3 +29,8 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 
 ## Progress
 - A1 (2026-10-10): evidence audit written in `ai/integration/AUDIT-A1.md`. ZBattle main `d2f938d` and ZPet main `1adcedb` were read; ZPet was cloned read-only. 8 contract gaps found (G1–G8). The BranchPalette description in `ai/ZCUBES_PLAN.md` was corrected.
+- A2 (2026-10-10): contract v0.2 draft written (`ai/integration/CONTRACT-v0.2.md`), with:
+  - `schemas/`: 9 JSON Schemas, draft 2020-12.
+  - `fixtures/`: 31 records (20 valid, 10 schema-invalid, 1 unknown-version) and 12 sequence scenarios (`manifest.json`).
+  - `fixtures/migration/`: a real ZBattle v1 save (golden file) plus the proposed uid → companionId mapping.
+  - Reference rule checker `tools/validate_contract.py` (rules R1–R12) and `tools/check_doc_links.py`, both run in CI.

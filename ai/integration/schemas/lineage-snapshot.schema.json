@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/lineage-snapshot.schema.json",
+  "title": "LineageSnapshot payload",
+  "description": "ZPet creates legacy; ZBattle displays. Cosmetic only: additionalProperties=false forbids any combat-stat field.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lineageId", "generation", "founderCompanionIds", "successorCompanionId", "elementId", "cosmeticAssetKey", "sourceRevision"],
+  "properties": {
+    "lineageId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "generation": { "type": "integer", "minimum": 1 },
+    "founderCompanionIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/uuid" }, "minItems": 1, "uniqueItems": true },
+    "successorCompanionId": { "anyOf": [{ "$ref": "common.schema.json#/$defs/uuid" }, { "type": "null" }] },
+    "elementId": { "$ref": "common.schema.json#/$defs/elementId" },
+    "cosmeticAssetKey": { "$ref": "common.schema.json#/$defs/artKey" },
+    "sourceRevision": { "$ref": "common.schema.json#/$defs/revision" }
+  }
+}

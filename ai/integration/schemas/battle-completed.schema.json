@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeus97x.github.io/zb-zp-contract/0.2/battle-completed.schema.json",
+  "title": "BattleCompleted payload",
+  "description": "Produced by ZBattle only. Only actual participants qualify for downstream credit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["battleId", "encounterId", "encounterKind", "groupId", "areaId", "participantCompanionIds", "outcome", "rulesRevision", "verification", "settlementRef"],
+  "properties": {
+    "battleId": { "$ref": "common.schema.json#/$defs/uuid" },
+    "encounterId": { "type": "string", "pattern": "^area-([0-3][0-9]|4[0-7])/slot-[0-9]+$" },
+    "encounterKind": { "enum": ["wild", "campaign", "mini-boss", "stage-boss", "location-boss", "region-boss", "mystical", "practice"], "description": "Kinds from the roadmap; counts and rules pending Phase B/C approval." },
+    "groupId": { "$ref": "common.schema.json#/$defs/groupId" },
+    "areaId": { "$ref": "common.schema.json#/$defs/areaId" },
+    "participantCompanionIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/uuid" }, "minItems": 1, "maxItems": 6, "uniqueItems": true },
+    "outcome": { "enum": ["victory", "defeat", "retreat"] },
+    "rulesRevision": { "type": "string", "pattern": "^zbattle-rules-[0-9]+$" },
+    "verification": { "$ref": "common.schema.json#/$defs/verification" },
+    "settlementRef": { "type": ["string", "null"], "maxLength": 128 }
+  },
+  "if": { "properties": { "verification": { "const": "server-settled" } } },
+  "then": { "properties": { "settlementRef": { "type": "string", "minLength": 1 } } }
+}

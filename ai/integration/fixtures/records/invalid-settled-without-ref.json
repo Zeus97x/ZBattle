@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "eventId": "00000000-0000-4000-8000-0000000e0015",
+  "accountId": "00000000-0000-4000-8000-0000000a0001",
+  "sourceApp": "zbattle",
+  "sourceDeviceId": "00000000-0000-4000-8000-0000000d0002",
+  "recordType": "BattleCompleted",
+  "recordId": "00000000-0000-4000-8000-0000000b0002",
+  "recordRevision": 1,
+  "createdAtUtc": "2026-10-10T04:00:00Z",
+  "payload": {
+    "battleId": "00000000-0000-4000-8000-0000000b0002",
+    "encounterId": "area-00/slot-0",
+    "encounterKind": "wild",
+    "groupId": "group-0",
+    "areaId": "area-00",
+    "participantCompanionIds": [
+      "00000000-0000-4000-8000-0000000c0001",
+      "00000000-0000-4000-8000-0000000c0002"
+    ],
+    "outcome": "victory",
+    "rulesRevision": "zbattle-rules-1",
+    "verification": "server-settled",
+    "settlementRef": null
+  }
+}

@@ -1,4 +1,6 @@
 # Shared integration contract — draft v0.1
+> Superseded by [CONTRACT-v0.2.md](CONTRACT-v0.2.md) (CLAUDE-004 A2, 2026-10-10). Kept for history.
+
 Status: PROPOSED, not a deployed API. ZBattle coordinator copy; ZPet project reviews and publishes its matching copy.
 Revision: zb-zp-contract-0.1. Updated 2026-10-10 America/Toronto.
 Changes: initial ownership, identity and event envelope proposal. No compatibility claim with existing saves.

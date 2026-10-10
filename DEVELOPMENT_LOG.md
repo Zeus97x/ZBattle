@@ -290,3 +290,26 @@ Remaining work:
 - Correction: `ai/ZCUBES_PLAN.md` wrongly described ZPet `BranchPalette` as species-variant colouring; it tints Branch-B forms only. Fixed.
 - Verification: findings cite source files at the stated commits. The GitHub PR API returned "invalid session", so PR states come from git refs and earlier reports.
 - Next: A2 (schemas, fixtures, authority/error/compatibility tables).
+
+## 2026-10-10 — CLAUDE-004 A2: contract v0.2 schemas, fixtures and checks (Claude)
+- Status: implemented on `claude/zbattle-phase-a-contract`. Documentation, fixtures and tooling only; no gameplay, save or backend change.
+- Changes:
+  - `ai/integration/CONTRACT-v0.2.md` (new, supersedes v0.1, which gets a pointer): resolutions for audit gaps G1–G8, authority table, acceptance rules R1–R12 with error codes, inbox states, compatibility matrix, migration notes.
+  - `ai/integration/schemas/*.schema.json`: 9 JSON Schemas, draft 2020-12 (common, envelope, 7 payloads). Form/branch consistency, origin/legacy-id prefix, nullable bond pair, server-settled ⇒ `settlementRef`, and no combat fields on lineage are all enforced by the schemas.
+  - `ai/integration/fixtures/records/` (31) and `manifest.json`:
+    - valid cases: imported vs native companions, a duplicate species as two individuals, nickname/form update, bond correction and stale bond, form regression, unverified vs settled battles, reward earn/redeem/rejected, expedition, boss, lineage
+    - 10 schema-invalid cases and 1 unknown-version case
+    - 12 sequence scenarios
+  - Fixture ids are synthetic UUIDs; reward tiers, quantities, durations and boss ids are labelled illustrative.
+  - `ai/integration/fixtures/migration/`: a real `BattleProgress` v1 golden file (`ZBATTLE_UPDATE_GOLDEN=1` regenerates it) plus the proposed `zb-uid-N` → `companionId` mapping, checked by `core/src/test/.../battle/ContractMigrationFixtureTest.kt`.
+  - `tools/validate_contract.py`: schema validation, catalogue coverage against `ZBattle-ZPet-Assets/reference/*.java`, a reference rule engine replaying every sequence, the migration check and the bundle hash.
+  - `tools/check_doc_links.py` (new).
+  - `.github/workflows/android-ui.yml`: CI step "Integration contract fixtures and doc links" (pip jsonschema 4.26.0).
+- Verification:
+  - `python3 tools/validate_contract.py` → OK (31 records, 20 schema-valid, 12 sequences).
+  - Each invalid fixture was confirmed to fail for its intended reason.
+  - `python3 tools/check_doc_links.py` → OK.
+  - `./gradlew -p preview test` → passed, including the new migration fixture test.
+  - A Maven JSON-schema dependency was not added; Maven Central rate-limited this session and the Python validator covers it in CI.
+- Gaps: the ZPet-side `pet-N` save fixture belongs to the ZPet project; the v2 ZBattle save is Phase D1.
+- Next: A3, the hash handoff to ZPet, the decision register with owners, and bounded B–G tasks.

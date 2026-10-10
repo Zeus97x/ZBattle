@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "eventId": "00000000-0000-4000-8000-0000000e0003",
+  "accountId": "00000000-0000-4000-8000-0000000a0001",
+  "sourceApp": "zbattle",
+  "sourceDeviceId": "00000000-0000-4000-8000-0000000d0002",
+  "recordType": "CompanionSnapshot",
+  "recordId": "00000000-0000-4000-8000-0000000c0002",
+  "recordRevision": 1,
+  "createdAtUtc": "2026-10-10T04:00:00Z",
+  "payload": {
+    "companionId": "00000000-0000-4000-8000-0000000c0002",
+    "originApp": "zbattle",
+    "legacyLocalId": "zb-uid-1",
+    "speciesId": "2:0",
+    "formIndex": 0,
+    "branch": "none",
+    "nickname": null,
+    "elementId": null,
+    "provenance": "native",
+    "sourceRevision": 1,
+    "bondPercent": null,
+    "bondRevision": null
+  }
+}

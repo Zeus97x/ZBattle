@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "contractRevision": "zb-zp-contract-0.2-draft",
+  "eventId": "00000000-0000-4000-8000-0000000e0028",
+  "accountId": "00000000-0000-4000-8000-0000000a0001",
+  "sourceApp": "zpet",
+  "sourceDeviceId": "00000000-0000-4000-8000-0000000d0001",
+  "recordType": "ExpeditionSnapshot",
+  "recordId": "00000000-0000-4000-8000-0000000e1001",
+  "recordRevision": 1,
+  "createdAtUtc": "2026-10-10T04:00:00Z",
+  "payload": {
+    "expeditionId": "00000000-0000-4000-8000-0000000e1001",
+    "companionId": "00000000-0000-4000-8000-0000000c0001",
+    "durationSeconds": 3600,
+    "startedAtUtc": "2026-10-10T04:00:00Z",
+    "eligibleEventIds": [
+      "00000000-0000-4000-8000-0000000e0015"
+    ],
+    "creditedProgressSeconds": 0,
+    "capRevision": "expedition-cap-r1",
+    "status": "running",
+    "claimId": null
+  }
+}
