@@ -5,14 +5,15 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 ## Current work
 | Task | Owner | Status | Scope |
 |---|---|---|---|
-| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Review — PR #2, CI green (branch claude/zbattle-ui-foundation) | Build Android UI foundation using existing ZPet assets and new-art placeholders |
+| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Merged — PR #2 | Android UI foundation using existing ZPet assets and new-art placeholders |
+| [CLAUDE-002](tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md) | Claude | Merged — PR #5 | Battle vertical slice: stats, real battle engine, saved progress, Android bottom-inset fix, full-circle lightning nav, ZCubes planning; double battles deferred |
+| [CLAUDE-003](tasks/CLAUDE-003-ARTWORK-INTEGRATION.md) | Claude | In progress — branch claude/zbattle-artwork-integration | Package and wire maps/hero scenery |
 | Artwork phase 1 | ChatGPT | Reference board uploaded; standalone exports pending | Logo, app icon, splash |
 | Artwork phase 2 | ChatGPT | 12 maps uploaded for review | Exact ZPet region groups |
 | Artwork phase 3 | ChatGPT | 48 primary landscapes + 7 variants uploaded for review | Exact ZPet locations |
-| [CLAUDE-003](tasks/CLAUDE-003-ARTWORK-INTEGRATION.md) | Claude | Ready | Package and wire maps/hero scenery |
 | Artwork phases 4-8 | ChatGPT | Pending | Battle scenery, opponents, shop, progress, finishing |
 
-[Layout specification](UI_LAYOUT_SPEC.md) is the implementation brief. Claude's summary of CLAUDE-001 for ChatGPT: [CLAUDE-001-SUMMARY-FOR-CHATGPT.md](CLAUDE-001-SUMMARY-FOR-CHATGPT.md). All 70 recovered ZBattle images are now in [the artwork drop](../design/artwork/README.md), with stable-ID mappings and checksums. Runtime integration is assigned to CLAUDE-003.
+[Layout specification](UI_LAYOUT_SPEC.md) is the implementation brief. ZCubes catching plan: [ZCUBES_PLAN.md](ZCUBES_PLAN.md). Claude's summary of CLAUDE-001 for ChatGPT: [CLAUDE-001-SUMMARY-FOR-CHATGPT.md](CLAUDE-001-SUMMARY-FOR-CHATGPT.md). All 70 recovered ZBattle images are now in [the artwork drop](../design/artwork/README.md), with stable-ID mappings and checksums. Runtime integration is CLAUDE-003.
 
 ## Collaboration
 Claim a task by recording owner, branch, base commit, status and start time in its task file. One owner per implementation task. Work in a feature branch and return a PR, not direct code writes to main. Check main and open work before starting.

@@ -7,6 +7,8 @@ import com.zeus97x.zbattle.core.PetMaster
 import com.zeus97x.zbattle.core.PlayerSettings
 import com.zeus97x.zbattle.core.RegionCatalog
 import com.zeus97x.zbattle.core.SettingsStore
+import com.zeus97x.zbattle.core.battle.BattleProgress
+import com.zeus97x.zbattle.core.battle.BattleProgressCodec
 
 /** Local-only persistence. Nothing here is sent anywhere or written to ZPet. */
 class PrefsSettingsStore(context: Context) : SettingsStore {
@@ -31,6 +33,7 @@ class PrefsSettingsStore(context: Context) : SettingsStore {
         )
         return PlayerSettings(
             master = master,
+            progress = loadProgress(),
             darkMode = prefs.getBoolean(KEY_DARK, defaults.darkMode),
             music = prefs.getBoolean(KEY_MUSIC, defaults.music),
             battleAnimations = prefs.getBoolean(KEY_ANIMATIONS, defaults.battleAnimations),
@@ -56,7 +59,22 @@ class PrefsSettingsStore(context: Context) : SettingsStore {
             .putBoolean(KEY_ANIMATIONS, settings.battleAnimations)
             .putInt(KEY_AREA, settings.currentAreaIndex)
             .putString(KEY_VISITED, settings.visitedAreas.sorted().joinToString(","))
+            .putString(KEY_PROGRESS, BattleProgressCodec.encode(settings.progress))
             .apply()
+    }
+
+    /**
+     * Unreadable battle data is moved aside (never deleted) so it can be recovered later, and
+     * the player continues with fresh progress; their starter is re-granted by AppState.
+     */
+    private fun loadProgress(): BattleProgress {
+        val raw = prefs.getString(KEY_PROGRESS, null) ?: return BattleProgress()
+        return try {
+            BattleProgressCodec.decode(raw)
+        } catch (_: IllegalStateException) {
+            prefs.edit().putString(KEY_PROGRESS_RECOVERY, raw).remove(KEY_PROGRESS).apply()
+            BattleProgress()
+        }
     }
 
     private companion object {
@@ -69,5 +87,7 @@ class PrefsSettingsStore(context: Context) : SettingsStore {
         const val KEY_ANIMATIONS = "battleAnimations"
         const val KEY_AREA = "currentArea"
         const val KEY_VISITED = "visitedAreas"
+        const val KEY_PROGRESS = "battleProgress"
+        const val KEY_PROGRESS_RECOVERY = "battleProgress.unreadable"
     }
 }

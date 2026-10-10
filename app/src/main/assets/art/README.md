@@ -7,6 +7,7 @@ ChatGPT-approved illustrations go here, named by the stable keys in
 - `region/group-<0..11>/map`
 - `location/area-<00..47>/hero`, `location/area-<00..47>/battle`
 - `boss/<id>`, `opponent/<id>`, `item/<id>`, `badge/<id>`, `avatar/<id>`, `event/<id>`
+- ZCubes (planned, see `ai/ZCUBES_PLAN.md`): `item/zcube-basic`, `item/zcube-great`, `item/zcube-ultra`, `item/zcube-mythic`
 
 Example: `art/location/area-12/hero.png` is the Desert Crossing scenery card.
 Screens pick files up automatically; until a file exists they draw a placeholder.
