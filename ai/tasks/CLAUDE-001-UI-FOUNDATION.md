@@ -45,3 +45,4 @@ Return PR URL, commit, changes, checks, screenshots if available, remaining bloc
 - 2026-10-09: shared Compose screens for all nine layouts + JVM layout harness committed (WIP, paused by user). Android entry point and CI not yet added.
 - 2026-10-09: handed off to ChatGPT at the user's request; remaining steps in [CLAUDE-001-HANDOFF.md](CLAUDE-001-HANDOFF.md).
 - 2026-10-09 (evening): user withdrew the ChatGPT handoff; Claude resumed. Added Android entry point (manifest, MainActivity, AssetArtLoader, PrefsSettingsStore), CI workflow, art drop-folder notes, layout fixes (large font, light mode, placeholder labels) and committed renders under docs/screenshots/claude-001/.
+- 2026-10-09 (evening): user asked not to build the app yet. CI run cancelled; workflow switched to manual-only (workflow_dispatch). Android compile/lint/APK remain unverified until the user approves a build.
