@@ -22,6 +22,7 @@
     "invalid-empty-participants": "REJECT_SCHEMA",
     "invalid-legacy-id-origin-mismatch": "REJECT_SCHEMA",
     "invalid-lineage-combat-stat": "REJECT_SCHEMA",
+    "invalid-party-of-four": "REJECT_SCHEMA",
     "invalid-settled-without-ref": "REJECT_SCHEMA",
     "invalid-species-out-of-range": "REJECT_SCHEMA",
     "invalid-ticket-without-tier": "REJECT_SCHEMA",

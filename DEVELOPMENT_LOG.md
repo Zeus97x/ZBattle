@@ -378,3 +378,18 @@ Remaining work:
   - `ai/PHASE-A-B1-SUMMARY-AND-QUESTIONS.md`: marked answered.
 - Verification: `python3 tools/check_doc_links.py`, `python3 tools/validate_contract.py`.
 - Next: contract amendments, then B2.
+
+## 2026-10-10 — Contract v0.2 amended for decision batch 1 (Claude)
+- Branch: `claude/zbattle-contract-v0.2-amend` (stacked on the decisions branch).
+- Changes:
+  - `battle-completed.schema.json`: party max 3 (D-PARTY); `practice` defined as rewardless (D-PARTICIPATION).
+  - New invalid fixture `invalid-party-of-four`.
+  - New `fixtures/origin-bonus-examples.json` (11 worked cases); `tools/validate_contract.py` computes them independently (`origin_bonus_bp`, `origin_stat`).
+  - `CONTRACT-v0.2.md` G2/G4/G6/G7/R12 updated (D-RARITY, D-NATIVE-SPECIES, D-ORIGIN-ROUNDING, D-OFFLINE-TRUST, D-PARTICIPATION).
+  - New bundle hash `77d69eb17081a088bd66a2f34ac4fe6350730b3749def59b9c2d914d8b6fa41a` (46 files), recorded in `CONTRACT-BUNDLE.sha256` and the ZPet handoff along with a change table.
+- Verification:
+  - `python3 tools/validate_contract.py` → OK.
+  - Deliberately corrupting an origin-bonus case made the checker fail as expected.
+  - The four-participant fixture fails on the array length.
+  - Doc links OK.
+- ZPet: not written. ZPet Claude adopts per Q3 and must report incompatibilities before accepting.

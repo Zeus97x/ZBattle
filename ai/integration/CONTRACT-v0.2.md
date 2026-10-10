@@ -4,6 +4,7 @@
 - **Revision:** `zb-zp-contract-0.2-draft`.
 - **Supersedes:** [CONTRACT-v0.1.md](CONTRACT-v0.1.md), which is kept for history.
 - **Written:** 2026-10-10 (America/Toronto) by Claude, as CLAUDE-004 Phase A sub-PR A2.
+- **Amended:** 2026-10-10 with Zeus97x decision batch 1 (Q4, Q8, Q13–Q16; see [DECISIONS.md](DECISIONS.md)). This changed the bundle hash. The revision string is unchanged because no copy had been adopted yet.
 
 v0.2 turns the v0.1 prose into machine-checkable artefacts, grounded in the evidence in [AUDIT-A1.md](AUDIT-A1.md):
 - JSON Schemas (draft 2020-12): [schemas/](schemas/)
@@ -16,19 +17,19 @@ The schemas and fixtures are the contract. This document explains them.
 | Gap | v0.2 resolution (proposal) |
 |---|---|
 | G1 identity | `companionId` is a UUID assigned **once** by the origin app's migration and persisted. It is never derived from `pet-N` or `uid`. The old id is kept as `legacyLocalId` (`pet-N` for ZPet, `zb-uid-N` for ZBattle), and its prefix must match `originApp`. |
-| G2 species | `speciesId` = ZPet `family:rarity`. ZBattle-native companions map to `family:0` (decision **D-NATIVE-SPECIES**). |
+| G2 species | `speciesId` = ZPet `family:rarity`, with the canonical rarity ids 0–3 unchanged. Display names (D-RARITY): 0 Common = Common, 1 Heroic = Rare, 2 Mythic = Epic, 3 Celestial = Legendary. ZBattle-native starters use their family's Common species `family:0` (D-NATIVE-SPECIES). Species stays separate from the instance `companionId` and from the form. |
 | G3 form | `formIndex` 0–5 plus `branch` `none`/`A`/`B`. Forms 0–1 are `none`, 2–3 are `A`, 4–5 are `B`; the schema enforces this. Form names are display only. |
-| G4 bond | `bondPercent` and `bondRevision` are nullable together. `null` means no ZPet bond producer exists yet, so **no** origin bonus is applied. |
+| G4 bond | `bondPercent` and `bondRevision` are nullable together. `null` means no ZPet bond producer exists yet. For the origin bonus it counts as **0%**, so the +10% base still applies (D-ORIGIN-ROUNDING). |
 | G5 element | `elementId` is nullable and its value set is pending (**D-ELEMENT**). Battle advantage stays as implemented until elements are approved. |
-| G6 origin bonus | Integer basis points: `bonusBp = 1000 + floor(bondPercent/25)*250`, capped at 2000; stat = `floor(base * (10000 + bonusBp) / 10000)`. Applied once, to unbonused HP/Power(Attack)/Guard(Defense)/Speed, with the bond snapshotted at fight start. ZPet-origin companions with `bondPercent = null` get **no** bonus. Rounding and the 0%-bond base are pending (**D-ORIGIN-ROUNDING**). |
-| G7 verification | Every `BattleCompleted` carries `verification` = `unverified-client` or `server-settled`. `server-settled` requires a `settlementRef`. Client UUIDs deduplicate; they never prove a result. |
+| G6 origin bonus | **Decided (D-ORIGIN-ROUNDING).** Only a **verified** ZPet-origin companion qualifies: its CompanionSnapshot must have been accepted by the delivery authority. Bonus % = `10 + 2.5 × floor(bondPercent/25)`, capped at 20; unknown bond = 0%. In integers: `bonusBp = min(2000, 1000 + 250*floor(bond/25))`, `stat = floor(base * (10000 + bonusBp) / 10000)`. Applied once, to the unmodified derived HP/Power/Guard/Speed, with the bond snapshotted at fight start. It is recomputed from base stats each time and never stored on top of a previous bonus, so a re-import cannot compound it. Worked cases: [fixtures/origin-bonus-examples.json](fixtures/origin-bonus-examples.json), checked by the validator. |
+| G7 verification | Every `BattleCompleted` carries `verification` = `unverified-client` or `server-settled`. `server-settled` requires a `settlementRef`. Client UUIDs deduplicate; they never prove a result. **D-OFFLINE-TRUST:** a server *receiving* a phone report is not verification. `server-settled` may only be used when the delivery authority has re-validated the result, and those checks must be documented (see the backend audit). Offline play keeps local progress, but cross-app rewards and progression stay pending until validated. |
 | G8 account | `accountId` = an authenticated account UUID. The account system and backend for ZBattle are pending (**D-BACKEND**). |
 
 ## 2. Authority (who may produce what)
 | Record | Producer (`sourceApp`) | Owner of truth | Consumer use |
 |---|---|---|---|
 | CompanionSnapshot | the companion's `originApp` | origin app (identity, species, form, nickname, bond) | Other app: read/display; battle input only |
-| BattleCompleted | `zbattle` | ZBattle (combat rules and XP); trusted settlement for rewards | ZPet: expedition participation credit only |
+| BattleCompleted (party ≤ 3, D-PARTY) | `zbattle` | ZBattle (combat rules and XP); trusted settlement for rewards | ZPet: expedition participation credit only |
 | RewardEarned | `zpet` | ZPet (earning rules) | ZBattle: inbox → atomic redemption |
 | RewardRedeemed | `zbattle` | ZBattle inventory transaction | ZPet: delivery history |
 | ExpeditionSnapshot | `zpet` | ZPet | ZBattle: read-only display |
@@ -60,7 +61,7 @@ Rules are evaluated in this order. `tools/validate_contract.py` (`Authority.subm
 | R10 | Companion `recordRevision` = `payload.sourceRevision` | `REJECT_REVISION_MISMATCH` |
 | R11 | Companion `originApp`, `legacyLocalId` and `speciesId` are immutable; `formIndex` never decreases | `REJECT_IMMUTABLE_FIELD`, `REJECT_FORM_REGRESSION` (correction policy pending **D-EVOLUTION**) |
 | R8 | `bondRevision` never decreases; a newer revision may lower the percent (a correction) | `REJECT_STALE_BOND` |
-| R12 | Redemption references a known reward and redeems at most once. Participation credit only for actual participants of a non-practice victory (loss eligibility pending **D-PARTICIPATION**). | `REJECT_UNKNOWN_REWARD`, `REJECT_ALREADY_REDEEMED` |
+| R12 | Redemption references a known reward and redeems at most once. **D-PARTICIPATION:** participation credit only for actual participants (active for at least one turn) of a qualifying **victory**. Losses, retreats and rewardless `practice` battles are excluded, and battle events are deduplicated by `eventId`/`battleId`. | `REJECT_UNKNOWN_REWARD`, `REJECT_ALREADY_REDEEMED` |
 | — | Everything passed | `ACCEPTED` |
 
 The deduplication scope is `accountId + eventId`, plus domain claim ids (`rewardId`, `deliveryId`, settlement ids). The same `eventId` under a different account is a different event, and R1 already rejects foreign submissions.

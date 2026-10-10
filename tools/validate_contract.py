@@ -181,9 +181,18 @@ class Authority:
 
 
 def eligible(battle_env, companion_id):
-    """R12 participation: only actual participants of a victory qualify (loss/practice policy pending D-PARTICIPATION)."""
+    """R12 participation (D-PARTICIPATION): only actual participants of a non-practice victory qualify."""
     p = battle_env["payload"]
     return p["outcome"] == "victory" and p["encounterKind"] != "practice" and companion_id in p["participantCompanionIds"]
+
+
+def origin_bonus_bp(bond_percent):
+    """D-ORIGIN-ROUNDING: 10% + 2.5% per full 25% bond, capped at 20%; unknown bond counts as 0%."""
+    return min(2000, 1000 + 250 * ((bond_percent or 0) // 25))
+
+
+def origin_stat(base, bond_percent):
+    return base * (10000 + origin_bonus_bp(bond_percent)) // 10000
 
 
 # ---------------------------------------------------------------- bundle hash
@@ -258,6 +267,12 @@ def main():
             for c in seq["eligibility"]["notEligible"]:
                 if eligible(battle, c):
                     fail(f"{seq['id']}: {c} must not be eligible")
+
+    examples = json.loads((FIXTURES / "origin-bonus-examples.json").read_text())
+    for case in examples["cases"]:
+        bp, stat = origin_bonus_bp(case["bondPercent"]), origin_stat(case["base"], case["bondPercent"])
+        if (bp, stat) != (case["bonusBp"], case["stat"]):
+            fail(f"origin bonus {case}: computed bonusBp={bp} stat={stat}")
 
     mapping_path = FIXTURES / "migration/zbattle-v1-companion-mapping.json"
     if mapping_path.exists():
