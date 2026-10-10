@@ -611,3 +611,4 @@ Remaining work:
   - `./gradlew -p preview test` (local mirror) → 118 tests, 0 failures.
   - Renders checked at 360dp. Fixed: Potion was not gated (its id is a constant, so the bulk edit missed it), the dialog offered Buy when the player couldn't afford the item, and long names were cut off.
 - Next: battle item action.
+- CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
