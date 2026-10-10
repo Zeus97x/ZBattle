@@ -484,3 +484,26 @@ Remaining work:
 - Verification: `python3 tools/check_doc_links.py` → OK; `python3 tools/validate_contract.py` → OK (bundle `77d69eb17081` unchanged); `python3 tools/campaign_proposal.py` → OK. The Gradle preview suite could not resolve dependencies (Maven Central HTTP 429); docs-only change.
 - CI note: the workflow's last `main` run is on `d2f938d`; `400d46b` has not been run in CI.
 - Next: EXT-020 battle accessibility as its own PR, then stop at the Phase B boundary for approval.
+
+## 2026-10-10 — EXT-020: battle status accessibility (Claude)
+- Request: the first open item in the PR #9 queue within approved Phase B (CLAUDE-005). No rules or values change, and `RULES_REVISION` stays `zbattle-rules-2`.
+- Already present before this change: the enemy intent pill, the results screen, action buttons of at least 54dp, and renders at 360/412dp and 130% text.
+- Added:
+  - `core/.../battle/BattleEngine.kt`:
+    - `BattleState.skillStatus`: "Ready", or "Ready after N more turns"; it counts the creature's own attack turns, matching the per-creature cooldown.
+    - `BattleState.activeEffects`: Burn/Weaken with the turns left.
+    - `SkillEffect.description`, worded from `EFFECT_AMOUNT` and `EFFECT_TURNS`.
+  - `ui/BattleScreen.kt`:
+    - Opponent effect pills.
+    - A skill line that says when the Skill is ready and what its effect does.
+    - The Skill button's TalkBack state description.
+    - A polite live region on the battle log, so new turns are announced.
+    - HP panels merged into one screen-reader item.
+  - `core/src/test/.../battle/BattleStatusTextTest.kt`: the promised turn count equals the number of attacks the engine actually needs; effect pills count down one per turn and clear, for both Burn (Sparklit) and Weaken (Inkling); descriptions use the engine values.
+- Verification:
+  - `./gradlew -p preview test` → 102 tests, 0 failures (99 before, plus 3 in `BattleStatusTextTest`).
+  - Renders `05-battle` (360dp, 130% text) and `22-party-battle` (360dp) checked by eye: the effect pill fits and nothing overlaps.
+  - Doc-link, contract and campaign checks: OK.
+  - Maven Central returned HTTP 429 to this container, so Gradle was run with a scratchpad-only init script pointing at Google's Maven Central mirror. No repository build file changed.
+  - Android assemble, lint and TalkBack on a device were not run here; CI covers assemble and lint.
+- Next: Phase B boundary. Report to Zeus97x for approval; do not start Phase C runtime work until it is approved.

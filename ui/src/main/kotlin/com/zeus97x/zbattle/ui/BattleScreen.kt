@@ -50,6 +50,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -64,6 +68,7 @@ import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.Outcome
 import com.zeus97x.zbattle.core.battle.RepeatEnd
 import com.zeus97x.zbattle.core.battle.RepeatSession
+import com.zeus97x.zbattle.core.battle.description
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -143,6 +148,7 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                 Pill("Turn ${battle.turn + 1}", container = p.accentDark, content = p.onAccent, icon = Icons.Filled.Bolt)
                 Pill("Next: ${battle.enemyIntent}")
             }
+            battle.activeEffects.takeIf { it.isNotEmpty() }?.let { effects -> EffectStrip(battle.enemy.creature.name, effects) }
             state.repeat?.takeIf { it.running }?.let { r ->
                 Pill("Repeat ${r.played + 1} of ${r.target} · ${r.wins} won", container = p.accentDark, content = p.onAccent)
             }
@@ -151,7 +157,8 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                 Text("Auto battle on · tap any move to take control. No items are used.", style = MaterialTheme.typography.bodyMedium, color = p.accent)
             }
             notice?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = p.accent) }
-            ZCard(Modifier.fillMaxWidth()) {
+            // Screen readers announce each new turn without the player having to find the log.
+            ZCard(Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     battle.log.takeLast(5).forEach { line ->
                         Text(line, style = MaterialTheme.typography.bodyMedium, color = if (line.startsWith("Turn ")) p.textSecondary else p.textPrimary)
@@ -159,7 +166,8 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                 }
             }
             Text(
-                "${battle.skill.name} · ${battle.skill.effect.label} · ready every ${com.zeus97x.zbattle.core.battle.BattleEngine.SKILL_COOLDOWN + 1} turns",
+                "${battle.skill.name} · ${battle.skillStatus} · ${battle.skill.effect.label}: ${battle.skill.effect.description}. " +
+                    "Usable every ${com.zeus97x.zbattle.core.battle.BattleEngine.SKILL_COOLDOWN + 1} turns.",
                 style = MaterialTheme.typography.labelMedium,
                 color = p.textSecondary,
             )
@@ -201,7 +209,7 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             ActionButton(
                 if (battle.skillReady) "Skill" else "Skill (${battle.skillCooldown})",
                 Icons.Filled.AutoAwesome,
-                Modifier.weight(1f),
+                Modifier.weight(1f).semantics { stateDescription = battle.skillStatus },
                 primary = true,
                 enabled = battle.skillReady,
             ) {
@@ -249,6 +257,19 @@ private fun TeamStrip(battle: BattleState) {
                 content = if (i == battle.activeIndex) p.onAccent else p.textPrimary,
             )
         }
+    }
+}
+
+/** Effects still running on the opponent, with turns left, so they are not only in the log. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun EffectStrip(enemyName: String, effects: List<String>) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.semantics(mergeDescendants = true) {},
+    ) {
+        effects.forEach { Pill("$enemyName · $it") }
     }
 }
 
@@ -356,7 +377,8 @@ private fun HealthPanel(c: Combatant, role: String) {
         else -> Color(0xFFE5484D)
     }
     Column(
-        Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xCC141720)).padding(horizontal = 10.dp, vertical = 8.dp),
+        Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xCC141720)).padding(horizontal = 10.dp, vertical = 8.dp)
+            .semantics(mergeDescendants = true) {},
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

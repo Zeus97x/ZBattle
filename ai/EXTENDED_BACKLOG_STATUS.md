@@ -9,15 +9,15 @@ Reconciled against `main` at `400d46b` (PRs #2–#18 merged). Each row was check
 |---|---|
 | **Done** | Acceptance criteria met by merged work; evidence named |
 | **Partial** | Some criteria met; the remaining gap is named |
-| **Claimed** | Being worked on now; owner and branch named |
+| **Claimed** | Being worked on now; owner and branch named. "Review" means the work is on a PR awaiting approval |
 | **Blocked** | Needs a named decision, artwork or a counterpart producer |
 | **Queued** | Its phase is not yet approved for runtime work |
 
 ## Summary
-| Phase | Done | Partial | Claimed | Blocked | Queued |
+| Phase | Done | Partial | Claimed or review | Blocked | Queued |
 |---|---|---|---|---|---|
 | A (EXT-001–008) | 7 | 1 | 0 | 0 | 0 |
-| B (EXT-009–020) | 7 | 2 | 1 | 2 | 0 |
+| B (EXT-009–020) | 7 | 2 | 1 (review) | 2 | 0 |
 | C (EXT-021–030) | 0 | 0 | 0 | 0 | 10 |
 | D (EXT-031–040) | 0 | 0 | 0 | 0 | 10 |
 | E (EXT-041–046) | 0 | 0 | 0 | 0 | 6 |
@@ -52,7 +52,7 @@ Phase B is at its boundary: B1–B5 are merged. The remaining B items either nee
 | EXT-017 | Partial | Stable `Encounter.id` and `EncounterKind`; `ai/proposals/campaign-proposal.json` validated but inactive. Runtime still has exactly one playable encounter, by design. **Gap:** registry loading waits for D-CAMPAIGN approval |
 | EXT-018 | Blocked | Needs approval of `ai/proposals/CAMPAIGN-PROPOSAL.md`, including Q-F (difficulty versus Option B XP) |
 | EXT-019 | Done | `BattleProgress.settle`: retreat and defeat pay 0; `settledThrough` and the active-id guard prevent double settlement (`ReplayTest`, `BattleProgressTest`) |
-| EXT-020 | Claimed | Owner Claude; branch `ccr-79612a33-kjesjl`, base `400d46b`. Scope: in-battle explanations of Skill cooldown, active Burn/Weaken effects and the outcome; 48dp targets; renders at 360/412dp and 130% text. No rule or value changes. "Enemy intent" is left out: the engine has no announced intent, and adding one would be a gameplay change |
+| EXT-020 | Review | Owner Claude; branch `ccr-79612a33-kjesjl`, base `400d46b`. Already present: enemy intent pill (`BattleState.enemyIntent`), outcome screen, ≥54dp action buttons, 360/412dp and 130% renders. Added: Skill readiness in words (`skillStatus`, also the button's TalkBack state), opponent effect pills with turns left (`activeEffects`), effect descriptions built from engine constants, a polite live region on the battle log, and merged HP panels for screen readers. No rule or value changes; `RULES_REVISION` unchanged |
 
 ## C–G — Queued
 Every item in phases C–G is runtime work in a phase that has not been approved. Each needs the phase approval plus the inputs below. Proposals are already written, so these items can start as soon as the inputs arrive.
@@ -67,7 +67,7 @@ Every item in phases C–G is runtime work in a phase that has not been approved
 
 ## Checkpoint (2026-10-10)
 - **Completed by existing work:** EXT-001–004, 006–012, 014, 015, 019 (PRs #10–#18).
-- **Claimed now:** EXT-020 (battle accessibility, no rule changes).
+- **In review:** EXT-020 (battle accessibility, no rule changes).
 - **Decisions that unblock the most work:**
   1. Approve or adjust `ECONOMY-PROPOSAL.md`. This unblocks Phase C and EXT-013 replay quantities.
   2. Approve `CAMPAIGN-PROPOSAL.md` and pick a Q-F resolution. This unblocks EXT-017/018.
