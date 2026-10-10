@@ -1,6 +1,22 @@
 # ZBattle AI workspace
-Updated 2026-10-09 America/Toronto.
+Updated 2026-10-10 America/Toronto.
 Read root AGENTS.md and DEVELOPMENT_LOG.md first.
+
+## Cross-app A–G queue
+
+[Full roadmap](CROSS_APP_ROADMAP.md) · [Draft contract](integration/CONTRACT-v0.1.md) · [ZPet counterpart handoff](integration/ZPET-COUNTERPART-HANDOFF.md)
+
+Claude owns implementation-heavy work. ChatGPT owns design/artwork/coordination. Phase A is ready for documentation/fixture work; later phases wait on dependencies and unresolved decisions. Check in after every phase.
+
+| Phase | Task | Status |
+|---|---|---|
+| A | [CLAUDE-004](tasks/CLAUDE-004-CONTRACT-AUDIT.md) | Ready: audit/contracts |
+| B | [CLAUDE-005](tasks/CLAUDE-005-CORE-PROGRESSION.md) | Queued: core/auto battle/campaign |
+| C | [CLAUDE-006](tasks/CLAUDE-006-BOSS-REWARDS.md) | Queued: economy/tickets/mystical bosses |
+| D | [CLAUDE-007](tasks/CLAUDE-007-CROSS-APP-BRIDGE.md) | Queued: origin/bond/inbox |
+| E | [CLAUDE-008](tasks/CLAUDE-008-EXPEDITION-EVENTS.md) | Queued: expedition integration |
+| F | [CLAUDE-009](tasks/CLAUDE-009-ADVANCED-COMBAT.md) | Queued: advanced combat |
+| G | [CLAUDE-010](tasks/CLAUDE-010-LEGACY-ENDGAME.md) | Queued: legacy/endgame |
 
 ## Current work
 | Task | Owner | Status | Scope |
@@ -23,8 +39,8 @@ ChatGPT handles image generation and design. Claude handles this foundation and 
 
 ## Artwork phases
 1. Branding — preview ready, individual exports pending approval.
-2. Region maps — 12 source maps uploaded, integration pending.
-3. Location scenery — 48 primary sources and seven variants uploaded, integration pending.
+2. Region maps — 12 maps integrated by CLAUDE-003.
+3. Location scenery — 48 primary heroes integrated; seven variants preserved.
 4. Battle backgrounds — matching each location.
 5. Approved bosses and opponent portraits.
 6. Approved equipment/consumable/cosmetic illustrations.
