@@ -50,3 +50,7 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - No ZPet `pet-N` save fixture; that belongs to the ZPet owner.
 - No v2 ZBattle save yet (D1).
 - The GitHub PR API was unavailable during the audit, so PR states come from git refs.
+
+
+## Batch 1 amendment (2026-10-10)
+Zeus97x decision batch 1 amended contract v0.2. The bundle hash is now `77d69eb17081a088bd66a2f34ac4fe6350730b3749def59b9c2d914d8b6fa41a` (46 files); see [ZPET-HANDOFF-A3.md](../integration/ZPET-HANDOFF-A3.md).

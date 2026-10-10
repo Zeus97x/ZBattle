@@ -1,0 +1,71 @@
+{
+  "rule": "D-ORIGIN-ROUNDING (Zeus97x, 2026-10-10): bonusPercent = 10 + 2.5*floor(bondPercent/25), capped at 20; unknown bond (null) = 0%. In basis points: bonusBp = min(2000, 1000 + 250*floor(bond/25)). stat = floor(base * (10000 + bonusBp) / 10000). Applied once to unmodified derived stats; never compounded on re-import.",
+  "cases": [
+    {
+      "bondPercent": null,
+      "base": 52,
+      "bonusBp": 1000,
+      "stat": 57
+    },
+    {
+      "bondPercent": 0,
+      "base": 52,
+      "bonusBp": 1000,
+      "stat": 57
+    },
+    {
+      "bondPercent": 24,
+      "base": 52,
+      "bonusBp": 1000,
+      "stat": 57
+    },
+    {
+      "bondPercent": 25,
+      "base": 52,
+      "bonusBp": 1250,
+      "stat": 58
+    },
+    {
+      "bondPercent": 49,
+      "base": 7,
+      "bonusBp": 1250,
+      "stat": 7
+    },
+    {
+      "bondPercent": 50,
+      "base": 7,
+      "bonusBp": 1500,
+      "stat": 8
+    },
+    {
+      "bondPercent": 74,
+      "base": 13,
+      "bonusBp": 1500,
+      "stat": 14
+    },
+    {
+      "bondPercent": 75,
+      "base": 13,
+      "bonusBp": 1750,
+      "stat": 15
+    },
+    {
+      "bondPercent": 99,
+      "base": 61,
+      "bonusBp": 1750,
+      "stat": 71
+    },
+    {
+      "bondPercent": 100,
+      "base": 61,
+      "bonusBp": 2000,
+      "stat": 73
+    },
+    {
+      "bondPercent": 100,
+      "base": 1,
+      "bonusBp": 2000,
+      "stat": 1
+    }
+  ]
+}

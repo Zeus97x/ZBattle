@@ -9,10 +9,10 @@
   "properties": {
     "battleId": { "$ref": "common.schema.json#/$defs/uuid" },
     "encounterId": { "type": "string", "pattern": "^area-([0-3][0-9]|4[0-7])/slot-[0-9]+$" },
-    "encounterKind": { "enum": ["wild", "campaign", "mini-boss", "stage-boss", "location-boss", "region-boss", "mystical", "practice"], "description": "Kinds from the roadmap; counts and rules pending Phase B/C approval." },
+    "encounterKind": { "enum": ["wild", "campaign", "mini-boss", "stage-boss", "location-boss", "region-boss", "mystical", "practice"], "description": "Kinds from the roadmap. `practice` = a battle that paid no reward (including replays while replay rewards are inactive); it never earns participation credit (D-PARTICIPATION)." },
     "groupId": { "$ref": "common.schema.json#/$defs/groupId" },
     "areaId": { "$ref": "common.schema.json#/$defs/areaId" },
-    "participantCompanionIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/uuid" }, "minItems": 1, "maxItems": 6, "uniqueItems": true },
+    "participantCompanionIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/uuid" }, "minItems": 1, "maxItems": 3, "uniqueItems": true, "description": "Party of 3 (D-PARTY); every companion that was active for at least one turn." },
     "outcome": { "enum": ["victory", "defeat", "retreat"] },
     "rulesRevision": { "type": "string", "pattern": "^zbattle-rules-[0-9]+$" },
     "verification": { "$ref": "common.schema.json#/$defs/verification" },

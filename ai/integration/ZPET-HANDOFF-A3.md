@@ -6,8 +6,8 @@ Written 2026-10-10 (America/Toronto) by Claude, from ZBattle branch `claude/zbat
 | Item | Value |
 |---|---|
 | Contract revision | `zb-zp-contract-0.2-draft` |
-| Bundle | `ai/integration/CONTRACT-v0.2.md`, `ai/integration/schemas/`, `ai/integration/fixtures/` (44 files) |
-| Bundle SHA-256 | `afc3a8de1367e1ffa0d684463ed81ddb020ccc18cbbc51f36146e6202a83e2c4` |
+| Bundle | `ai/integration/CONTRACT-v0.2.md`, `ai/integration/schemas/`, `ai/integration/fixtures/` (46 files) |
+| Bundle SHA-256 | `77d69eb17081a088bd66a2f34ac4fe6350730b3749def59b9c2d914d8b6fa41a` (batch-1 amendment; replaces Phase A's `afc3a8de…`) |
 | How it is computed | `python3 tools/validate_contract.py --print-hash`: SHA-256 over sorted `path\0sha256(file)\n` lines |
 | ZBattle commit | the PR commit that adds this file (record it on merge) |
 
@@ -23,7 +23,15 @@ Zeus97x assigned contract adoption to **the Claude session working in ZPet** (ZP
 
 Neither copy may be silently altered. The ZBattle session (this repo) never writes to ZPet.
 
-Batch 1 also changes the contract text (Q8, Q14, Q15, Q16). The bundle hash therefore changes in the contract-amendment PR, and that PR's hash replaces the one below. Adopt only the hash recorded in the latest merged version of this file.
+Batch 1 amended the contract. The hash above is the amended one; adopt only the hash recorded in the latest merged version of this file. What changed:
+
+| Change | Decision | Files |
+|---|---|---|
+| `participantCompanionIds` max 6 → 3; new invalid fixture `invalid-party-of-four` | D-PARTY | `schemas/battle-completed.schema.json`, `fixtures/records/invalid-party-of-four.json`, `fixtures/manifest.json` |
+| `practice` defined as a rewardless battle, excluded from participation | D-PARTICIPATION | `schemas/battle-completed.schema.json`, contract R12 |
+| Origin bonus: +10% at 0% bond, unknown bond = 0%, never compounds; worked cases | D-ORIGIN-ROUNDING | contract G4/G6, `fixtures/origin-bonus-examples.json` |
+| Rarity display mapping; native species `family:0` | D-RARITY, D-NATIVE-SPECIES | contract G2 |
+| Receiving a report is not verification | D-OFFLINE-TRUST | contract G7 |
 
 ## What the ZPet project needs to do (ZPet-owned; not done by ZBattle Claude)
 1. **Copy the bundle byte-for-byte** into ZPet, wherever ZPet's conventions put it. Run the validator, or a port of it, and confirm the hash.
