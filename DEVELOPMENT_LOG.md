@@ -680,3 +680,4 @@ Remaining work:
   - Doc links OK.
 - Blocked: campaign runtime activation (EXT-017/018) waits for approval of the opponent stat rule (questions 1–2 in CURVE-SIMULATION.md).
 - Next: ticket rolls (C3).
+- CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
