@@ -27,3 +27,6 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-LEGACY (G1/G5), D-ELEMENT (G2), D-EXCLUSIVE-POOL and approved art (G3/G4).
 - **Bounded scope:** G1 displays LineageSnapshot once ZPet produces it. G2 needs element metadata and ChatGPT-approved assets. G3/G4 need approved definitions.
 - **Contract impact:** LineageSnapshot forbids combat fields (schema `additionalProperties: false`). See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).
+
+## Decision batch 1 (Zeus97x, 2026-10-10)
+Decisions affecting this task are recorded in [DECISIONS.md](../integration/DECISIONS.md) (Q2–Q21). Proposed values stay inactive until approved. Status is unchanged: this task still waits on Phase B and on its own approvals.

@@ -27,3 +27,6 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-ADV-COMBAT (F1–F3), D-ELEMENT (weather and element effects).
 - **Bounded scope:** Nothing in F starts before Phase B core is stable and D-ADV-COMBAT values are approved. Double battles stay deferred until F1 is explicitly activated.
 - **Contract impact:** personality and friendship inputs need new ZPet record types (a future contract revision). See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).
+
+## Decision batch 1 (Zeus97x, 2026-10-10)
+Decisions affecting this task are recorded in [DECISIONS.md](../integration/DECISIONS.md) (Q2–Q21). Proposed values stay inactive until approved. Status is unchanged: this task still waits on Phase B and on its own approvals.

@@ -27,3 +27,6 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-PARTICIPATION (E1), D-EXPEDITION (E2/E3).
 - **Bounded scope:** E1 emits BattleCompleted with actual participants only; loss/practice credit needs D-PARTICIPATION. E2/E3 need ZPet's ExpeditionSnapshot producer and D-EXPEDITION values.
 - **Contract impact:** ExpeditionSnapshot schema; participation check per R12 / sequence S10. See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).
+
+## Decision batch 1 (Zeus97x, 2026-10-10)
+Decisions affecting this task are recorded in [DECISIONS.md](../integration/DECISIONS.md) (Q2–Q21). Proposed values stay inactive until approved. Status is unchanged: this task still waits on Phase B and on its own approvals.

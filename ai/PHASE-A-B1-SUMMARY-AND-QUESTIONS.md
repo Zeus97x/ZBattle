@@ -1,6 +1,8 @@
 # ZBattle: Phase A + B1 summary and open questions
 
-Updated 2026-10-10 (America/Toronto) by Claude. This file covers what was done in Phase A (CLAUDE-004) and Phase B step B1 (CLAUDE-005), and lists every question that needs your input.
+Updated 2026-10-10 (America/Toronto) by Claude.
+
+> **Answered:** Zeus97x answered Q2–Q21 in decision batch 1 (2026-10-10). The answers are recorded in [integration/DECISIONS.md](integration/DECISIONS.md). This file is kept as history. This file covers what was done in Phase A (CLAUDE-004) and Phase B step B1 (CLAUDE-005), and lists every question that needs your input.
 
 To answer, write under each question's **Your answer:** line. You can also just reply in chat with the numbers, e.g. "Q4: party of 3, switching costs a turn".
 

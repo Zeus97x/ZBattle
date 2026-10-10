@@ -29,3 +29,6 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-ECONOMY (C1/C2), D-RARITY (C2/C3), D-WEEK-WINDOW (C4), D-EXCLUSIVE-POOL (C5), D-OFFLINE-TRUST (timers).
 - **Bounded scope:** C1 inventory and ledger can be built without prices. C2/C3 need D-RARITY and D-ECONOMY. C4 needs D-WEEK-WINDOW. C5 stays unavailable until D-EXCLUSIVE-POOL is defined.
 - **Contract impact:** BossState and RewardRedeemed schemas (v0.2). Rolls persisted once per `deliveryId` (rule R12); no re-roll on retry. See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).
+
+## Decision batch 1 (Zeus97x, 2026-10-10)
+Decisions affecting this task are recorded in [DECISIONS.md](../integration/DECISIONS.md) (Q2–Q21). Proposed values stay inactive until approved. Status is unchanged: this task still waits on Phase B and on its own approvals.
