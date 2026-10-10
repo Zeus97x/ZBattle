@@ -13,3 +13,9 @@ Example: `art/location/area-12/hero.png` is the Desert Crossing scenery card.
 Screens pick files up automatically; until a file exists they draw a placeholder.
 Existing ZPet creature PNGs are not copied here — they are packaged unchanged from
 `ZBattle-ZPet-Assets/assets/monsters/`.
+
+## Current contents (CLAUDE-003)
+- `region/group-0..11/map.webp`: the 12 region maps.
+- `location/area-00..47/hero.webp`: the 48 primary location heroes.
+
+These are exported from `design/artwork/` by `tools/export_artwork.py` (1280px long side, WebP quality 82). Battle scenery, branding, opponents, items, badges, avatars and ZCubes are still placeholders.

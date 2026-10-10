@@ -29,8 +29,10 @@ class AssetArtLoader(private val assets: AssetManager, private val maxDimension:
         return try {
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             assets.open(path).use { BitmapFactory.decodeStream(it, null, bounds) }
+            // Largest power-of-two step that keeps the long side at or above maxDimension, so
+            // 1280px scenery stays sharp and 1536px creature PNGs still decode at 768px.
             var sample = 1
-            while (maxOf(bounds.outWidth, bounds.outHeight) / sample > maxDimension) sample *= 2
+            while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= maxDimension) sample *= 2
             val options = BitmapFactory.Options().apply { inSampleSize = sample }
             val bitmap = assets.open(path).use { BitmapFactory.decodeStream(it, null, options) }
             bitmap?.asImageBitmap()?.also { cache.put(path, it) } ?: run { missing += path; null }

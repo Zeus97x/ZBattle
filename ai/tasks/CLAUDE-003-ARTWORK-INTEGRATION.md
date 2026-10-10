@@ -1,6 +1,6 @@
 # CLAUDE-003 — Integrate the artwork drop
 
-Status: READY. Owner: Claude. Source branch: ai/chatgpt/artwork-handoff. Base: main 2051a4b. Updated 2026-10-09 America/Toronto.
+Status: IN PROGRESS — claimed by Claude 2026-10-09 ~21:55 America/Toronto; branch claude/zbattle-artwork-integration from ai/chatgpt/artwork-handoff (f12caf7) with main (7024d1a, after PR #5) merged in to clear PR #4's conflicts. Owner: Claude. Source branch: ai/chatgpt/artwork-handoff. Base: main 2051a4b. Updated 2026-10-09 America/Toronto.
 
 ## Read first
 Read AGENTS.md, DEVELOPMENT_LOG.md, ai/UI_LAYOUT_SPEC.md, ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md, design/artwork/README.md and design/artwork/manifest.json. Check current main and open work; avoid overlapping the battle vertical-slice task. Claim this task with branch/base/status/time before editing.
@@ -23,3 +23,38 @@ Wire the supplied 12 maps and 48 primary landscapes into the existing Home locat
 
 ## Working branch
 If artwork PR is still open, branch from ai/chatgpt/artwork-handoff so images are present; target the artwork branch to isolate implementation, then retarget main after artwork merge. If merged, branch from current main. Do not work directly on main or edit another owner's battle task.
+
+## Completion report (Claude, 2026-10-09)
+
+### What changed
+- **Runtime exports:** `tools/export_artwork.py` verifies all 70 source PNGs against `design/artwork/manifest.json` (SHA-256), then writes 60 WebP files to `app/src/main/assets/art/region/group-N/map.webp` and `.../location/area-NN/hero.webp`.
+  - Long side 1280px, quality 82, total 12.7 MiB.
+  - Quality was chosen from 1:1 crops at q75/82/88: q75 softened skies, and q82 matched the source.
+  - Every export is recorded in `design/artwork/runtime-exports.json` (key, source, checksum, size, bytes).
+  - Source PNGs are untouched, and no PNG runtime copies are bundled.
+- **Not exported:** the 7 variants (optional alternatives) and the 3 reference boards (branding and UI concepts). Launcher icon and splash are unchanged until standalone branding exports exist.
+- **Battle scenery** (`location/area-NN/battle`) stays a placeholder; it is a separate art phase.
+- **Wiring:** the existing `ArtCatalog` keys pick the files up with no screen code naming files.
+  - Home carousel cards, Travel map, Travel area rows and the Challenges header all show the scenery.
+  - "Scenery pending" chips hide automatically.
+- **Travel map:** maps are portrait, about 2:3. Travel now shows the whole map (Contain) over a dimmed cover backdrop, so no landmark is cropped. The region title moved above the map. `ArtKey.RegionMap` fit changed to Contain.
+- **Loader** (`app/.../AssetArtLoader.kt`): it now picks the largest power-of-two downsample that keeps the long side at or above 768px. 1280px scenery decodes at full size, and 1536px creature PNGs still decode at 768px as before.
+- **Harness:** `preview/.../FileArtLoader.kt` now decodes with Skia, which supports WebP, like Android.
+
+### Verification
+- `core/.../ArtworkTest.kt`:
+  - all 60 keys resolve to exactly one `.webp`; there are no PNG runtime copies
+  - the two Egyptian and two Greek groups show distinct maps
+  - all 48 manifest names equal `RegionCatalog` exactly
+  - all 70 source checksums match, and all 60 exports trace back to verified sources
+  - no battle art yet
+- Render checks: Home and Travel at 412dp, 360dp and 1.3× font. Travel is rendered for groups 1, 4, 7 and 8 (both Greek and both Egyptian groups).
+- Android CI: see the PR. There is no device run by Claude.
+
+### For ChatGPT
+- **Next art phases:**
+  - battle backgrounds (`location/area-NN/battle`)
+  - standalone branding exports (logo, icon, splash)
+  - ZCube tiers (`ai/ZCUBES_PLAN.md`)
+- **Re-exporting after art changes:** replace the PNG under `design/artwork/`, update its manifest checksum, then run `python3 tools/export_artwork.py`.
+- **Variant picks:** to use a variant instead of a primary image, give it a primary `art_key` in the manifest.

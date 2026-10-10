@@ -1,0 +1,606 @@
+{
+  "long_side": 1280,
+  "quality": 82,
+  "exports": [
+    {
+      "art_key": "region/group-0/map",
+      "source": "design/artwork/regions/group-0/map.png",
+      "source_sha256": "52352e129341812ec8aaa5e548ed3211798cd07f295279bf5f350a6bd7d4439e",
+      "runtime": "app/src/main/assets/art/region/group-0/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 291270,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-1/map",
+      "source": "design/artwork/regions/group-1/map.png",
+      "source_sha256": "5e37a157676653073a67d9adb3653250410f21de7e7cf9667a23d814f2e8ed19",
+      "runtime": "app/src/main/assets/art/region/group-1/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 316740,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-2/map",
+      "source": "design/artwork/regions/group-2/map.png",
+      "source_sha256": "83b14b2f07f7b2d90a9dbbb9577ac82a072b16cc58e002d96f346a2742dc5036",
+      "runtime": "app/src/main/assets/art/region/group-2/map.webp",
+      "width": 720,
+      "height": 1280,
+      "bytes": 289880,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-3/map",
+      "source": "design/artwork/regions/group-3/map.png",
+      "source_sha256": "30fef22bed20512477fc8aa0ddacbdd33b1332771622d47cad2b61cc0591b862",
+      "runtime": "app/src/main/assets/art/region/group-3/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 213374,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-4/map",
+      "source": "design/artwork/regions/group-4/map.png",
+      "source_sha256": "abbf5bcfc6664df7c6a65427bda3177a351b4d827613cb95f9eb911b58960609",
+      "runtime": "app/src/main/assets/art/region/group-4/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 331920,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-5/map",
+      "source": "design/artwork/regions/group-5/map.png",
+      "source_sha256": "b7b899cb89fed6b3ce79502171cbaa368023b4aadca75b8573d21f309c2e60fe",
+      "runtime": "app/src/main/assets/art/region/group-5/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 367154,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-6/map",
+      "source": "design/artwork/regions/group-6/map.png",
+      "source_sha256": "40eb3ee42f946b061a34ef2b2ad33f7968465b2b98579b20500d456c2aa55d0f",
+      "runtime": "app/src/main/assets/art/region/group-6/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 294678,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-7/map",
+      "source": "design/artwork/regions/group-7/map.png",
+      "source_sha256": "f2901155e0e0ecc97eb7ad2acc18898fb7f7170afb891757af2fbc0b5f245b77",
+      "runtime": "app/src/main/assets/art/region/group-7/map.webp",
+      "width": 719,
+      "height": 1280,
+      "bytes": 295248,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-8/map",
+      "source": "design/artwork/regions/group-8/map.png",
+      "source_sha256": "26e8d4b0a86a58b78289483b8f793a1a044ab2419ae7660d3504f443fa170510",
+      "runtime": "app/src/main/assets/art/region/group-8/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 324098,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-9/map",
+      "source": "design/artwork/regions/group-9/map.png",
+      "source_sha256": "8897ebc5678d0e4406a8e0ffefde19d34f072c9b202f33662036e16e0218c673",
+      "runtime": "app/src/main/assets/art/region/group-9/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 281164,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-10/map",
+      "source": "design/artwork/regions/group-10/map.png",
+      "source_sha256": "b017ed4c631fa8fb5b01dcc43dd6fc5da22beb7b1d6db394a9510503a25ec252",
+      "runtime": "app/src/main/assets/art/region/group-10/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 407248,
+      "quality": 82
+    },
+    {
+      "art_key": "region/group-11/map",
+      "source": "design/artwork/regions/group-11/map.png",
+      "source_sha256": "65e5e11d86ccfd917b60bd558ff5debb20720f795538d25ec6c065733107152d",
+      "runtime": "app/src/main/assets/art/region/group-11/map.webp",
+      "width": 853,
+      "height": 1280,
+      "bytes": 372970,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-00/hero",
+      "source": "design/artwork/locations/area-00/hero.png",
+      "source_sha256": "cf6524c8860f2d7e31719df6514333d473a4e97138a3411df91a7b18a8c482d2",
+      "runtime": "app/src/main/assets/art/location/area-00/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 265148,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-01/hero",
+      "source": "design/artwork/locations/area-01/hero.png",
+      "source_sha256": "fb74a155b631da2c0f1a62890b7cd1ec6e1bebf17032878f9854888163cb9090",
+      "runtime": "app/src/main/assets/art/location/area-01/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 124100,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-02/hero",
+      "source": "design/artwork/locations/area-02/hero.png",
+      "source_sha256": "ea2a96acbf0c4a849bfcb34f59dc2ec9a0e3ea64b28a804cfc8f2c8a27c36319",
+      "runtime": "app/src/main/assets/art/location/area-02/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 128620,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-03/hero",
+      "source": "design/artwork/locations/area-03/hero.png",
+      "source_sha256": "7c96709afda0e281eb1c2f6a476f1f3f4b6158691cca1682246935be05b50db9",
+      "runtime": "app/src/main/assets/art/location/area-03/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 194290,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-04/hero",
+      "source": "design/artwork/locations/area-04/hero.png",
+      "source_sha256": "f002dde8e90255d684d72e482eaf1e987df6044e67f2b108513f2e4689380c24",
+      "runtime": "app/src/main/assets/art/location/area-04/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 297234,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-05/hero",
+      "source": "design/artwork/locations/area-05/hero.png",
+      "source_sha256": "d24e5db330bb297b9952cb26441526859edf0f84afdd6d9a900fe20d6cb94932",
+      "runtime": "app/src/main/assets/art/location/area-05/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 199654,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-06/hero",
+      "source": "design/artwork/locations/area-06/hero.png",
+      "source_sha256": "a27d0d9417281688c4a68372db0dac77c65a54a028029801e44f365add772970",
+      "runtime": "app/src/main/assets/art/location/area-06/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 170124,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-07/hero",
+      "source": "design/artwork/locations/area-07/hero.png",
+      "source_sha256": "e689b9fa52fd2d1db8b6f0006ee9352769f7b9828059f134032610059f417bd9",
+      "runtime": "app/src/main/assets/art/location/area-07/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 134436,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-08/hero",
+      "source": "design/artwork/locations/area-08/hero.png",
+      "source_sha256": "e3bde6791acff45ba4e51a5dfc0c2e0002b8741af1f2dd8d9947096f76314faa",
+      "runtime": "app/src/main/assets/art/location/area-08/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 249578,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-09/hero",
+      "source": "design/artwork/locations/area-09/hero.png",
+      "source_sha256": "7b3b840fdb35e8febb577ff64f7ce72ea6265a577058b1b62236ac64dc7efa59",
+      "runtime": "app/src/main/assets/art/location/area-09/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 144284,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-10/hero",
+      "source": "design/artwork/locations/area-10/hero.png",
+      "source_sha256": "3752666d92eb021d068df77b94373e5af88fa22d7d111024d57c79147ea70211",
+      "runtime": "app/src/main/assets/art/location/area-10/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 240844,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-11/hero",
+      "source": "design/artwork/locations/area-11/hero.png",
+      "source_sha256": "7f432fb6f24b4801a364b9dda2669a07e42e95882e78516f81fc9609ee19d229",
+      "runtime": "app/src/main/assets/art/location/area-11/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 106434,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-12/hero",
+      "source": "design/artwork/locations/area-12/hero.png",
+      "source_sha256": "ffb6732f4a8da18ebf219fb0db776f2e863dafb2abd82eea60dd4dece506b5e7",
+      "runtime": "app/src/main/assets/art/location/area-12/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 98308,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-13/hero",
+      "source": "design/artwork/locations/area-13/hero.png",
+      "source_sha256": "1d0da5f0b6347da71a5de6dfd5a00225cc86c3d3e7ab56dc4e6797d7fee90076",
+      "runtime": "app/src/main/assets/art/location/area-13/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 142566,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-14/hero",
+      "source": "design/artwork/locations/area-14/hero.png",
+      "source_sha256": "dd00612c19f736738fd6756a5db44d6aeed9a33f2eff949a821614e19e505e9b",
+      "runtime": "app/src/main/assets/art/location/area-14/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 74460,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-15/hero",
+      "source": "design/artwork/locations/area-15/hero.png",
+      "source_sha256": "2d2193f8d7f920111cf7e954d878f23b30d707ec1537250ed7a51196ae3dcf91",
+      "runtime": "app/src/main/assets/art/location/area-15/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 141786,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-16/hero",
+      "source": "design/artwork/locations/area-16/hero.png",
+      "source_sha256": "cec9d181e6212007d740e2c74aeec9c257169c57aeeb43ca964f255e2d2b23fa",
+      "runtime": "app/src/main/assets/art/location/area-16/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 191682,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-17/hero",
+      "source": "design/artwork/locations/area-17/hero.png",
+      "source_sha256": "42f93e69af9f09f461f117548a05affc5fa96692c3d7cf940c8e7fe12640e751",
+      "runtime": "app/src/main/assets/art/location/area-17/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 240082,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-18/hero",
+      "source": "design/artwork/locations/area-18/hero.png",
+      "source_sha256": "fed73373cbf759155730b88bab2d62597a0018a5530580db3b077b951da8825c",
+      "runtime": "app/src/main/assets/art/location/area-18/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 181360,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-19/hero",
+      "source": "design/artwork/locations/area-19/hero.png",
+      "source_sha256": "23eaa73a25f2e1d64e0d7383fb856094836bbbc4b178b7c6a93624b0e5345d1c",
+      "runtime": "app/src/main/assets/art/location/area-19/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 174582,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-20/hero",
+      "source": "design/artwork/locations/area-20/hero.png",
+      "source_sha256": "a78bd52a9bef60d614cd17cd9da8a458d4c2d4e32dbdaf3952f19b54d53f547e",
+      "runtime": "app/src/main/assets/art/location/area-20/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 237572,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-21/hero",
+      "source": "design/artwork/locations/area-21/hero.png",
+      "source_sha256": "8b685c2693cc63bf8c84e0f6b2fd3b8a37a631efecb56e268b7e3bbae8706ea5",
+      "runtime": "app/src/main/assets/art/location/area-21/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 165190,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-22/hero",
+      "source": "design/artwork/locations/area-22/hero.png",
+      "source_sha256": "c1f1ff17bef13627863c4d7feb5d2061a3bd328fefc1dbb30b5d0b7c481d9548",
+      "runtime": "app/src/main/assets/art/location/area-22/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 244504,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-23/hero",
+      "source": "design/artwork/locations/area-23/hero.png",
+      "source_sha256": "e1e48275e18fdc583f9c8cf4abdcffc03a735a5464ec64fb36d4240d8a17f60d",
+      "runtime": "app/src/main/assets/art/location/area-23/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 193064,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-24/hero",
+      "source": "design/artwork/locations/area-24/hero.png",
+      "source_sha256": "33d522ad1456aa25d7bf11199527521ebc5caa274549b15d526882653ec09d7e",
+      "runtime": "app/src/main/assets/art/location/area-24/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 95120,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-25/hero",
+      "source": "design/artwork/locations/area-25/hero.png",
+      "source_sha256": "7778533be47a3c9f5fdd0793d98a13d83d5d6e8eba58054773965c500480188b",
+      "runtime": "app/src/main/assets/art/location/area-25/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 254678,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-26/hero",
+      "source": "design/artwork/locations/area-26/hero.png",
+      "source_sha256": "7fc3077636da7a67abb176a6de2a0dbfd06be52c35ee1f7b2e84792ec1c9b1a8",
+      "runtime": "app/src/main/assets/art/location/area-26/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 229302,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-27/hero",
+      "source": "design/artwork/locations/area-27/hero.png",
+      "source_sha256": "09878c135d68e7cadb17f5809fca836155103ac29c3f7ebeaf4eb6ae59127c78",
+      "runtime": "app/src/main/assets/art/location/area-27/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 158822,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-28/hero",
+      "source": "design/artwork/locations/area-28/hero.png",
+      "source_sha256": "c34ad7efb9e9f732163a4344bc0dab85673f7c96ca2f83ad6a2c3849b7cfb060",
+      "runtime": "app/src/main/assets/art/location/area-28/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 219974,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-29/hero",
+      "source": "design/artwork/locations/area-29/hero.png",
+      "source_sha256": "3cc2ab4ab8bd3001c1ff46be83a6d617430cbcd9747ce52b11a320c7f4912b1f",
+      "runtime": "app/src/main/assets/art/location/area-29/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 257956,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-30/hero",
+      "source": "design/artwork/locations/area-30/hero.png",
+      "source_sha256": "c0d3fd4910dd2acb452863f935965d8b12c975151bafb4d9476115ae57a944cf",
+      "runtime": "app/src/main/assets/art/location/area-30/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 200172,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-31/hero",
+      "source": "design/artwork/locations/area-31/hero.png",
+      "source_sha256": "a88cf7c23d0162ecc294a761e7e5e517dcdccc51e326cca3593fec1de78c0cb3",
+      "runtime": "app/src/main/assets/art/location/area-31/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 194310,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-32/hero",
+      "source": "design/artwork/locations/area-32/hero.png",
+      "source_sha256": "cd6e9ad360783d730441bbb6b440034b58522db94a3662624eff124ca4572b26",
+      "runtime": "app/src/main/assets/art/location/area-32/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 228818,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-33/hero",
+      "source": "design/artwork/locations/area-33/hero.png",
+      "source_sha256": "59801b8f0adb26a65855d3ae609adf4aee79ec891263dccf118cf6e6f032c3fa",
+      "runtime": "app/src/main/assets/art/location/area-33/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 232522,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-34/hero",
+      "source": "design/artwork/locations/area-34/hero.png",
+      "source_sha256": "adabf7f1076001750cdbdedc8956890f9e4871dad16419088348b28d998674bd",
+      "runtime": "app/src/main/assets/art/location/area-34/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 198854,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-35/hero",
+      "source": "design/artwork/locations/area-35/hero.png",
+      "source_sha256": "487447d7cb6e7440504c684d55266b4637cbbab734620ffbf1c5c4ae44d13eab",
+      "runtime": "app/src/main/assets/art/location/area-35/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 201228,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-36/hero",
+      "source": "design/artwork/locations/area-36/hero.png",
+      "source_sha256": "b3ed8e24587c26b6b685dec05b8beab6a0b0472cb176de4d0b7fd859162e05f8",
+      "runtime": "app/src/main/assets/art/location/area-36/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 189226,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-37/hero",
+      "source": "design/artwork/locations/area-37/hero.png",
+      "source_sha256": "d2ef21fe53b7ab8e6670f46bbc8071d062f25ed7ca54530d99dd74b51b713300",
+      "runtime": "app/src/main/assets/art/location/area-37/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 116350,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-38/hero",
+      "source": "design/artwork/locations/area-38/hero.png",
+      "source_sha256": "6fe61f144949ae55ef29381d0b6bee36028499a5a6714e2ca00ef70bff25f89e",
+      "runtime": "app/src/main/assets/art/location/area-38/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 147392,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-39/hero",
+      "source": "design/artwork/locations/area-39/hero.png",
+      "source_sha256": "ffaf7626cabfbf13aa1cc1132751a730cb0977b16c6a1527e1514f103e7b193d",
+      "runtime": "app/src/main/assets/art/location/area-39/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 225560,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-40/hero",
+      "source": "design/artwork/locations/area-40/hero.png",
+      "source_sha256": "76d95dc2057884fb4668e5c8b4d44e5d7250045d19c09c18fc14ed448a9bbe60",
+      "runtime": "app/src/main/assets/art/location/area-40/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 234400,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-41/hero",
+      "source": "design/artwork/locations/area-41/hero.png",
+      "source_sha256": "ad663c8a4fa098419c3180e89811f06e0cbb21fd6d80629296f9160dd3453e54",
+      "runtime": "app/src/main/assets/art/location/area-41/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 261428,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-42/hero",
+      "source": "design/artwork/locations/area-42/hero.png",
+      "source_sha256": "4e3a785cf75f60348ad2f0830a78c1b102c2e7208ce774f3ed0a937f3865eab5",
+      "runtime": "app/src/main/assets/art/location/area-42/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 219912,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-43/hero",
+      "source": "design/artwork/locations/area-43/hero.png",
+      "source_sha256": "41da91719f9b339a337e1f5b75f0a2b3f5e3b37ceeefd096bacdc0a5b7b3c553",
+      "runtime": "app/src/main/assets/art/location/area-43/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 251954,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-44/hero",
+      "source": "design/artwork/locations/area-44/hero.png",
+      "source_sha256": "aa5407e674ec06e5d6761a6e5f949d047148735fb3a58028851818594dd9d81f",
+      "runtime": "app/src/main/assets/art/location/area-44/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 274604,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-45/hero",
+      "source": "design/artwork/locations/area-45/hero.png",
+      "source_sha256": "7d70d9f82bcf4118935b206348bd619d5057992fb0301e44d2a03bca425f8e51",
+      "runtime": "app/src/main/assets/art/location/area-45/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 249648,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-46/hero",
+      "source": "design/artwork/locations/area-46/hero.png",
+      "source_sha256": "9b232ef14d3d620e1cd42ba3eeb7e575b46afcf0e5e12fc9f72aaee0f9776d64",
+      "runtime": "app/src/main/assets/art/location/area-46/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 255870,
+      "quality": 82
+    },
+    {
+      "art_key": "location/area-47/hero",
+      "source": "design/artwork/locations/area-47/hero.png",
+      "source_sha256": "265ab04942f33780c6143ffd86f3622953ea25c38479ee2b5274f6df6141008e",
+      "runtime": "app/src/main/assets/art/location/area-47/hero.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 286476,
+      "quality": 82
+    }
+  ]
+}

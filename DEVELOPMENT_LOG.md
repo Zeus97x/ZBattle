@@ -219,3 +219,29 @@ Remaining work:
 - Validation: all 70 source files found and PNG integrity verified with Pillow; source copies preserved byte-for-byte; primary ID coverage is 12 groups and 48 areas. No application code changed; Android compilation and visual/device acceptance were not run for this source-only drop.
 - Pending: runtime WebP exports and wiring; standalone branding exports, battle art and later phases. Reference boards must not be flattened into runtime UI. No merge or release requested/performed.
 - Next: Claude claims CLAUDE-003, integrates maps/heroes using existing ArtCatalog and returns a tested implementation PR.
+
+## 2026-10-09 (late evening) — CLAUDE-003 artwork integration (Claude)
+- Status: implemented on branch `claude/zbattle-artwork-integration`. The PR is opened after this commit; CI is recorded after it runs. Not merged.
+- Request: Zeus97x asked Claude to "do PR 4": implement `ai/tasks/CLAUDE-003-ARTWORK-INTEGRATION.md` from ChatGPT's artwork PR #4.
+- Base:
+  - Branched from PR #4 head `f12caf7` (the artwork drop), so the 70 source PNGs are included.
+  - Then merged current main `7024d1a` (after PR #5) to resolve PR #4's conflicts in `DEVELOPMENT_LOG.md` and `ai/README.md`. Both sides' entries are kept; CLAUDE-002 is marked Merged.
+  - Merging this PR includes PR #4's content.
+- Changes:
+  - `tools/export_artwork.py` (new): checksum-verified, reproducible WebP export (1280px long side, q82). Output is `app/src/main/assets/art/region/group-*/map.webp` (12) and `location/area-*/hero.webp` (48), 12.7 MiB in total.
+  - `design/artwork/runtime-exports.json` (new): the export record.
+  - Variants and reference boards are not bundled. Source PNGs are unchanged.
+  - `core/.../ArtCatalog.kt`: `RegionMap` fit changed from Cover to Contain.
+  - `ui/.../TravelScreen.kt`: region title above the map; the whole portrait map over a dimmed cover backdrop (aspect 0.9).
+  - `ui/.../Art.kt`: optional `contentScale` override.
+  - `app/.../AssetArtLoader.kt`: power-of-two downsample that never drops below 768px on the long side, so scenery stays sharp. Creature decoding is unchanged.
+  - `preview/.../FileArtLoader.kt`: decodes with Skia (WebP support), target 1024px.
+  - Tests: `core/src/test/.../ArtworkTest.kt` (new). `LayoutRenderTest` now asserts that scenery loads while battle art stays absent, preloads scenery, and adds Travel renders for groups 1, 7 and 8.
+  - Docs: CLAUDE-003 task (claim and completion report), `ai/README.md`, `app/src/main/assets/art/README.md`, `docs/screenshots/claude-003/`.
+- Verification:
+  - All 70 manifest checksums matched.
+  - `./gradlew -p preview test` passed, including the 5 new artwork tests.
+  - Home and Travel renders inspected at 412dp, 360dp and 1.3× font, with both Egyptian and both Greek groups distinct.
+  - Android build pending on PR CI. No device run.
+- Remaining: battle scenery (separate art phase); standalone branding (launcher icon/splash unchanged); choosing among the 7 variants; ZCube art.
+- Next step: open the PR, read CI, fix any failure, record the results, and set CLAUDE-003 to REVIEW.

@@ -72,6 +72,9 @@ class LayoutRenderTest {
         Triple("01-home", NavState(), visitedSettings),
         Triple("02-collection", NavState(listOf(Route.Collection)), visitedSettings),
         Triple("03-travel", NavState(listOf(Route.Home, Route.Travel(3))), visitedSettings),
+        Triple("03b-travel-egyptian-group7", NavState(listOf(Route.Home, Route.Travel(6))), visitedSettings),
+        Triple("03c-travel-greek-group1", NavState(listOf(Route.Home, Route.Travel(0))), visitedSettings),
+        Triple("03d-travel-greek-group8", NavState(listOf(Route.Home, Route.Travel(7))), visitedSettings),
         Triple("04-challenges", NavState(listOf(Route.Home, Route.Challenges(0))), sliceArea),
         Triple("04b-challenges-preview-area", NavState(listOf(Route.Home, Route.Challenges(13))), visitedSettings),
         Triple("04c-challenges-defeated", NavState(listOf(Route.Home, Route.Challenges(0))), afterWin.copy(progress = afterWin.progress.dismissResult())),
@@ -184,12 +187,17 @@ class LayoutRenderTest {
             val path = ArtCatalog.candidates(ArtKey.CreatureArt(creature)).single()
             assertNotNull(loader.load(path), path)
         }
-        val hero = ArtCatalog.candidates(ArtKey.LocationHero(RegionCatalog.area(0)))
-        assertTrue(hero.all { loader.load(it) == null }, "No scenery art is committed yet; placeholders must be used")
+        // CLAUDE-003: maps and heroes ship as WebP; battle scenery is a later art phase.
+        assertNotNull(ArtCatalog.candidates(ArtKey.LocationHero(RegionCatalog.area(0))).firstNotNullOfOrNull { loader.load(it) })
+        assertNotNull(ArtCatalog.candidates(ArtKey.RegionMap(RegionCatalog.groups[6])).firstNotNullOfOrNull { loader.load(it) })
+        val battle = ArtCatalog.candidates(ArtKey.LocationBattle(RegionCatalog.area(0)))
+        assertTrue(battle.all { loader.load(it) == null }, "Battle scenery placeholders remain until that phase")
     }
 
     private fun preloadCreatures() {
         CreatureCatalog.created.forEach { loader.load(it.assetPath!!) }
+        (RegionCatalog.groups.map { ArtKey.RegionMap(it) } + RegionCatalog.areas.map { ArtKey.LocationHero(it) })
+            .forEach { key -> ArtCatalog.candidates(key).firstNotNullOfOrNull { loader.load(it) } }
     }
 
     private fun render(phone: Phone, name: String, nav: NavState, settings: PlayerSettings, setup: (AppState) -> Unit = {}): File {

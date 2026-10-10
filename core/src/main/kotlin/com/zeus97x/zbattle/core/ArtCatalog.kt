@@ -12,7 +12,8 @@ sealed class ArtKey(val path: String, val fit: ArtFit, val placeholder: Placehol
     data object BrandLogo : ArtKey("branding/logo", ArtFit.Contain, PlaceholderStyle.Brand)
     data object BrandIcon : ArtKey("branding/icon", ArtFit.Contain, PlaceholderStyle.Brand)
     data object BrandSplash : ArtKey("branding/splash", ArtFit.Cover, PlaceholderStyle.Brand)
-    class RegionMap(group: RegionGroup) : ArtKey("region/${group.id}/map", ArtFit.Cover, PlaceholderStyle.Map)
+    // Maps are tall journey illustrations (~2:3); shown whole so every landmark stays visible.
+    class RegionMap(group: RegionGroup) : ArtKey("region/${group.id}/map", ArtFit.Contain, PlaceholderStyle.Map)
     class LocationHero(area: Area) : ArtKey("location/${area.id}/hero", ArtFit.Cover, PlaceholderStyle.Scenery)
     class LocationBattle(area: Area) : ArtKey("location/${area.id}/battle", ArtFit.Cover, PlaceholderStyle.Scenery)
     class Boss(id: String) : ArtKey("boss/$id", ArtFit.Contain, PlaceholderStyle.Portrait)

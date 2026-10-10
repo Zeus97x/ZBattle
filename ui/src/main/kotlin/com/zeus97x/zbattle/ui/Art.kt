@@ -90,6 +90,8 @@ fun ArtworkSlot(
     modifier: Modifier = Modifier,
     placeholderLabel: String? = null,
     placeholderAlignment: Alignment = Alignment.Center,
+    /** Overrides the key's fit, e.g. a cover-scaled backdrop behind a contained map. */
+    contentScale: ContentScale? = null,
 ) {
     val image = rememberArt(key)
     Box(modifier, contentAlignment = Alignment.Center) {
@@ -97,7 +99,7 @@ fun ArtworkSlot(
             Image(
                 bitmap = image,
                 contentDescription = contentDescription,
-                contentScale = if (key.fit == ArtFit.Cover) ContentScale.Crop else ContentScale.Fit,
+                contentScale = contentScale ?: if (key.fit == ArtFit.Cover) ContentScale.Crop else ContentScale.Fit,
                 modifier = Modifier.matchParentSize(),
             )
         } else {
