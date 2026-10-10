@@ -261,3 +261,11 @@ Remaining work:
   - `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` given an update note, so ChatGPT does not read the old preview/no-art statements as current.
 - Housekeeping noted, not done: PR #3 (CLAUDE-002 docs, included in #5) and PR #4 (artwork, included in #6) are open but redundant; Zeus97x can close them.
 - Build: "Android UI foundation checks" was dispatched on `main` at the user's request and is not monitored by Claude. Result: see the Actions tab.
+
+## 2026-10-10 — Separate extended Claude backlog
+- User expects ChatGPT usage to end before Claude usage; requested a long queue, then explicitly instructed a separate PR because Claude is working on #8.
+- Added ai/CLAUDE_EXTENDED_BACKLOG.md: 62 scoped A–G items with dependencies, common source paths, per-item acceptance, small PR cadence, blocked-work alternatives and recovery checkpoint format.
+- Created from main on ai/chatgpt/claude-extended-backlog; PR #8/task/contract files were not modified. This is additive, not competing ownership or phase authorization.
+- Claude finishes current task first and reconciles current main/active PRs. Retains user approval at phase boundaries and all unresolved gameplay/backend/art decisions. No cross-repo writes, merge/release or artwork creation.
+- Verification: current open PR #8 confirmed; source baseline and task content from recent audit reused; all document writes inspected. No app changes/build/tests required for backlog-only documentation.
+- Shared log path can conflict with #8; preserve both append-only entries when merging. Resume from extended backlog after the current Claude checkpoint.
