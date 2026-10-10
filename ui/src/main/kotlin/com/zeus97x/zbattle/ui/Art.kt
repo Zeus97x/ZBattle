@@ -20,7 +20,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -57,10 +59,12 @@ val LocalArtLoader = staticCompositionLocalOf<ArtLoader> { NoArtLoader }
 fun rememberArt(key: ArtKey): ImageBitmap? {
     val loader = LocalArtLoader.current
     val candidates = remember(key) { ArtCatalog.candidates(key) }
-    val initial = remember(key, loader) { candidates.firstNotNullOfOrNull(loader::cached) }
-    val image by produceState(initial, key, loader) {
-        // Assigned at the top level of the producer (Compose lint ProduceStateDoesNotAssignValue).
-        value = value ?: withContext(Dispatchers.IO) { candidates.firstNotNullOfOrNull(loader::load) }
+    // Cached bitmaps show on the first frame; others decode off the main thread, then recompose.
+    var image by remember(key, loader) { mutableStateOf(candidates.firstNotNullOfOrNull(loader::cached)) }
+    LaunchedEffect(key, loader) {
+        if (image == null && candidates.isNotEmpty()) {
+            image = withContext(Dispatchers.IO) { candidates.firstNotNullOfOrNull(loader::load) }
+        }
     }
     return image
 }
