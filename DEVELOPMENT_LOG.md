@@ -75,3 +75,18 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Changes: added `ai/tasks/CLAUDE-001-HANDOFF.md` (done vs remaining steps, exact files and cautions); updated task status in `ai/tasks/CLAUDE-001-UI-FOUNDATION.md` and `ai/README.md`. Documentation only.
 - Branch head before this entry: `5cf73a3`. Verification: documentation only; no new checks run.
 - Next step: follow the handoff's "Not done" list starting with the Android manifest and MainActivity.
+
+## 2026-10-10 — CLAUDE-001 resumed: Android entry point, CI, layout fixes
+- Status: implemented; Android compile pending CI on the PR (see next entry for results).
+- Request: user withdrew the ChatGPT handoff ("go back to where u left off and finish everything").
+- Changes:
+  - `app/src/main/AndroidManifest.xml` — launcher `MainActivity`, `adjustResize`, `allowBackup=false`, no network permission.
+  - `app/src/main/kotlin/com/zeus97x/zbattle/MainActivity.kt` — edge-to-edge Compose host; `ZBattleViewModel` keeps `AppState` and the art cache across rotation; system Back routed through `NavState` (overlay → screen → Home → exit).
+  - `AssetArtLoader.kt` — APK asset decoding with power-of-two downsampling to ≤768px (as ZPet `CreatureView`), `LruCache`, missing paths → placeholder.
+  - `PrefsSettingsStore.kt` — SharedPreferences `zbattle.settings.v1` (name, dark mode, music, animations, current area, visited areas) with validation on load. Local only; no ZPet writes.
+  - `app/src/main/assets/art/README.md` — drop-folder naming for ChatGPT art keys.
+  - `.github/workflows/android-ui.yml` — on pull_request/workflow_dispatch: `:core:test :app:assembleDebug :app:lintDebug` and `-p preview test`; uploads APK, lint report, test reports and renders. Validation only.
+  - `ui/` fixes: location card title no longer truncated by the "You are here" chip; card height scales with font; scenery placeholders stay dark (white overlay text stays readable in light mode); "Scenery pending" chips appear only while art is missing; small placeholders keep their icon; Collection controls wrap at 1.3× font; bottom-bar labels shrink instead of truncating; Battle hides the bottom bar.
+  - Docs: `README.md` build section, `preview/README.md`, `docs/screenshots/claude-001/` (23 downscaled renders + provenance note), task status, `ai/README.md`, handoff marked superseded.
+- Verification: `./gradlew -p preview test` — 25 tests passed; 42 renders inspected at 412dp/360dp, 1.3× font and light mode. Android sources were not compiled locally (dl.google.com blocked in this session); CI result recorded next.
+- Next step: open the PR, read CI, fix any Android compile/lint differences between Compose 1.5 (harness) and BOM 2024.12.01 (app).

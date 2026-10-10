@@ -1,4 +1,7 @@
 # CLAUDE-001 handoff — remaining work
+
+> **Superseded 2026-10-10:** the user withdrew this handoff and Claude resumed and completed the steps below on the same branch. Kept for history; see the task file and DEVELOPMENT_LOG.md for current status.
+
 Updated 2026-10-09 America/Toronto. Branch: `claude/zbattle-ui-foundation` (base main `b1fa4c5`). No PR opened yet.
 Claude paused at the user's request; the user asked ChatGPT to continue. Read AGENTS.md, DEVELOPMENT_LOG.md and ai/UI_LAYOUT_SPEC.md first.
 

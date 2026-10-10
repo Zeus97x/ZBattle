@@ -188,7 +188,7 @@ private fun AreaRow(area: Area, selected: Boolean, isCurrent: Boolean, visited: 
                 )
             }
             when {
-                isCurrent -> Box(Modifier.size(32.dp).clip(CircleShape).background(p.success), contentAlignment = Alignment.Center) {
+                isCurrent -> Box(Modifier.size(32.dp).clip(CircleShape).background(DarkPalette.success), contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.MyLocation, contentDescription = "Current", tint = Color(0xFF0B2416), modifier = Modifier.size(18.dp))
                 }
                 !unlocked -> Icon(Icons.Filled.Lock, contentDescription = "Locked", tint = p.textSecondary)

@@ -80,7 +80,7 @@ fun BattleScreen(state: AppState, areaIndex: Int, opponentSlot: Int) {
                 ArtworkSlot(ArtKey.LocationBattle(area), contentDescription = "${area.name} battle scenery", modifier = Modifier.fillMaxSize(), placeholderAlignment = Alignment.TopCenter)
                 Column(Modifier.align(Alignment.TopStart).padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     PreviewBadge()
-                    Pill("Scenery pending")
+                    if (rememberArt(ArtKey.LocationBattle(area)) == null) Pill("Scenery pending")
                 }
                 Column(Modifier.align(Alignment.TopEnd).padding(12.dp).fillMaxWidth(0.55f)) {
                     HealthPanel(opponent.party.first().name, "Opponent")

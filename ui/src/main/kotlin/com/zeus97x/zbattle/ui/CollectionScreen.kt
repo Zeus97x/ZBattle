@@ -51,6 +51,7 @@ import com.zeus97x.zbattle.core.CreatureCatalog
 import com.zeus97x.zbattle.core.Overlay
 import com.zeus97x.zbattle.core.StageFilter
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CollectionScreen(state: AppState) {
     val p = Z.colors
@@ -94,7 +95,8 @@ fun CollectionScreen(state: AppState) {
                             cursorColor = p.accent,
                         ),
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Wraps instead of squeezing labels at large font scales.
+                    FlowRow(verticalArrangement = Arrangement.Center, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         SortMenu(query.sort) { state.collectionQuery = query.copy(sort = it) }
                         TextButton(onClick = { filtersOpen = !filtersOpen }, modifier = Modifier.heightIn(min = Dimens.touchTarget)) {
                             Icon(Icons.Filled.FilterList, contentDescription = null, tint = p.accent)
@@ -104,8 +106,12 @@ fun CollectionScreen(state: AppState) {
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         }
-                        Box(Modifier.weight(1f))
-                        Text("${results.size} shown", style = MaterialTheme.typography.labelLarge, color = p.textSecondary)
+                        Text(
+                            "${results.size} shown",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = p.textSecondary,
+                            modifier = Modifier.align(Alignment.CenterVertically).padding(horizontal = 8.dp, vertical = 14.dp),
+                        )
                     }
                     if (filtersOpen) FilterPanel(state)
                     ProgressRow(

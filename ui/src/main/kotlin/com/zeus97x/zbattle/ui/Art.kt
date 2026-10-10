@@ -114,19 +114,23 @@ fun ArtPlaceholder(
     val p = Z.colors
     val brush = remember(style, p) {
         when (style) {
-            PlaceholderStyle.Scenery, PlaceholderStyle.Map -> Brush.linearGradient(listOf(p.elevated, p.surface, p.accentDark.copy(alpha = 0.35f)))
+            // Scenery always carries white overlay text, so its placeholder stays dark in both themes.
+            PlaceholderStyle.Scenery, PlaceholderStyle.Map ->
+                Brush.linearGradient(listOf(DarkPalette.elevated, DarkPalette.surface, DarkPalette.accentDark.copy(alpha = 0.35f)))
             PlaceholderStyle.Creature -> Brush.radialGradient(listOf(p.elevated, p.surface))
             else -> Brush.linearGradient(listOf(p.elevated, p.surface))
         }
     }
     Box(modifier.background(brush), contentAlignment = alignment) {
-        Column(Modifier.padding(vertical = 20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Icon(style.icon(), contentDescription = contentDescription, tint = p.textSecondary.copy(alpha = 0.7f), modifier = Modifier.size(32.dp))
+        Column(if (label != null) Modifier.padding(vertical = 20.dp) else Modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            val scenery = style == PlaceholderStyle.Scenery || style == PlaceholderStyle.Map
+            val tint = if (scenery) DarkPalette.textSecondary else p.textSecondary
+            Icon(style.icon(), contentDescription = contentDescription, tint = tint.copy(alpha = 0.7f), modifier = Modifier.size(32.dp))
             if (label != null) {
                 Text(
                     label,
                     style = MaterialTheme.typography.labelSmall,
-                    color = p.textSecondary,
+                    color = tint,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 8.dp),
                 )

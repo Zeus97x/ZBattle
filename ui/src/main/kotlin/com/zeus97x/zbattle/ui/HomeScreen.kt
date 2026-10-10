@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -172,12 +174,14 @@ private fun LocationCarousel(state: AppState, current: Area) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 /** Full-bleed scenery card with region chip, Travel pill and lower scrim text. */
 @Composable
 fun LocationCard(area: Area, isCurrent: Boolean, onTravel: () -> Unit, modifier: Modifier = Modifier) {
     val p = Z.colors
     // Grows with font scale so the title and description keep room over the scrim.
     val height = (240 * LocalDensity.current.fontScale.coerceIn(1f, 1.4f)).dp
+    val hasScenery = rememberArt(ArtKey.LocationHero(area)) != null
     Box(
         modifier
             .fillMaxWidth()
@@ -185,14 +189,13 @@ fun LocationCard(area: Area, isCurrent: Boolean, onTravel: () -> Unit, modifier:
             .clip(RoundedCornerShape(Dimens.cardRadius))
             .background(p.surface),
     ) {
-        ArtworkSlot(ArtKey.LocationHero(area), contentDescription = "${area.name} scenery", modifier = Modifier.fillMaxSize(), placeholderLabel = "Scenery art pending")
+        ArtworkSlot(ArtKey.LocationHero(area), contentDescription = "${area.name} scenery", modifier = Modifier.fillMaxSize())
         Row(
             Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Pill(area.group.tradition, container = Color(0xE6F5F4F7), content = Color(0xFF141720), icon = Icons.Filled.Place, modifier = Modifier.weight(1f, fill = false))
-            Box(Modifier.weight(0.001f))
             Row(
                 Modifier
                     .heightIn(min = Dimens.touchTarget)
@@ -212,7 +215,10 @@ fun LocationCard(area: Area, isCurrent: Boolean, onTravel: () -> Unit, modifier:
                 .padding(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            if (isCurrent) Pill("You are here", container = p.success, content = Color(0xFF0B2416))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (isCurrent) Pill("You are here", container = DarkPalette.success, content = Color(0xFF0B2416))
+                if (!hasScenery) Pill("Scenery pending", container = Color(0x66141720), content = Color(0xFFE6E3EA))
+            }
             Text(area.name, style = MaterialTheme.typography.headlineSmall, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(RegionCatalog.scenery(area), style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE6E3EA), maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
