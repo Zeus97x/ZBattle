@@ -211,6 +211,27 @@ class LayoutRenderTest {
     }
 
     @Test
+    fun ticketRedemptionThroughAppStateIsSavedBeforeItIsShown() {
+        val withTicket = sliceArea.withSeededStarter().let {
+            it.copy(progress = it.progress.copy(inventory = it.progress.inventory.applyOrThrow(Transaction("render-ticket", mapOf(ItemCatalog.TICKET_EPIC to 1L)))))
+        }
+        // No approved pool: nothing happens and the ticket is kept.
+        val locked = AppState(InMemorySettingsStore(withTicket))
+        assertEquals(null, locked.redeemTicket(ItemCatalog.TICKET_EPIC))
+        assertEquals(1, locked.settings.progress.inventory[ItemCatalog.TICKET_EPIC])
+
+        val store = InMemorySettingsStore(withTicket)
+        val ids = generateSequence(1) { it + 1 }.map { "00000000-0000-4000-8000-%012d".format(it) }.iterator()
+        val state = AppState(store, newCompanionId = { ids.next() }, ticketPool = com.zeus97x.zbattle.core.economy.TicketPool { listOf("inkling") }, ticketRoll = { 0 })
+        val claim = state.redeemTicket(ItemCatalog.TICKET_EPIC)!!
+        assertEquals(2, claim.rarity, "roll 0 on an Epic ticket is Epic")
+        val saved = store.load().progress
+        assertEquals(listOf(claim), saved.ticketClaims)
+        assertEquals(0, saved.inventory[ItemCatalog.TICKET_EPIC])
+        assertTrue(saved.owned(claim.uid)!!.companionId != null, "the new companion gets its UUID in the same save")
+    }
+
+    @Test
     fun partyFlowThroughAppState() {
         val store = InMemorySettingsStore(trio)
         val state = AppState(store, NavState(listOf(Route.Home, Route.Challenges(0))))

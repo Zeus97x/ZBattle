@@ -69,5 +69,7 @@ Owners:
 | D-RETRO-TICKETS | ECONOMY Q-E13: tickets for bosses cleared before C2 | Not answered; following the proposal (**no** retroactive tickets). No boss is playable before C2, so nothing is lost | Zeus97x | C2 |
 | D-EXPEDITION-REPLAY | ECONOMY Q-E6: do replays earn expedition credit? | Phase E; not needed for C | Zeus97x + ZPet owner | E |
 | D-EXCLUSIVE-POOL | Mystical exclusive pool | Gated (Q11) | ChatGPT | C5 |
+| D-TICKET-POOL | Which creature a ticket gives once its rarity is rolled: which families, and at which form? | Built and tested; **no production pool**, so tickets are kept unspent. Proposal: uniform over the 9 illustrated families (0–8), Baby form, rarity from the roll; duplicates are separate individuals. | Zeus97x (+ ChatGPT for art coverage) | C3 redemption |
+| D-CURVE-STATS | Opponent stat rule for the campaign (ai/proposals/CURVE-SIMULATION.md) | Recommend candidate B (multiplicative boss scaling); final region boss wall to decide | Zeus97x | EXT-017/018, C4 |
 
 Proposal documents live in [../proposals/](../proposals/README.md).

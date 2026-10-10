@@ -1,6 +1,7 @@
 package com.zeus97x.zbattle
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.zeus97x.zbattle.core.MasterGender
 import com.zeus97x.zbattle.core.MasterStyle
 import com.zeus97x.zbattle.core.PetMaster
@@ -42,7 +43,14 @@ class PrefsSettingsStore(context: Context) : SettingsStore {
         )
     }
 
-    override fun save(settings: PlayerSettings) {
+    override fun save(settings: PlayerSettings) = edit(settings).apply()
+
+    /** Synchronous write, so a ticket roll is on disk before its result is shown (C3). */
+    override fun saveDurably(settings: PlayerSettings) {
+        check(edit(settings).commit()) { "Save failed" }
+    }
+
+    private fun edit(settings: PlayerSettings): SharedPreferences.Editor {
         val editor = prefs.edit()
         val master = settings.master
         if (master == null) {
@@ -60,7 +68,7 @@ class PrefsSettingsStore(context: Context) : SettingsStore {
             .putInt(KEY_AREA, settings.currentAreaIndex)
             .putString(KEY_VISITED, settings.visitedAreas.sorted().joinToString(","))
             .putString(KEY_PROGRESS, BattleProgressCodec.encode(settings.progress))
-            .apply()
+        return editor
     }
 
     /**

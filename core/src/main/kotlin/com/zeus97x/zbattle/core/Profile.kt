@@ -36,6 +36,8 @@ data class PlayerSettings(
 interface SettingsStore {
     fun load(): PlayerSettings
     fun save(settings: PlayerSettings)
+    /** Saves and waits until the data is on disk (ticket rolls); defaults to [save]. */
+    fun saveDurably(settings: PlayerSettings) = save(settings)
 }
 
 class InMemorySettingsStore(private var value: PlayerSettings = PlayerSettings()) : SettingsStore {

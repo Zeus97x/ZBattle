@@ -1,5 +1,8 @@
 package com.zeus97x.zbattle.ui
 
+import com.zeus97x.zbattle.core.economy.TicketClaim
+import com.zeus97x.zbattle.core.economy.TicketPool
+import com.zeus97x.zbattle.core.economy.TicketPools
 import com.zeus97x.zbattle.core.economy.BuyRefusal
 import com.zeus97x.zbattle.core.economy.BuyResult
 import com.zeus97x.zbattle.core.economy.Shop
@@ -33,6 +36,10 @@ class AppState(
     initialNav: NavState? = null,
     /** Source of new companion UUIDs (CLAUDE-005 B3); injectable for tests. */
     private val newCompanionId: () -> String = { java.util.UUID.randomUUID().toString() },
+    /** Ticket creature pool (C3); null while D-TICKET-POOL is open. Injectable for tests. */
+    val ticketPool: TicketPool? = TicketPools.approved,
+    /** Ticket roll source: returns 0 until n. Injectable for tests. */
+    private val ticketRoll: (Int) -> Int = { n -> java.security.SecureRandom().nextInt(n) },
 ) {
     var settings by mutableStateOf(normalized(store.load()))
         private set
@@ -106,6 +113,21 @@ class AppState(
             is BuyResult.Bought -> { updateProgress { it.copy(inventory = r.inventory) }; null }
             is BuyResult.Refused -> r.reason
         }
+    }
+
+    /**
+     * Redeems one ticket (C3). The outcome is written to disk before it is returned, so a crash can't
+     * lead to a second roll. Returns null when redemption isn't possible (no pool approved yet, no
+     * ticket, or a battle in progress).
+     */
+    fun redeemTicket(itemId: String): TicketClaim? {
+        val pool = ticketPool ?: return null
+        val p = settings.progress
+        if (p.active != null || p.inventory[itemId] <= 0) return null
+        val next = normalized(settings.copy(progress = p.redeemTicket(itemId, pool, ticketRoll)))
+        store.saveDurably(next)
+        settings = next
+        return next.progress.ticketClaims.last()
     }
 
     /** Saves the first-run Pet Master, grants the starter and opens Home. */
