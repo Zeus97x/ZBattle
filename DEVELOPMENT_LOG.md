@@ -334,3 +334,24 @@ Remaining work:
   - No ZPet copy or ZPet commit exists; ZPet is not writable from this task.
   - No GitHub PR state API (session errors during the audit).
 - Next step: Zeus97x reviews the Phase A PR and the decision register, and the ZPet owner mirrors the bundle. After D-CONTRACT-ACCEPT and the B decisions (D-AUTO-FIGHT first), Claude starts CLAUDE-005 B1.
+
+## 2026-10-10 — CLAUDE-005 B1: auto-fight (Claude)
+- Request: Zeus97x asked for "a list of stuff that needs me input and keep going". Claude took that as permission to continue past the Phase A review stop. Only B1 can go ahead without new values: D-AUTO-FIGHT has a proposal with no numbers in it, so B1 was built to that proposal. B2–B5 stay blocked.
+- Branch: `claude/zbattle-b1-auto-fight`, stacked on the unmerged Phase A branch (d24ade8).
+- Changes and why:
+  - `core/src/main/kotlin/com/zeus97x/zbattle/core/battle/AutoFight.kt` (new): a pure move policy (Skill when ready, otherwise Attack). Moves go through the same `BattleProgress.act` path as a tap, so rules and rewards are identical to manual play. `autoStep(battleId, turn)` is the idempotency guard against late or duplicate timers and against acting after settlement.
+  - `ui/src/main/kotlin/com/zeus97x/zbattle/ui/AppState.kt`: in-memory `autoFight` flag (never saved, so a restart needs an explicit re-start). It is stopped by a tapped move, Back, Retreat, finishing or settling, and paused while a dialog is open.
+  - `ui/src/main/kotlin/com/zeus97x/zbattle/ui/BattleScreen.kt`: one keyed scheduler, the Auto battle / Stop auto button and the notice. Leaving the screen stops auto.
+  - `app/src/main/kotlin/com/zeus97x/zbattle/MainActivity.kt`: `onStop` stops auto, so it only runs in the foreground.
+  - No engine, reward, save-format or contract change.
+- Tests:
+  - `core/src/test/.../battle/AutoFightTest.kt` (new, 6 tests).
+  - `preview/.../LayoutRenderTest.kt`: an AppState auto-fight flow test and `05c-battle-auto` renders at 412dp, 360dp and 360dp with 130% text.
+- Verification:
+  - `./gradlew -p preview test` → all passed (AutoFightTest 6/6, LayoutRenderTest 6/6).
+  - Renders checked by eye.
+  - Android `assembleDebug` and `lintDebug` were not run locally (dl.google.com is blocked in this session). CI runs them once a PR is opened.
+  - No device lifecycle check was available.
+- Open: Zeus97x must confirm D-AUTO-FIGHT before B1 merges. No PR was opened because the GitHub connector session errors.
+- Compare link: https://github.com/Zeus97x/ZBattle/compare/claude/zbattle-phase-a-contract...claude/zbattle-b1-auto-fight?expand=1
+- Next: B2 once D-PARTY is answered (party size and switch turn cost).

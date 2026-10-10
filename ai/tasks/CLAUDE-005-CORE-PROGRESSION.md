@@ -1,7 +1,12 @@
 # CLAUDE-005 — Phase B: Core progression and auto battle
 Updated 2026-10-10 America/Toronto.
-Owner: Claude (unclaimed). Status: Blocked on Phase A and B design approval.
-Claim fields: implementation branch, base commit, start time, subtask owner and current PR — fill before edits.
+Owner: Claude. Status: IN PROGRESS — B1 in review; B2–B5 blocked on decisions.
+Claim fields:
+- Implementation branch: `claude/zbattle-b1-auto-fight` (stacked on `claude/zbattle-phase-a-contract`, Phase A PR not yet merged)
+- Base commit: d24ade8
+- Started: 2026-10-10 America/Toronto, after Zeus97x said "keep going" past the Phase A review stop
+- Subtask owner: Claude (B1)
+- Current PR: not opened (GitHub connector session error); compare link in DEVELOPMENT_LOG.md
 
 ## Read first
 AGENTS.md, DEVELOPMENT_LOG.md, ai/README.md, ai/CROSS_APP_ROADMAP.md, ai/integration/CONTRACT-v0.1.md and relevant preceding task summaries. Inspect latest main and active PRs; never overwrite concurrent changes.
@@ -28,3 +33,23 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-AUTO-FIGHT (B1), D-PARTY (B2), D-EVOLUTION (B3), D-CAMPAIGN (B4), D-REPLAY-REWARDS (B5).
 - **Bounded scope:** B1 can start once D-AUTO-FIGHT is approved; it reuses `BattleEngine` unchanged. B2 needs D-PARTY. B3 needs D-EVOLUTION. B4 needs approved campaign content (D-CAMPAIGN); no invented rosters. B5 needs D-REPLAY-REWARDS.
 - **Contract impact:** party battles must emit up to 6 `participantCompanionIds` (BattleCompleted schema). Keep `rulesRevision` as `zbattle-rules-N` and bump it whenever combat rules change. See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).
+
+## Progress
+| Step | Status | Notes |
+|---|---|---|
+| B1 auto-fight | REVIEW | Built on the proposed D-AUTO-FIGHT scope (foreground only, no items, stops on interruption). Zeus97x still has to confirm that scope. |
+| B2 party/switching | BLOCKED | D-PARTY: party size and switch turn cost |
+| B3 evolution | BLOCKED | D-EVOLUTION |
+| B4 campaign | BLOCKED | D-CAMPAIGN: stage counts, rosters, gates, difficulty |
+| B5 repeat battles | BLOCKED | D-REPLAY-REWARDS |
+
+### B1 implementation
+- `core/.../battle/AutoFight.kt`: `AutoFight.choose`, a pure, legal policy: Skill when ready, otherwise Attack. It never uses items and never retreats. `BattleProgress.autoStep(battleId, turn)` acts only while that battle is active and still on that turn.
+- `ui/AppState.kt`: `autoFight` lives in memory only and is never saved. `startAutoFight`, `stopAutoFight` and `autoFightStep` are guarded. A dialog pauses auto. Back, Retreat, a tapped move, settlement and leaving the screen each stop it.
+- `ui/BattleScreen.kt`: one `LaunchedEffect(battleId, turn)` scheduler with a 900 ms pause (400 ms when animations are off), an "Auto battle / Stop auto" button and an "auto on" notice.
+- `app/MainActivity.kt`: `onStop` stops auto, which makes it foreground-only.
+- No engine, reward or save-format change. `rulesRevision` is unchanged.
+- Tests:
+  - `core/.../AutoFightTest.kt` (6): legal moves only, the same result and rewards as manual play, deterministic, ends within the turn limit, stale or duplicate steps ignored, no action after settlement, manual take-over.
+  - `LayoutRenderTest.autoFightThroughAppStateIsForegroundOnlyAndSettlesOnce`.
+  - `05c-battle-auto` renders at 412dp, 360dp and 360dp with 130% text.

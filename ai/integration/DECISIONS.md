@@ -21,7 +21,7 @@ Owners:
 | D-WEEK-WINDOW | Mystical boss limit: anchored 168-hour window or trailing 7 days? | Roadmap notes the two readings conflict | Anchored 168h per boss (needs no timestamp ledger) | Zeus97x | C4 |
 | D-CAMPAIGN | Stage counts, rosters per area, gates, difficulty curve | One real encounter today; ZPet rule: area family, boss every 10th | Needs approved content; Claude will not invent it | Zeus97x + ChatGPT | B4 |
 | D-REPLAY-REWARDS | XP/coins/tickets for replays | Rematches currently pay 0 XP | Decide before auto/repeat battles | Zeus97x | B5, C2 |
-| D-AUTO-FIGHT | Auto-fight scope (foreground only? item use?) | Roadmap proposes foreground only, no item use, stop on interruption | As proposed | Zeus97x | B1 |
+| D-AUTO-FIGHT | Auto-fight scope (foreground only? item use?) | Roadmap proposes foreground only, no item use, stop on interruption | As proposed. **Built provisionally in B1** (`claude/zbattle-b1-auto-fight`); confirm or change. | Zeus97x | B1 (merge) |
 | D-PARTY | Party size and switch turn cost | Contract allows up to 6 participants | Pending | Zeus97x | B2 |
 | D-ECONOMY | Coins, prices, ticket repeatability and quantities | Coins fixed at 0; no shop pricing | Pending | Zeus97x | C1, C2 |
 | D-EXCLUSIVE-POOL | Mystical exclusive ZPet/item pools | Empty; must not substitute ordinary rewards | Keep mystical encounters unavailable until defined | Zeus97x + ChatGPT | C5 |

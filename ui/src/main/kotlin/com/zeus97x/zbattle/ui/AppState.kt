@@ -18,6 +18,7 @@ import com.zeus97x.zbattle.core.battle.BattleAction
 import com.zeus97x.zbattle.core.battle.BattleProgress
 import com.zeus97x.zbattle.core.battle.Encounter
 import com.zeus97x.zbattle.core.battle.Encounters
+import com.zeus97x.zbattle.core.battle.autoStep
 
 /** UI state holder shared by every screen. Settings are persisted through [store] on change. */
 @Stable
@@ -27,6 +28,13 @@ class AppState(private val store: SettingsStore, initialNav: NavState? = null) {
     var nav by mutableStateOf(initialNav ?: resumeNav(settings))
         private set
     var collectionQuery by mutableStateOf(CollectionQuery())
+
+    /**
+     * Auto-fight (CLAUDE-005 B1) is foreground-only and never saved: closing, backgrounding or
+     * leaving the battle turns it off, and the player restarts it explicitly.
+     */
+    var autoFight by mutableStateOf(false)
+        private set
 
     fun navigate(route: Route) { nav = nav.push(route) }
     fun selectTab(tab: Tab) { nav = nav.selectTab(tab) }
@@ -40,6 +48,7 @@ class AppState(private val store: SettingsStore, initialNav: NavState? = null) {
      */
     fun back(): Boolean {
         if (nav.overlay == null && nav.current is Route.Battle) {
+            stopAutoFight()
             when {
                 settings.progress.active != null -> { show(Overlay.ConfirmRetreat); return true }
                 settings.progress.lastResult != null -> { finishBattle(); return true }
@@ -81,18 +90,36 @@ class AppState(private val store: SettingsStore, initialNav: NavState? = null) {
         nav = nav.popTo { it is Route.Challenges }.push(Route.Battle(encounter.area.index, encounter.slot))
     }
 
+    /** A tapped move. Tapping while auto-fight runs takes control back (auto stops first). */
     fun battleAction(action: BattleAction) {
+        stopAutoFight()
         if (settings.progress.active != null) updateProgress { it.act(action) }
+    }
+
+    fun startAutoFight() { if (settings.progress.active != null) autoFight = true }
+
+    fun stopAutoFight() { autoFight = false }
+
+    /**
+     * One scheduled auto move for [battleId] at [turn]. Ignored when auto is off, a dialog is open,
+     * or the battle has moved on (see [autoStep]); stops itself once the battle settles.
+     */
+    fun autoFightStep(battleId: Long, turn: Int) {
+        if (!autoFight || nav.overlay != null) return
+        updateProgress { it.autoStep(battleId, turn) }
+        if (settings.progress.active == null) autoFight = false
     }
 
     /** Retreat grants nothing and returns to the challenge list. */
     fun retreatBattle() {
+        stopAutoFight()
         if (settings.progress.active != null) updateProgress { it.retreat().dismissResult() }
         nav = nav.popTo { it is Route.Challenges }
     }
 
     /** Leaves the results screen. Rewards were already applied when the battle ended. */
     fun finishBattle() {
+        stopAutoFight()
         updateProgress { it.dismissResult() }
         nav = nav.popTo { it is Route.Challenges }
     }

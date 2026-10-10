@@ -48,4 +48,10 @@ class MainActivity : ComponentActivity() {
         // Re-arm after an exit-to-background so Back keeps closing sheets when the user returns.
         backCallback.isEnabled = true
     }
+
+    override fun onStop() {
+        super.onStop()
+        // Auto battle is foreground-only (D-AUTO-FIGHT proposal): leaving the app stops it.
+        model.state.stopAutoFight()
+    }
 }
