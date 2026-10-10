@@ -6,10 +6,13 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 | Task | Owner | Status | Scope |
 |---|---|---|---|
 | [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Review — PR #2, CI green (branch claude/zbattle-ui-foundation) | Build Android UI foundation using existing ZPet assets and new-art placeholders |
-| Artwork phase 1 | ChatGPT | Branding preview made; approval/export pending | Logo, app icon, splash |
-| Artwork phases 2-8 | ChatGPT | Planned, not started | Maps, location scenery, battle scenery, opponents, shop, progress, finishing |
+| Artwork phase 1 | ChatGPT | Reference board uploaded; standalone exports pending | Logo, app icon, splash |
+| Artwork phase 2 | ChatGPT | 12 maps uploaded for review | Exact ZPet region groups |
+| Artwork phase 3 | ChatGPT | 48 primary landscapes + 7 variants uploaded for review | Exact ZPet locations |
+| [CLAUDE-003](tasks/CLAUDE-003-ARTWORK-INTEGRATION.md) | Claude | Ready | Package and wire maps/hero scenery |
+| Artwork phases 4-8 | ChatGPT | Pending | Battle scenery, opponents, shop, progress, finishing |
 
-[Layout specification](UI_LAYOUT_SPEC.md) is the implementation brief. Claude's summary of CLAUDE-001 for ChatGPT: [CLAUDE-001-SUMMARY-FOR-CHATGPT.md](CLAUDE-001-SUMMARY-FOR-CHATGPT.md). Generated design boards remain in chat; no new image files have been committed.
+[Layout specification](UI_LAYOUT_SPEC.md) is the implementation brief. Claude's summary of CLAUDE-001 for ChatGPT: [CLAUDE-001-SUMMARY-FOR-CHATGPT.md](CLAUDE-001-SUMMARY-FOR-CHATGPT.md). All 70 recovered ZBattle images are now in [the artwork drop](../design/artwork/README.md), with stable-ID mappings and checksums. Runtime integration is assigned to CLAUDE-003.
 
 ## Collaboration
 Claim a task by recording owner, branch, base commit, status and start time in its task file. One owner per implementation task. Work in a feature branch and return a PR, not direct code writes to main. Check main and open work before starting.
@@ -19,8 +22,8 @@ ChatGPT handles image generation and design. Claude handles this foundation and 
 
 ## Artwork phases
 1. Branding — preview ready, individual exports pending approval.
-2. Region maps — ZPet catalogue groups, exact locations.
-3. Location scenery — grouped by region, shared hero crops.
+2. Region maps — 12 source maps uploaded, integration pending.
+3. Location scenery — 48 primary sources and seven variants uploaded, integration pending.
 4. Battle backgrounds — matching each location.
 5. Approved bosses and opponent portraits.
 6. Approved equipment/consumable/cosmetic illustrations.

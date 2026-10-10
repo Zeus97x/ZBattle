@@ -129,3 +129,13 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Changes in this commit: task status → REVIEW (`ai/tasks/CLAUDE-001-UI-FOUNDATION.md`, `ai/README.md`); `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` status table and remaining-work list updated.
 - Not verified: no emulator/device run (insets, gestures, predictive back, rotation, TalkBack still need a device check).
 - Next step: user review of PR #2; on approval merge and close PR #1's superseded Java shell; then device testing and ChatGPT art drops.
+
+## 2026-10-09 — Artwork source drop and Claude integration handoff
+- Request: upload all completed ZBattle artwork in a separate PR, with a Claude task to place it in the app.
+- Base main: 2051a4b (merged UI foundation PR #2). Branch: ai/chatgpt/artwork-handoff.
+- Added design/artwork/: 70 unchanged PNGs, README mapping guide, manifest.json with stable keys, original source names, dimensions and SHA-256. Includes 12 maps, 48 primary heroes, seven variants, branding concept board and two UI boards.
+- Mapped against core RegionCatalog's exact 48 ordered names and numeric groups, preserving repeated traditions. Existing ZBattle-ZPet-Assets creature artwork is unchanged.
+- Added ai/tasks/CLAUDE-003-ARTWORK-INTEGRATION.md; refreshed ai/README.md artwork status. Claude owns runtime export/integration/visual validation on an isolated branch.
+- Validation: all 70 source files found and PNG integrity verified with Pillow; source copies preserved byte-for-byte; primary ID coverage is 12 groups and 48 areas. No application code changed; Android compilation and visual/device acceptance were not run for this source-only drop.
+- Pending: runtime WebP exports and wiring; standalone branding exports, battle art and later phases. Reference boards must not be flattened into runtime UI. No merge or release requested/performed.
+- Next: Claude claims CLAUDE-003, integrates maps/heroes using existing ArtCatalog and returns a tested implementation PR.
