@@ -97,6 +97,5 @@ class CatalogTest {
             assertEquals(6, PreviewContent.doubleLineup(area).size)
             assertTrue(PreviewContent.doubleLineup(area).all { it.hasArtwork })
         }
-        assertTrue(PreviewContent.shopItems.all { it.label.startsWith("Demo ") })
     }
 }

@@ -17,6 +17,8 @@ import com.zeus97x.zbattle.core.PlayerSettings
 import com.zeus97x.zbattle.core.RegionCatalog
 import com.zeus97x.zbattle.core.Route
 import com.zeus97x.zbattle.core.ShopCategory
+import com.zeus97x.zbattle.core.economy.ItemCatalog
+import com.zeus97x.zbattle.core.economy.Transaction
 import com.zeus97x.zbattle.core.StageFilter
 import com.zeus97x.zbattle.core.Tab
 import com.zeus97x.zbattle.core.battle.BattleAction
@@ -61,6 +63,10 @@ class LayoutRenderTest {
         visitedAreas = setOf(0),
     ).withSeededStarter()
     private val encounter = Encounters.playable.single()
+    /** Seeded save with 1,000 coins (CLAUDE-006 shop renders). */
+    private val richSettings = visitedSettings.withSeededStarter().let {
+        it.copy(progress = it.progress.copy(inventory = it.progress.inventory.applyOrThrow(Transaction("render-grant", mapOf(ItemCatalog.COINS to 900L)))))
+    }
     private val midBattle = sliceArea.copy(progress = sliceArea.progress.startBattle(encounter).act(BattleAction.Skill).act(BattleAction.Attack))
     private val afterWin = sliceArea.copy(progress = run {
         var p = sliceArea.progress.startBattle(encounter)
@@ -84,6 +90,9 @@ class LayoutRenderTest {
         Triple("05b-battle-result", battleNav, afterWin),
         Triple("06-shop-sheet", NavState(overlay = Overlay.ShopSheet), visitedSettings),
         Triple("07-item-shop", NavState(listOf(Route.Home, Route.ItemShop(ShopCategory.Equipment))), visitedSettings),
+        Triple("07b-item-shop-consumables", NavState(listOf(Route.Home, Route.ItemShop(ShopCategory.Consumables))), visitedSettings),
+        Triple("07c-confirm-purchase", NavState(listOf(Route.Home, Route.ItemShop(ShopCategory.Cosmetics)), Overlay.ConfirmPurchase("cosmetic-trainer-frame")), richSettings),
+        Triple("07d-cannot-afford", NavState(listOf(Route.Home, Route.ItemShop(ShopCategory.Cosmetics)), Overlay.ConfirmPurchase("cosmetic-trainer-title")), visitedSettings),
         Triple("08-double-battle", NavState(listOf(Route.Home, Route.DoubleBattle(13))), visitedSettings),
         Triple("09-profile", NavState(listOf(Route.Profile)), visitedSettings),
         Triple("10-achievements", NavState(listOf(Route.Profile, Route.Achievements)), visitedSettings),
@@ -178,6 +187,20 @@ class LayoutRenderTest {
         fresh.startRepeat(encounter, 3)
         assertEquals(null, fresh.repeat)
         assertEquals(null, fresh.settings.progress.active)
+    }
+
+    @Test
+    fun purchaseThroughAppStateIsSavedOnce() {
+        val store = InMemorySettingsStore(richSettings)
+        val state = AppState(store, NavState(listOf(Route.Home, Route.ItemShop(ShopCategory.Cosmetics)), Overlay.ConfirmPurchase("cosmetic-trainer-frame")))
+        assertEquals(null, state.buy("cosmetic-trainer-frame"))
+        assertEquals(null, state.nav.overlay)
+        val saved = store.load().progress.inventory
+        assertEquals(700, saved.coins)
+        assertEquals(1, saved["cosmetic-trainer-frame"])
+        assertEquals(com.zeus97x.zbattle.core.economy.BuyRefusal.AtCap, state.buy("cosmetic-trainer-frame"))
+        assertEquals(com.zeus97x.zbattle.core.economy.BuyRefusal.Unavailable, state.buy("potion"))
+        assertEquals(saved, store.load().progress.inventory, "refusals save nothing")
     }
 
     @Test

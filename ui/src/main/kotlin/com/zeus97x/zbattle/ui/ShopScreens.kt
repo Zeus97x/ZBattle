@@ -45,11 +45,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zeus97x.zbattle.core.ArtKey
-import com.zeus97x.zbattle.core.DemoShopItem
 import com.zeus97x.zbattle.core.Overlay
-import com.zeus97x.zbattle.core.PreviewContent
 import com.zeus97x.zbattle.core.Route
 import com.zeus97x.zbattle.core.ShopCategory
+import com.zeus97x.zbattle.core.battle.BattleEngine
+import com.zeus97x.zbattle.core.economy.BuyRefusal
+import com.zeus97x.zbattle.core.economy.ItemDef
+import com.zeus97x.zbattle.core.economy.ItemEffect
+import com.zeus97x.zbattle.core.economy.ItemKind
+import com.zeus97x.zbattle.core.economy.Shop
 import java.util.Locale
 
 private fun ShopCategory.icon(): ImageVector = when (this) {
@@ -62,7 +66,7 @@ private fun ShopCategory.icon(): ImageVector = when (this) {
 fun ShopCategorySheet(state: AppState) {
     val p = Z.colors
     BottomSheet(onDismiss = state::dismissOverlay, title = "Shop") {
-        Text("Categories are provisional groupings; the economy is not approved yet.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+        Text("Everything is bought with coins earned in battle. No real money.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
         ShopCategory.entries.forEach { category ->
             ZCard(Modifier.fillMaxWidth(), onClick = { state.navigate(Route.ItemShop(category)) }) {
                 Row(
@@ -90,13 +94,14 @@ fun ItemShopScreen(state: AppState, initialCategory: ShopCategory) {
     var category by rememberSaveable { mutableStateOf<ShopCategory?>(initialCategory) }
     var search by rememberSaveable { mutableStateOf("") }
     val needle = search.trim().lowercase(Locale.ROOT)
-    val items = PreviewContent.shopItems.filter {
-        (category == null || it.category == category) && (needle.isEmpty() || it.label.lowercase(Locale.ROOT).contains(needle))
+    val inventory = state.settings.progress.inventory
+    val items = (category?.let(::listOf) ?: ShopCategory.entries).flatMap(Shop::items).filter {
+        needle.isEmpty() || it.name.lowercase(Locale.ROOT).contains(needle)
     }
     Column(Modifier.fillMaxSize()) {
         AppHeader(
             title = "Item Shop",
-            subtitle = "Demo catalogue · purchases disabled",
+            subtitle = "Coins only · purchases can't be refunded",
             onBack = { state.back() },
             actions = { StatChip(Icons.Filled.MonetizationOn, formatCoins(state.settings.progress.inventory.coins), "coins", Modifier.padding(end = 4.dp)) },
         )
@@ -134,17 +139,14 @@ fun ItemShopScreen(state: AppState, initialCategory: ShopCategory) {
                 }
             }
             item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    SectionHeading(category?.label ?: "All items", Modifier.weight(1f))
-                    PreviewBadge(text = "Demo")
-                }
+                SectionHeading(category?.label ?: "All items")
             }
             if (items.isEmpty()) {
                 item { EmptyState(ArtKey.Item("none"), "No items", "Try another search or category.") }
             }
             items(items, key = { it.id }) { item ->
-                ShopItemCard(item, onBuy = {
-                    state.show(Overlay.Notice("Purchases unavailable", "${item.label} is demo content. Buying is disabled until the ZBattle economy and items are approved."))
+                ShopItemCard(item, owned = inventory[item.id], refusal = Shop.check(inventory, item), onBuy = {
+                    state.show(Overlay.ConfirmPurchase(item.id))
                 })
             }
         }
@@ -152,23 +154,53 @@ fun ItemShopScreen(state: AppState, initialCategory: ShopCategory) {
 }
 
 @Composable
-fun ShopItemCard(item: DemoShopItem, onBuy: () -> Unit, modifier: Modifier = Modifier) {
+fun ShopItemCard(item: ItemDef, owned: Long, refusal: BuyRefusal?, onBuy: () -> Unit, modifier: Modifier = Modifier) {
     val p = Z.colors
+    // Not-yet-available items explain why; affordability problems leave the button enabled so the
+    // dialog can say so, except when nothing could change it (at cap).
+    val note = when (refusal) {
+        BuyRefusal.Unavailable -> item.unavailableReason
+        BuyRefusal.AtCap -> "Owned · ${refusal.message}"
+        BuyRefusal.NotEnoughCoins -> refusal.message
+        else -> null
+    }
     ZCard(modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             ArtworkSlot(ArtKey.Item(item.id), contentDescription = null, modifier = Modifier.size(64.dp).clip(RoundedCornerShape(14.dp)))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(item.label, style = MaterialTheme.typography.titleMedium, color = p.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(item.category.label, style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
-                Text("Price pending", style = MaterialTheme.typography.labelLarge, color = p.textSecondary)
+                Text(item.name, style = MaterialTheme.typography.titleMedium, color = p.textPrimary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(item.summary(), style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+                Text(
+                    "${item.price?.let { "${formatCoins(it)} coins" } ?: "Not sold"}" + if (owned > 0) " · owned $owned" else "",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = p.textPrimary,
+                )
+                note?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = p.textSecondary) }
             }
             Button(
                 onClick = onBuy,
+                enabled = refusal == null || refusal == BuyRefusal.NotEnoughCoins,
                 modifier = Modifier.heightIn(min = Dimens.touchTarget),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = p.elevated, contentColor = p.textPrimary),
             ) { Text("Buy") }
         }
     }
+}
+
+/** One-line description from the item's real effect or bonus. */
+private fun ItemDef.summary(): String = when {
+    effect is ItemEffect.Heal -> "Heals ${(effect as ItemEffect.Heal).hp} HP in battle · uses your turn"
+    effect == ItemEffect.ApplyBurn -> "Burns the opponent: ${BattleEngine.EFFECT_AMOUNT} damage for ${BattleEngine.EFFECT_TURNS} turns"
+    effect == ItemEffect.ApplyWeaken -> "Weakens the opponent: it hits ${BattleEngine.EFFECT_AMOUNT} less for ${BattleEngine.EFFECT_TURNS} turns"
+    bonus != null -> bonus!!.let { b ->
+        listOfNotNull(
+            b.power.takeIf { it > 0 }?.let { "+$it Power" }, b.guard.takeIf { it > 0 }?.let { "+$it Guard" },
+            b.speed.takeIf { it > 0 }?.let { "+$it Speed" }, b.maxHp.takeIf { it > 0 }?.let { "+$it max HP" },
+        ).joinToString() + " · one charm per creature"
+    }
+    kind == ItemKind.Cosmetic -> "Cosmetic · no stats"
+    kind == ItemKind.ZCube -> "Catches wild creatures"
+    else -> kind.name
 }
 

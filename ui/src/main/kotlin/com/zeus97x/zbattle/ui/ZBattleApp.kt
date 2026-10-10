@@ -112,6 +112,7 @@ private fun OverlayHost(state: AppState) {
         Overlay.ConfirmRetreat -> ConfirmRetreatDialog(state)
         is Overlay.LockedArea -> LockedAreaDialog(state, overlay.areaIndex)
         is Overlay.Notice -> NoticeDialog(state, overlay)
+        is Overlay.ConfirmPurchase -> ConfirmPurchaseDialog(state, overlay.itemId)
         Overlay.EditMaster -> EditMasterDialog(state)
     }
 }

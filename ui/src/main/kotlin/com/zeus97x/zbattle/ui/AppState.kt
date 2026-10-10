@@ -1,5 +1,8 @@
 package com.zeus97x.zbattle.ui
 
+import com.zeus97x.zbattle.core.economy.BuyRefusal
+import com.zeus97x.zbattle.core.economy.BuyResult
+import com.zeus97x.zbattle.core.economy.Shop
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -92,6 +95,18 @@ class AppState(
 
     private fun updateProgress(transform: (BattleProgress) -> BattleProgress) =
         updateSettings { it.copy(progress = transform(it.progress)) }
+
+    /**
+     * Buys one [itemId] with coins (one ledger transaction). Returns the refusal, if any, so the
+     * caller can explain it; the overlay is closed either way.
+     */
+    fun buy(itemId: String): BuyRefusal? {
+        dismissOverlay()
+        return when (val r = Shop.buy(settings.progress.inventory, itemId)) {
+            is BuyResult.Bought -> { updateProgress { it.copy(inventory = r.inventory) }; null }
+            is BuyResult.Refused -> r.reason
+        }
+    }
 
     /** Saves the first-run Pet Master, grants the starter and opens Home. */
     fun completeSetup(master: PetMaster) {

@@ -1,5 +1,8 @@
 package com.zeus97x.zbattle.ui
 
+import com.zeus97x.zbattle.core.economy.BuyRefusal
+import com.zeus97x.zbattle.core.economy.ItemCatalog
+import com.zeus97x.zbattle.core.economy.Shop
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -168,6 +171,27 @@ fun LockedAreaDialog(state: AppState, areaIndex: Int) {
         title = "${area.name} is locked",
         message = TravelRules.requirement(area),
         confirm = "OK" to state::dismissOverlay,
+        onDismissRequest = state::dismissOverlay,
+    )
+}
+
+@Composable
+fun ConfirmPurchaseDialog(state: AppState, itemId: String) {
+    val item = ItemCatalog.get(itemId) ?: return state.dismissOverlay()
+    val inventory = state.settings.progress.inventory
+    val balance = inventory.coins
+    val price = item.price ?: 0
+    Shop.check(inventory, item)?.let { refusal ->
+        val extra = if (refusal == BuyRefusal.NotEnoughCoins) " ${item.name} costs ${formatCoins(price)} coins; you have ${formatCoins(balance)}." else ""
+        return ZDialog("Can't buy ${item.name}", refusal.message + extra, confirm = "OK" to state::dismissOverlay, onDismissRequest = state::dismissOverlay)
+    }
+    ZDialog(
+        title = "Buy ${item.name}?",
+        message = "${formatCoins(price)} coins · you have ${formatCoins(balance)}. Purchases can't be refunded.",
+        confirm = "Buy" to {
+            state.buy(itemId)?.let { state.show(Overlay.Notice("Couldn't buy ${item.name}", it.message)) }
+        },
+        dismiss = "Cancel" to state::dismissOverlay,
         onDismissRequest = state::dismissOverlay,
     )
 }

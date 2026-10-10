@@ -51,23 +51,27 @@ object ItemCatalog {
     const val TICKET_CAP = 9_999L
 
     private const val CATCHING_PENDING = "Catching isn't in ZBattle yet"
+    /** Lifted by the item-action PR (C). */
+    private const val ITEMS_PENDING = "Battle items arrive in the next update"
+    /** Lifted by the equipment PR (C). */
+    private const val EQUIP_PENDING = "Equipping arrives in the next update"
 
     val all: List<ItemDef> = listOf(
         ItemDef(COINS, ItemKind.Currency, "Coins", cap = COIN_CAP),
         // Consumables (§7.1): one per turn, at most 5 per battle, never used by auto.
-        ItemDef(POTION, ItemKind.Consumable, "Potion", price = 30, cap = STACK_CAP, effect = ItemEffect.Heal(25)),
-        ItemDef("super-potion", ItemKind.Consumable, "Super Potion", price = 80, cap = STACK_CAP, effect = ItemEffect.Heal(60)),
-        ItemDef("ember-vial", ItemKind.Consumable, "Ember Vial", price = 50, cap = STACK_CAP, effect = ItemEffect.ApplyBurn),
-        ItemDef("sapping-dust", ItemKind.Consumable, "Sapping Dust", price = 50, cap = STACK_CAP, effect = ItemEffect.ApplyWeaken),
+        ItemDef(POTION, ItemKind.Consumable, "Potion", price = 30, cap = STACK_CAP, effect = ItemEffect.Heal(25), unavailableReason = ITEMS_PENDING),
+        ItemDef("super-potion", ItemKind.Consumable, "Super Potion", price = 80, cap = STACK_CAP, effect = ItemEffect.Heal(60), unavailableReason = ITEMS_PENDING),
+        ItemDef("ember-vial", ItemKind.Consumable, "Ember Vial", price = 50, cap = STACK_CAP, effect = ItemEffect.ApplyBurn, unavailableReason = ITEMS_PENDING),
+        ItemDef("sapping-dust", ItemKind.Consumable, "Sapping Dust", price = 50, cap = STACK_CAP, effect = ItemEffect.ApplyWeaken, unavailableReason = ITEMS_PENDING),
         // Equipment (§7.2): one slot per creature; tier II replaces tier I.
-        ItemDef("fang-charm-1", ItemKind.Equipment, "Fang Charm I", price = 200, cap = STACK_CAP, bonus = StatBonus(power = 1)),
-        ItemDef("fang-charm-2", ItemKind.Equipment, "Fang Charm II", price = 600, cap = STACK_CAP, bonus = StatBonus(power = 2)),
-        ItemDef("shell-charm-1", ItemKind.Equipment, "Shell Charm I", price = 200, cap = STACK_CAP, bonus = StatBonus(guard = 1)),
-        ItemDef("shell-charm-2", ItemKind.Equipment, "Shell Charm II", price = 600, cap = STACK_CAP, bonus = StatBonus(guard = 2)),
-        ItemDef("feather-charm-1", ItemKind.Equipment, "Feather Charm I", price = 200, cap = STACK_CAP, bonus = StatBonus(speed = 1)),
-        ItemDef("feather-charm-2", ItemKind.Equipment, "Feather Charm II", price = 600, cap = STACK_CAP, bonus = StatBonus(speed = 2)),
-        ItemDef("heart-charm-1", ItemKind.Equipment, "Heart Charm I", price = 250, cap = STACK_CAP, bonus = StatBonus(maxHp = 10)),
-        ItemDef("heart-charm-2", ItemKind.Equipment, "Heart Charm II", price = 700, cap = STACK_CAP, bonus = StatBonus(maxHp = 20)),
+        ItemDef("fang-charm-1", ItemKind.Equipment, "Fang Charm I", price = 200, cap = STACK_CAP, bonus = StatBonus(power = 1), unavailableReason = EQUIP_PENDING),
+        ItemDef("fang-charm-2", ItemKind.Equipment, "Fang Charm II", price = 600, cap = STACK_CAP, bonus = StatBonus(power = 2), unavailableReason = EQUIP_PENDING),
+        ItemDef("shell-charm-1", ItemKind.Equipment, "Shell Charm I", price = 200, cap = STACK_CAP, bonus = StatBonus(guard = 1), unavailableReason = EQUIP_PENDING),
+        ItemDef("shell-charm-2", ItemKind.Equipment, "Shell Charm II", price = 600, cap = STACK_CAP, bonus = StatBonus(guard = 2), unavailableReason = EQUIP_PENDING),
+        ItemDef("feather-charm-1", ItemKind.Equipment, "Feather Charm I", price = 200, cap = STACK_CAP, bonus = StatBonus(speed = 1), unavailableReason = EQUIP_PENDING),
+        ItemDef("feather-charm-2", ItemKind.Equipment, "Feather Charm II", price = 600, cap = STACK_CAP, bonus = StatBonus(speed = 2), unavailableReason = EQUIP_PENDING),
+        ItemDef("heart-charm-1", ItemKind.Equipment, "Heart Charm I", price = 250, cap = STACK_CAP, bonus = StatBonus(maxHp = 10), unavailableReason = EQUIP_PENDING),
+        ItemDef("heart-charm-2", ItemKind.Equipment, "Heart Charm II", price = 700, cap = STACK_CAP, bonus = StatBonus(maxHp = 20), unavailableReason = EQUIP_PENDING),
         // Cosmetics (§7.3): no stats, owned once.
         ItemDef("cosmetic-trainer-frame", ItemKind.Cosmetic, "Trainer frame", price = 300, cap = 1),
         ItemDef("cosmetic-party-banner", ItemKind.Cosmetic, "Party banner", price = 500, cap = 1),

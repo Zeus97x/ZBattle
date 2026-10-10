@@ -26,6 +26,8 @@ sealed interface Overlay {
     data object ConfirmRetreat : Overlay
     data class LockedArea(val areaIndex: Int) : Overlay
     data class Notice(val title: String, val message: String) : Overlay
+    /** Confirm spending coins on one item (CLAUDE-006 shop). */
+    data class ConfirmPurchase(val itemId: String) : Overlay
     /** Edit name and cosmetic appearance; the starter choice is fixed after setup. */
     data object EditMaster : Overlay
 }
