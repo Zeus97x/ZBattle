@@ -24,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
@@ -33,6 +35,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +60,7 @@ import com.zeus97x.zbattle.core.battle.BattleState
 import com.zeus97x.zbattle.core.battle.Combatant
 import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.Outcome
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 /** Real turn-based battle (CLAUDE-002). State lives in saved progress, so it survives restarts. */
@@ -99,6 +103,15 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             if (state.settings.battleAnimations) for (target in listOf(-10f, 10f, -6f, 0f)) shake.animateTo(target, tween(70))
         }
     }
+    // Auto-fight scheduler: one coroutine per (battle, turn), cancelled when the turn changes or
+    // the screen leaves; the step itself re-checks battle id and turn, so it can never act twice.
+    if (state.autoFight) {
+        LaunchedEffect(battle.battleId, battle.turn) {
+            delay(if (state.settings.battleAnimations) AUTO_STEP_MS else AUTO_STEP_FAST_MS)
+            state.autoFightStep(battle.battleId, battle.turn)
+        }
+    }
+    DisposableEffect(Unit) { onDispose { state.stopAutoFight() } }
 
     Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
         Box(Modifier.fillMaxWidth().height(300.dp)) {
@@ -124,6 +137,9 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Pill("Turn ${battle.turn + 1}", container = p.accentDark, content = p.onAccent, icon = Icons.Filled.Bolt)
                 Pill("Next: ${battle.enemyIntent}")
+            }
+            if (state.autoFight) {
+                Text("Auto battle on · tap any move to take control. No items are used.", style = MaterialTheme.typography.bodyMedium, color = p.accent)
             }
             notice?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = p.accent) }
             ZCard(Modifier.fillMaxWidth()) {
@@ -166,15 +182,30 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                 state.battleAction(BattleAction.Skill)
             }
         }
+        ActionButton(
+            if (state.autoFight) "Stop auto" else "Auto battle",
+            if (state.autoFight) Icons.Filled.Stop else Icons.Filled.PlayArrow,
+            Modifier.fillMaxWidth(),
+        ) {
+            notice = null
+            if (state.autoFight) state.stopAutoFight() else state.startAutoFight()
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ActionButton("Switch", Icons.Filled.SwapHoriz, Modifier.weight(1f)) {
                 notice = if (state.settings.ownedParty.size > 1) "Switching arrives with multi-creature parties."
                 else "Only one companion so far · more arrive with ZCubes and the ZPet import."
             }
-            ActionButton("Retreat", Icons.Filled.DirectionsRun, Modifier.weight(1f)) { state.show(Overlay.ConfirmRetreat) }
+            ActionButton("Retreat", Icons.Filled.DirectionsRun, Modifier.weight(1f)) {
+                state.stopAutoFight()
+                state.show(Overlay.ConfirmRetreat)
+            }
         }
     }
 }
+
+/** Pause between auto moves so each turn stays readable; shorter when animations are off. */
+private const val AUTO_STEP_MS = 900L
+private const val AUTO_STEP_FAST_MS = 400L
 
 @Composable
 private fun ResultPanel(state: AppState, result: BattleResult) {

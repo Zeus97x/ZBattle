@@ -104,6 +104,7 @@ class LayoutRenderTest {
         for ((name, nav, settings) in cases.filter { it.first in setOf("00-setup", "01-home", "02-collection", "03-travel", "04-challenges", "05-battle", "05b-battle-result", "09-profile") }) {
             written += render(largeText, name, nav, settings)
         }
+        for (phone in phones + largeText) written += render(phone, "05c-battle-auto", battleNav, midBattle) { it.startAutoFight() }
         written += render(phones[0], "18-home-light", NavState(), visitedSettings.copy(darkMode = false))
         written += render(phones[0], "19-profile-light", NavState(listOf(Route.Profile)), visitedSettings.copy(darkMode = false))
         written += render(
@@ -143,6 +144,50 @@ class LayoutRenderTest {
         assertTrue(state.back())
         assertEquals(null, state.nav.overlay)
         assertEquals(false, state.back())
+    }
+
+    @Test
+    fun autoFightThroughAppStateIsForegroundOnlyAndSettlesOnce() {
+        val store = InMemorySettingsStore(sliceArea)
+        val state = AppState(store, NavState(listOf(Route.Home, Route.Challenges(0))))
+        state.startAutoFight()
+        assertEquals(false, state.autoFight, "No auto without an active battle")
+        state.startBattle(encounter)
+        state.startAutoFight()
+        val id = state.settings.progress.active!!.battleId
+        state.autoFightStep(id, 0)
+        assertEquals(1, state.settings.progress.active!!.turn)
+        state.autoFightStep(id, 0) // duplicate timer for the same turn
+        assertEquals(1, state.settings.progress.active!!.turn)
+
+        // A dialog pauses it; Back (retreat prompt) stops it.
+        state.show(Overlay.ConfirmRetreat)
+        state.autoFightStep(id, 1)
+        assertEquals(1, state.settings.progress.active!!.turn)
+        state.dismissOverlay()
+        assertTrue(state.back())
+        assertEquals(false, state.autoFight)
+        state.dismissOverlay()
+
+        // Tapping a move takes control back.
+        state.startAutoFight()
+        state.battleAction(BattleAction.Attack)
+        assertEquals(false, state.autoFight)
+
+        // Not saved: a restart comes back with auto off.
+        state.startAutoFight()
+        assertEquals(false, AppState(store).autoFight)
+
+        while (state.settings.progress.active != null) {
+            val a = state.settings.progress.active!!
+            state.autoFightStep(a.battleId, a.turn)
+        }
+        assertEquals(false, state.autoFight, "Auto stops once the battle settles")
+        assertEquals(Outcome.Victory, store.load().progress.lastResult!!.outcome)
+        assertEquals(60, store.load().progress.lead!!.xp)
+        state.autoFightStep(id, 0)
+        assertEquals(60, store.load().progress.lead!!.xp)
+        assertEquals(1, store.load().progress.wins.values.sum())
     }
 
     @Test
