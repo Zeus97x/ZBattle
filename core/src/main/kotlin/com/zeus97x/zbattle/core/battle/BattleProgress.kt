@@ -185,6 +185,29 @@ data class BattleProgress(
         return if (next.over) settle(next) else copy(active = next)
     }
 
+    /** Why [itemId] can't be used in the active battle now, or null when it can. */
+    fun itemRefusal(itemId: String): String? {
+        val battle = active ?: return "No battle"
+        val effect = ItemCatalog.get(itemId)?.effect ?: return "Not a battle item"
+        if (inventory[itemId] <= 0) return "None left"
+        return BattleEngine.itemRefusal(battle, effect)
+    }
+
+    /**
+     * Uses one battle item (manual only). The item leaves the inventory in the same state change as
+     * the turn, as transaction `item-<battleId>-<turn>`; if the creature is knocked out before it
+     * moves, the item isn't used and stays in the inventory.
+     */
+    fun useItem(itemId: String): BattleProgress {
+        val battle = checkNotNull(active) { "No active battle" }
+        itemRefusal(itemId)?.let { error(it) }
+        val item = ItemCatalog.require(itemId)
+        val next = BattleEngine.useItem(battle, item.effect!!, item.name)
+        val paid = if (next.itemsUsed > battle.itemsUsed) inventory.applyOrThrow(Transaction("item-${battle.battleId}-${next.turn}", mapOf(itemId to -1L))) else inventory
+        val updated = copy(inventory = paid)
+        return if (next.over) updated.settle(next) else updated.copy(active = next)
+    }
+
     fun switchTo(index: Int): BattleProgress {
         val battle = checkNotNull(active) { "No active battle" }
         val next = BattleEngine.switch(battle, index)

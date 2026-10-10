@@ -611,3 +611,29 @@ Remaining work:
   - `./gradlew -p preview test` (local mirror) → 118 tests, 0 failures.
   - Renders checked at 360dp. Fixed: Potion was not gated (its id is a constant, so the bulk edit missed it), the dialog offered Buy when the player couldn't afford the item, and long names were cut off.
 - Next: battle item action.
+
+## 2026-10-10 — CLAUDE-006: battle item action (Claude)
+- Branch: `claude/zbattle-c-items` (stacked on the shop branch). Decision basis: D-SHOP (batch 2), ECONOMY §7.1.
+- Rules, implemented in `BattleEngine.useItem`:
+  - An item uses the turn and deals 0 damage. The opponent still strikes and the Skill cooldown ticks as on Attack.
+  - At most 5 items per battle.
+  - Heal restores up to max HP and is refused at full HP. Burn/Weaken items refresh to 3 turns rather than stacking, applied like the Skill effect.
+  - If the creature is knocked out before it moves, the item is not used.
+  - Using an item counts as participation.
+  - Auto never uses items: `AutoMove` has no item move.
+  - `RULES_REVISION` = `zbattle-rules-3`.
+- Changes:
+  - `BattleProgress.useItem` / `itemRefusal`: the item leaves the inventory as transaction `item-<battleId>-<turn>` in the same state change as the turn, and a winning item turn settles normally.
+  - Codec v7 stores `itemsUsed`.
+  - Consumables are no longer gated in the shop.
+  - Battle UI:
+    - New Items button and item picker, showing counts, the reason an item can't be used, and items left out of 5.
+    - The action panel is now a 2×2 grid (Attack/Skill, Items/Switch) plus a full-width Retreat. Three buttons in one row were cut off at 360dp, even at 100% text.
+- Tests:
+  - New `BattleItemsTest` (7): heal plus turn plus a single debit, full-HP refusal and the HP cap, refresh not stack, the 5-item limit and out-of-stock, no debit on a knockout before moving, a victory from an item's Burn tick, and a codec round trip with a full auto battle leaving the items untouched.
+  - `LayoutRenderTest` purchase test updated (Potion is now purchasable).
+- Verification:
+  - `./gradlew -p preview test` (local mirror) → 125 tests, 0 failures.
+  - `05-battle` renders checked at 360dp with 100% and 130% text.
+  - The item picker is not rendered: it is local UI state the harness cannot open.
+- Next: equipment slot.

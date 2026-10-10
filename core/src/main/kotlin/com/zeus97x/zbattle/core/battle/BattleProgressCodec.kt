@@ -29,9 +29,10 @@ import java.util.Base64
  *   with an empty inventory; the starter kit is then granted once by [BattleProgress.withStarter].
  * - v6 (CLAUDE-006 C2): the last result also records coins and the ticket paid. Older results read
  *   as 0 coins and no ticket (nothing was paid then).
+ * - v7 (CLAUDE-006 battle items): the active battle records items used. Older battles read as 0.
  */
 object BattleProgressCodec {
-    const val VERSION = 6
+    const val VERSION = 7
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -94,7 +95,7 @@ object BattleProgressCodec {
             val defeated = List(count(d, 10_000)) { d.readUTF() }.toSet()
             val wins = List(count(d, 10_000)) { d.readUTF() to d.readInt() }.toMap()
             val party = if (version >= 2) List(count(d, BattleEngine.PARTY_SIZE)) { d.readLong() } else emptyList()
-            val active = if (d.readBoolean()) (if (version >= 2) readBattle(d) else readBattleV1(d)) else null
+            val active = if (d.readBoolean()) (if (version >= 2) readBattle(d, version) else readBattleV1(d)) else null
             val last = if (!d.readBoolean()) null else if (version >= 2) {
                 val r = BattleResult(d.readLong(), d.readUTF(), Outcome.valueOf(d.readUTF()), d.readBoolean(),
                     List(count(d, BattleEngine.PARTY_SIZE)) { XpGain(d.readLong(), d.readLong(), d.readInt(), d.readInt()) })
@@ -151,9 +152,10 @@ object BattleProgressCodec {
         d.writeBoolean(b.awaitingReplacement)
         d.writeInt(b.log.size); b.log.forEach(d::writeUTF)
         d.writeUTF(b.outcome?.name ?: "")
+        d.writeInt(b.itemsUsed)
     }
 
-    private fun readBattle(d: DataInputStream): BattleState {
+    private fun readBattle(d: DataInputStream, version: Int): BattleState {
         val battleId = d.readLong()
         val encounterId = d.readUTF()
         val team = List(count(d, BattleEngine.PARTY_SIZE)) { TeamMember(d.readLong(), readCombatant(d), d.readInt()) }
@@ -170,6 +172,7 @@ object BattleProgressCodec {
             awaitingReplacement = d.readBoolean(),
             log = List(count(d, 100)) { d.readUTF() },
             outcome = d.readUTF().takeIf { it.isNotEmpty() }?.let(Outcome::valueOf),
+            itemsUsed = if (version >= 7) d.readInt() else 0,
         )
         if (state.participants.any { p -> team.none { it.uid == p } }) throw IOException("Invalid participants")
         if (state.awaitingReplacement != (state.player.fainted)) throw IOException("Invalid replacement state")
@@ -206,7 +209,8 @@ object BattleProgressCodec {
         if (state.outcome != null) throw IOException("Settled battle stored as active")
         if (Encounters.byId(state.encounterId) == null) throw IOException("Unknown encounter")
         if (state.turn !in 0 until BattleEngine.TURN_LIMIT || state.team.any { it.skillCooldown !in 0..BattleEngine.SKILL_COOLDOWN } ||
-            state.burnTurns !in 0..BattleEngine.EFFECT_TURNS || state.weakenTurns !in 0..BattleEngine.EFFECT_TURNS
+            state.burnTurns !in 0..BattleEngine.EFFECT_TURNS || state.weakenTurns !in 0..BattleEngine.EFFECT_TURNS ||
+            state.itemsUsed !in 0..BattleEngine.MAX_ITEMS_PER_BATTLE
         ) throw IOException("Invalid battle counters")
         return state
     }

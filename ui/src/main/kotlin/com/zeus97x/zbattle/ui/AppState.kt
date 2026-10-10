@@ -135,6 +135,12 @@ class AppState(
         if (settings.progress.active != null) updateProgress { it.act(action) }
     }
 
+    /** Uses a battle item (costs the turn). Manual only: auto stops first and never uses items. */
+    fun useItem(itemId: String) {
+        stopAutoFight()
+        if (settings.progress.itemRefusal(itemId) == null) updateProgress { it.useItem(itemId) }
+    }
+
     /** Manual switch (costs the turn). Like any tapped move it takes control back from auto. */
     fun switchTo(index: Int) {
         stopAutoFight()
