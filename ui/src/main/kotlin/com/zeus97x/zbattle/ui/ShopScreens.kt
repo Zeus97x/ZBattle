@@ -193,12 +193,7 @@ private fun ItemDef.summary(): String = when {
     effect is ItemEffect.Heal -> "Heals ${(effect as ItemEffect.Heal).hp} HP in battle · uses your turn"
     effect == ItemEffect.ApplyBurn -> "Burns the opponent: ${BattleEngine.EFFECT_AMOUNT} damage for ${BattleEngine.EFFECT_TURNS} turns"
     effect == ItemEffect.ApplyWeaken -> "Weakens the opponent: it hits ${BattleEngine.EFFECT_AMOUNT} less for ${BattleEngine.EFFECT_TURNS} turns"
-    bonus != null -> bonus!!.let { b ->
-        listOfNotNull(
-            b.power.takeIf { it > 0 }?.let { "+$it Power" }, b.guard.takeIf { it > 0 }?.let { "+$it Guard" },
-            b.speed.takeIf { it > 0 }?.let { "+$it Speed" }, b.maxHp.takeIf { it > 0 }?.let { "+$it max HP" },
-        ).joinToString() + " · one charm per creature"
-    }
+    bonus != null -> bonus!!.label() + " · one charm per creature"
     kind == ItemKind.Cosmetic -> "Cosmetic · no stats"
     kind == ItemKind.ZCube -> "Catches wild creatures"
     else -> kind.name

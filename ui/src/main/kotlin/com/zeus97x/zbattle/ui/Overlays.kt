@@ -2,6 +2,8 @@ package com.zeus97x.zbattle.ui
 
 import com.zeus97x.zbattle.core.economy.BuyRefusal
 import com.zeus97x.zbattle.core.economy.ItemCatalog
+import com.zeus97x.zbattle.core.economy.ItemKind
+import com.zeus97x.zbattle.core.economy.StatBonus
 import com.zeus97x.zbattle.core.economy.Shop
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -77,6 +79,7 @@ fun CreatureDetailSheet(state: AppState, creatureId: String) {
                 Pill("Speed ${stats.speed}")
             }
             DetailLine("Skill", "${skill.name} · ${skill.effect.label}")
+            EquipmentSection(state, owned)
             DetailLine("Species", "${creature.family.label} · ${OwnedCreature.RARITY_NAMES[owned.rarity]} (${owned.speciesId})")
             DetailLine(
                 "Evolution",
@@ -174,6 +177,40 @@ fun LockedAreaDialog(state: AppState, areaIndex: Int) {
         onDismissRequest = state::dismissOverlay,
     )
 }
+
+/** One charm slot (CLAUDE-006): shows the equipped charm and lets the player change it between battles. */
+@Composable
+private fun EquipmentSection(state: AppState, owned: OwnedCreature) {
+    val p = Z.colors
+    val progress = state.settings.progress
+    val current = owned.equipment?.let { ItemCatalog.require(it) }
+    DetailLine("Charm", current?.let { "${it.name} · ${it.bonus!!.label()}" } ?: "None equipped")
+    if (progress.active != null) {
+        Text("Charms can be changed after the battle.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+        return
+    }
+    val inBag = ItemCatalog.ofKind(ItemKind.Equipment).filter { progress.inventory[it.id] > 0 && it.id != owned.equipment }
+    if (inBag.isEmpty() && current == null) {
+        Text("Buy charms in the Shop · one per creature.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        inBag.forEach { item ->
+            SecondaryButton(
+                "Equip ${item.name} (${item.bonus!!.label()}) · ${progress.inventory[item.id]} in bag",
+                onClick = { state.equip(owned.uid, item.id) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (current != null) SecondaryButton("Remove ${current.name}", onClick = { state.equip(owned.uid, null) }, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/** "+1 Power", "+10 max HP", … */
+fun StatBonus.label(): String = listOfNotNull(
+    power.takeIf { it > 0 }?.let { "+$it Power" }, guard.takeIf { it > 0 }?.let { "+$it Guard" },
+    speed.takeIf { it > 0 }?.let { "+$it Speed" }, maxHp.takeIf { it > 0 }?.let { "+$it max HP" },
+).joinToString()
 
 @Composable
 fun ConfirmPurchaseDialog(state: AppState, itemId: String) {

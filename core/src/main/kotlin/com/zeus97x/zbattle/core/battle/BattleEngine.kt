@@ -1,6 +1,7 @@
 package com.zeus97x.zbattle.core.battle
 
 import com.zeus97x.zbattle.core.economy.ItemEffect
+import com.zeus97x.zbattle.core.economy.StatBonus
 
 import com.zeus97x.zbattle.core.CreatureCatalog
 
@@ -137,7 +138,7 @@ object BattleEngine {
     const val RULES_REVISION = "zbattle-rules-3"
 
     /** A fighter entering battle at full HP (every separate encounter starts fresh, D-REPLAY-REWARDS). */
-    data class Entrant(val uid: Long, val creatureId: String, val level: Int)
+    data class Entrant(val uid: Long, val creatureId: String, val level: Int, val bonus: StatBonus? = null)
 
     fun start(battleId: Long, encounter: Encounter, playerUid: Long, playerCreatureId: String, playerLevel: Int): BattleState =
         start(battleId, encounter, listOf(Entrant(playerUid, playerCreatureId, playerLevel)))
@@ -145,7 +146,7 @@ object BattleEngine {
     fun start(battleId: Long, encounter: Encounter, party: List<Entrant>): BattleState {
         val team = party.map { m ->
             val creature = CreatureCatalog.require(m.creatureId)
-            val p = CreatureStats.forCreature(creature, m.level)
+            val p = CreatureStats.forCreature(creature, m.level) + m.bonus
             TeamMember(m.uid, Combatant(creature.id, m.level, p.maxHp, p.maxHp, p.power, p.guard, p.speed))
         }
         val e = encounter.stats

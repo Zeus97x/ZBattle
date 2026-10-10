@@ -30,9 +30,10 @@ import java.util.Base64
  * - v6 (CLAUDE-006 C2): the last result also records coins and the ticket paid. Older results read
  *   as 0 coins and no ticket (nothing was paid then).
  * - v7 (CLAUDE-006 battle items): the active battle records items used. Older battles read as 0.
+ * - v8 (CLAUDE-006 equipment): each owned creature records its equipped charm. Older saves read as none.
  */
 object BattleProgressCodec {
-    const val VERSION = 7
+    const val VERSION = 8
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -45,6 +46,7 @@ object BattleProgressCodec {
                 d.writeLong(c.uid); d.writeUTF(c.creatureId); d.writeLong(c.xp)
                 d.writeUTF(c.companionId ?: ""); d.writeInt(c.rarity); d.writeUTF(c.nickname ?: "")
                 d.writeUTF(c.origin.name); d.writeLong(c.sourceRevision)
+                d.writeUTF(c.equipment ?: "")
             }
             d.writeInt(progress.defeated.size)
             progress.defeated.sorted().forEach(d::writeUTF)
@@ -89,6 +91,7 @@ object BattleProgressCodec {
                         uid = d.readLong(), creatureId = d.readUTF(), xp = d.readLong(),
                         companionId = d.readUTF().ifEmpty { null }, rarity = d.readInt(), nickname = d.readUTF().ifEmpty { null },
                         origin = CompanionOrigin.valueOf(d.readUTF()), sourceRevision = d.readLong(),
+                        equipment = if (version >= 8) d.readUTF().ifEmpty { null } else null,
                     )
                 } else OwnedCreature(d.readLong(), d.readUTF(), d.readLong())
             }

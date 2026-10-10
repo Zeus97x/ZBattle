@@ -637,3 +637,24 @@ Remaining work:
   - `05-battle` renders checked at 360dp with 100% and 130% text.
   - The item picker is not rendered: it is local UI state the harness cannot open.
 - Next: equipment slot.
+
+## 2026-10-10 — CLAUDE-006: equipment slot (Claude)
+- Branch: `claude/zbattle-c-equipment` (stacked on the items branch). Decision basis: D-SHOP (batch 2), ECONOMY §7.2.
+- Changes:
+  - `OwnedCreature.equipment`: one charm slot per creature.
+  - `StatBlock + StatBonus` applies the flat bonus once; `OwnedCreature.stats` and `BattleEngine.Entrant.bonus` both include it, so the battle starts at the boosted full HP.
+  - `BattleProgress.equip(uid, itemId?)`:
+    - The charm leaves the bag and the previous one returns, as one `equip-<n>` transaction.
+    - Refused during a battle or without the charm in the bag.
+    - Tier II replaces tier I; tier I goes back to the bag (no trade-in, nothing lost).
+  - Codec v8 stores each creature's charm.
+  - Charms are no longer gated in the shop.
+  - Creature sheet: Charm line plus Equip/Remove buttons between battles. `StatBonus.label()` is shared with the shop.
+- Tests:
+  - New `EquipmentTest` (4): bag ↔ slot moves, the bonus applied once to sheet and battle stats, changes refused in battle or without ownership, codec round trip.
+  - Render `28-owned-detail-charm`.
+- Verification:
+  - `./gradlew -p preview test` (local mirror) → 129 tests, 0 failures.
+  - The render shows HP 62 (52 + Heart Charm 10). The charm controls are below the visible part of the sheet in the harness.
+- Rules: no `rulesRevision` change. Engine rules are unchanged; stats include the item.
+- Next: D-CURVE simulation with the real engine (party of 3, switching, items, equipment).

@@ -4,6 +4,8 @@ import com.zeus97x.zbattle.core.Area
 import com.zeus97x.zbattle.core.CreatureCatalog
 import com.zeus97x.zbattle.core.economy.Inventory
 import com.zeus97x.zbattle.core.economy.ItemCatalog
+import com.zeus97x.zbattle.core.economy.ItemKind
+import com.zeus97x.zbattle.core.economy.StatBonus
 import com.zeus97x.zbattle.core.economy.Transaction
 
 /**
@@ -26,6 +28,8 @@ data class OwnedCreature(
     val origin: CompanionOrigin = CompanionOrigin.ZBattle,
     /** Last accepted origin-app snapshot revision (0 = none). */
     val sourceRevision: Long = 0,
+    /** Equipped charm item id (one slot, CLAUDE-006), or null. */
+    val equipment: String? = null,
 ) {
     init {
         require(uid > 0 && xp >= 0) { "Invalid owned creature" }
@@ -34,6 +38,7 @@ data class OwnedCreature(
         require(companionId == null || UUID_PATTERN.matches(companionId)) { "Invalid companion id" }
         require(nickname == null || nickname.length in 1..NICKNAME_MAX) { "Invalid nickname" }
         require(sourceRevision >= 0) { "Invalid revision" }
+        require(equipment == null || ItemCatalog.get(equipment)?.kind == ItemKind.Equipment) { "Invalid equipment" }
     }
 
     val creature get() = CreatureCatalog.require(creatureId)
@@ -50,7 +55,9 @@ data class OwnedCreature(
         val RARITY_NAMES = listOf("Common", "Rare", "Epic", "Legendary")
     }
     val level: Int get() = Leveling.levelFor(xp)
-    val stats: StatBlock get() = CreatureStats.forCreature(creature, level)
+    val equipmentBonus: StatBonus? get() = equipment?.let { ItemCatalog.require(it).bonus }
+    /** Battle stats: level stats plus the equipped charm. */
+    val stats: StatBlock get() = CreatureStats.forCreature(creature, level) + equipmentBonus
 }
 
 /** XP one party member received from a settled battle. */
@@ -175,7 +182,7 @@ data class BattleProgress(
         check(active == null) { "Finish or retreat from the current battle first" }
         val members = partyMembers
         check(members.isNotEmpty()) { "No companion to battle with" }
-        val battle = BattleEngine.start(nextBattleId, encounter, members.map { BattleEngine.Entrant(it.uid, it.creatureId, it.level) })
+        val battle = BattleEngine.start(nextBattleId, encounter, members.map { BattleEngine.Entrant(it.uid, it.creatureId, it.level, it.equipmentBonus) })
         return copy(active = battle, nextBattleId = nextBattleId + 1, lastResult = null)
     }
 
@@ -183,6 +190,30 @@ data class BattleProgress(
         val battle = checkNotNull(active) { "No active battle" }
         val next = BattleEngine.act(battle, action)
         return if (next.over) settle(next) else copy(active = next)
+    }
+
+    /**
+     * Puts charm [itemId] in [uid]'s slot (null removes it). The charm comes out of the bag and any
+     * charm already in the slot goes back, as one ledger transaction. Not during a battle, because
+     * stats are fixed when the battle starts.
+     */
+    fun equip(uid: Long, itemId: String?): BattleProgress {
+        check(active == null) { "Equipment can't change during a battle" }
+        val creature = checkNotNull(owned(uid)) { "Unknown creature" }
+        if (creature.equipment == itemId) return this
+        if (itemId != null) {
+            check(ItemCatalog.get(itemId)?.kind == ItemKind.Equipment) { "Not equipment" }
+            check(inventory[itemId] > 0) { "No ${ItemCatalog.require(itemId).name} in the bag" }
+        }
+        val deltas = buildMap {
+            itemId?.let { put(it, -1L) }
+            creature.equipment?.let { put(it, 1L) }
+        }
+        val (id, reserved) = inventory.reserveId("equip")
+        return copy(
+            creatures = creatures.map { if (it.uid == uid) it.copy(equipment = itemId) else it },
+            inventory = reserved.applyOrThrow(Transaction(id, deltas)),
+        )
     }
 
     /** Why [itemId] can't be used in the active battle now, or null when it can. */

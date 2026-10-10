@@ -153,6 +153,14 @@ class AppState(
         if (settings.progress.active?.awaitingReplacement == true) updateProgress { it.replaceWith(index) }
     }
 
+    /** Equips charm [itemId] on [uid] (null removes it); ignored during a battle or without the charm. */
+    fun equip(uid: Long, itemId: String?) {
+        val p = settings.progress
+        if (p.active != null || p.owned(uid) == null) return
+        if (itemId != null && p.inventory[itemId] <= 0) return
+        updateProgress { it.equip(uid, itemId) }
+    }
+
     fun toggleParty(uid: Long) { if (settings.progress.active == null) updateProgress { it.toggleParty(uid) } }
 
     fun makeLead(uid: Long) { if (settings.progress.active == null) updateProgress { it.makeLead(uid) } }
