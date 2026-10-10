@@ -680,4 +680,27 @@ Remaining work:
   - Doc links OK.
 - Blocked: campaign runtime activation (EXT-017/018) waits for approval of the opponent stat rule (questions 1–2 in CURVE-SIMULATION.md).
 - Next: ticket rolls (C3).
+
+## 2026-10-10 — CLAUDE-006 C3: ticket rolls (Claude)
+- Branch: `claude/zbattle-c3-tickets` (stacked on the simulation branch). Items: EXT-023, EXT-024.
+- Changes:
+  - New `core/.../economy/Tickets.kt`:
+    - `TicketTables` (Rare 70/30; Epic 50/35/15; Legendary 40/30/21/9), as a cascading lookup on a 0–99 roll.
+    - `TicketPool`, with `TicketPools.approved = null`.
+    - `TicketClaim`.
+  - `BattleProgress.redeemTicket(ticket, pool, roll)`: in one state change it consumes the ticket, rolls the rarity, picks one creature, grants a new individual (new uid; duplicates stay separate) and stores the claim under a single `ticket-<n>` id.
+  - Codec v9 stores the claims; a claim without its matching ledger transaction is rejected as corrupt.
+  - `SettingsStore.saveDurably`: the Android store uses `commit()`, so a roll is on disk before its result is shown and a crash can't lead to a second roll.
+  - `AppState.redeemTicket`: refused during a battle, without a ticket, or without an approved pool. A new companion gets its UUID in the same save.
+  - The shop sheet shows a Tickets card with counts and why redemption isn't available yet.
+- Blocked: **D-TICKET-POOL**. Which creatures a ticket can give is not decided, so nothing is invented and tickets stay unspent. No ticket-paying boss is playable yet anyway.
+- Tests:
+  - New `TicketsTest` (5): exact table boundaries and counts over all 100 rolls; one debit and one new individual per ticket; duplicates stay separate; save round trip; a forged claim rejected; no production pool.
+  - `LayoutRenderTest.ticketRedemptionThroughAppStateIsSavedBeforeItIsShown`.
+  - `BattleProgressTest` now uses version 99 as its "unknown version".
+- Verification:
+  - `./gradlew -p preview test` (local mirror) → 136 tests, 0 failures.
+  - Shop sheet render checked at 360dp.
+  - `PrefsSettingsStore` (app module) was not compiled locally (dl.google.com is blocked); CI covers it.
+- Next: Phase C checkpoint. C4/C5 mystical bosses need the campaign runtime (D-CURVE-STATS approval) and D-EXCLUSIVE-POOL.
 - CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.

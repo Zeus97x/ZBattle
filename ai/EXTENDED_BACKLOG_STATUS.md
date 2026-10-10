@@ -85,3 +85,4 @@ Every item in phases C–G is runtime work in a phase that has not been approved
 - Battle items (D-SHOP): **Review** on `claude/zbattle-c-items`. `rulesRevision` is now `zbattle-rules-3`; consumables can be bought and used.
 - Equipment slot (D-SHOP): **Review** on `claude/zbattle-c-equipment`. Charms are now purchasable and equippable between battles.
 - D-CURVE simulation: **Review** on `claude/zbattle-c-curve-sim` (`ai/proposals/CURVE-SIMULATION.md`). Recommends multiplicative boss scaling (candidate B); awaiting approval before EXT-017/018 activation.
+- C3 ticket rolls (EXT-023/024): **Review** on `claude/zbattle-c3-tickets`. Tables, the persisted outcome and atomic redemption are built; redemption is **blocked** on D-TICKET-POOL. EXT-025 (results UI) waits for it.

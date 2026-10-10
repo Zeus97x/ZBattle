@@ -6,6 +6,9 @@ import com.zeus97x.zbattle.core.economy.Inventory
 import com.zeus97x.zbattle.core.economy.ItemCatalog
 import com.zeus97x.zbattle.core.economy.ItemKind
 import com.zeus97x.zbattle.core.economy.StatBonus
+import com.zeus97x.zbattle.core.economy.TicketClaim
+import com.zeus97x.zbattle.core.economy.TicketPool
+import com.zeus97x.zbattle.core.economy.TicketTables
 import com.zeus97x.zbattle.core.economy.Transaction
 
 /**
@@ -134,6 +137,8 @@ data class BattleProgress(
     val settledThrough: Long = 0,
     /** Coins, items and tickets (CLAUDE-006 C1). Saved with the battle so rewards settle atomically. */
     val inventory: Inventory = Inventory(),
+    /** Redeemed tickets and their fixed outcomes (CLAUDE-006 C3), oldest first. */
+    val ticketClaims: List<TicketClaim> = emptyList(),
 ) {
     /** Party used for the next battle: the chosen members that are still owned, else the first owned creatures. */
     val partyMembers: List<OwnedCreature>
@@ -213,6 +218,31 @@ data class BattleProgress(
         return copy(
             creatures = creatures.map { if (it.uid == uid) it.copy(equipment = itemId) else it },
             inventory = reserved.applyOrThrow(Transaction(id, deltas)),
+        )
+    }
+
+    /**
+     * Redeems one [ticketItemId] (C3): consumes the ticket, rolls one rarity with [roll] (`roll(n)`
+     * returns 0 until n), picks one creature from [pool], grants it as a new individual and stores the
+     * outcome, all in one state change under one claim id. Duplicates of a species are separate
+     * creatures. Callers save this state durably before showing the result.
+     */
+    fun redeemTicket(ticketItemId: String, pool: TicketPool, roll: (Int) -> Int): BattleProgress {
+        val ticket = ItemCatalog.require(ticketItemId)
+        val tier = checkNotNull(ticket.ticketTier) { "Not a ticket" }
+        check(inventory[ticketItemId] > 0) { "No ${ticket.name}" }
+        val rarityRoll = roll(100).also { require(it in 0..99) { "Roll out of range" } }
+        val rarity = TicketTables.rarity(tier, rarityRoll)
+        val options = pool.creatures(rarity)
+        check(options.isNotEmpty()) { "Empty pool for rarity $rarity" }
+        val creatureId = options[roll(options.size).also { require(it in options.indices) { "Pick out of range" } }]
+        val (claimId, reserved) = inventory.reserveId("ticket")
+        val creature = OwnedCreature(nextUid, creatureId, 0, rarity = rarity)
+        return copy(
+            creatures = creatures + creature,
+            nextUid = nextUid + 1,
+            inventory = reserved.applyOrThrow(Transaction(claimId, mapOf(ticketItemId to -1L))),
+            ticketClaims = ticketClaims + TicketClaim(claimId, ticketItemId, rarityRoll, rarity, creatureId, creature.uid),
         )
     }
 

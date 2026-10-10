@@ -4,6 +4,7 @@ import com.zeus97x.zbattle.core.CreatureCatalog
 import com.zeus97x.zbattle.core.economy.Inventory
 import com.zeus97x.zbattle.core.economy.ItemCatalog
 import com.zeus97x.zbattle.core.economy.ItemKind
+import com.zeus97x.zbattle.core.economy.TicketClaim
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -31,9 +32,10 @@ import java.util.Base64
  *   as 0 coins and no ticket (nothing was paid then).
  * - v7 (CLAUDE-006 battle items): the active battle records items used. Older battles read as 0.
  * - v8 (CLAUDE-006 equipment): each owned creature records its equipped charm. Older saves read as none.
+ * - v9 (CLAUDE-006 C3): redeemed ticket claims with their fixed outcomes. Older saves have none.
  */
 object BattleProgressCodec {
-    const val VERSION = 8
+    const val VERSION = 9
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -74,6 +76,10 @@ object BattleProgressCodec {
             d.writeInt(inv.balances.size); inv.balances.toSortedMap().forEach { (k, v) -> d.writeUTF(k); d.writeLong(v) }
             d.writeInt(inv.applied.size); inv.applied.sorted().forEach(d::writeUTF)
             d.writeLong(inv.nextSeq)
+            d.writeInt(progress.ticketClaims.size)
+            progress.ticketClaims.forEach { t ->
+                d.writeUTF(t.claimId); d.writeUTF(t.ticketItemId); d.writeInt(t.rarityRoll); d.writeInt(t.rarity); d.writeUTF(t.creatureId); d.writeLong(t.uid)
+            }
         }
         return Base64.getEncoder().encodeToString(bytes.toByteArray())
     }
@@ -123,6 +129,9 @@ object BattleProgressCodec {
                 applied = List(count(d, 1_000_000)) { d.readUTF() }.toSet(),
                 nextSeq = d.readLong(),
             ) else Inventory()
+            val claims = if (version >= 9) List(count(d, 100_000)) {
+                TicketClaim(d.readUTF(), d.readUTF(), d.readInt(), d.readInt(), d.readUTF(), d.readLong())
+            } else emptyList()
             if (d.available() != 0) throw IOException("Trailing data")
             if (settledThrough < 0 || settledThrough >= nextBattleId || (active != null && active.battleId <= settledThrough)) throw IOException("Invalid settlement marker")
             if (nextUid < 1 || nextBattleId < 1) throw IOException("Invalid counters")
@@ -136,7 +145,10 @@ object BattleProgressCodec {
             val ids = creatures.mapNotNull { it.companionId }
             if (ids.toSet().size != ids.size) throw IOException("Duplicate companion ids")
             if (ledger.outbound.any { !it.validated || it.toForm !in 0..5 }) throw IOException("Invalid outbound unlock")
-            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party, ledger, settledThrough, inventory)
+            if (claims.map { it.claimId }.toSet().size != claims.size || claims.any { it.claimId !in inventory.applied || ItemCatalog.get(it.ticketItemId)?.kind != ItemKind.Ticket }) {
+                throw IOException("Invalid ticket claims")
+            }
+            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party, ledger, settledThrough, inventory, claims)
         }
     } catch (e: Exception) {
         throw IllegalStateException("Battle save unreadable; raw data retained for recovery", e)

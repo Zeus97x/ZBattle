@@ -50,6 +50,7 @@ import com.zeus97x.zbattle.core.Route
 import com.zeus97x.zbattle.core.ShopCategory
 import com.zeus97x.zbattle.core.battle.BattleEngine
 import com.zeus97x.zbattle.core.economy.BuyRefusal
+import com.zeus97x.zbattle.core.economy.ItemCatalog
 import com.zeus97x.zbattle.core.economy.ItemDef
 import com.zeus97x.zbattle.core.economy.ItemEffect
 import com.zeus97x.zbattle.core.economy.ItemKind
@@ -84,6 +85,30 @@ fun ShopCategorySheet(state: AppState) {
                     Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = p.textSecondary)
                 }
             }
+        }
+        TicketsCard(state)
+    }
+}
+
+/** Boss tickets (C3): counts, and redemption once the creature pool is approved. */
+@Composable
+private fun TicketsCard(state: AppState) {
+    val p = Z.colors
+    val inventory = state.settings.progress.inventory
+    ZCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(Dimens.cardPadding), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("Tickets", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
+            Text(
+                ItemCatalog.ofKind(ItemKind.Ticket).joinToString(" · ") { "${it.name} ${inventory[it.id]}" },
+                style = MaterialTheme.typography.bodyMedium,
+                color = p.textPrimary,
+            )
+            Text(
+                if (state.ticketPool == null) "Earned from first clears of mini, stage and region bosses. Each gives one creature; which creatures can appear is still awaiting approval, so tickets are kept safe until then."
+                else "Each ticket gives one creature.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = p.textSecondary,
+            )
         }
     }
 }

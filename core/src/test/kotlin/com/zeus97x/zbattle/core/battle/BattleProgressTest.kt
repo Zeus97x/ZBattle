@@ -116,7 +116,7 @@ class BattleProgressTest {
         assertFailsWith<IllegalStateException> { BattleProgressCodec.decode("not base64!") }
         assertFailsWith<IllegalStateException> { BattleProgressCodec.decode(good.dropLast(8)) }
         val bytes = java.util.Base64.getDecoder().decode(good)
-        bytes[3] = 9 // version
+        bytes[3] = 99 // an unknown future version
         assertFailsWith<IllegalStateException> { BattleProgressCodec.decode(java.util.Base64.getEncoder().encodeToString(bytes)) }
     }
 
