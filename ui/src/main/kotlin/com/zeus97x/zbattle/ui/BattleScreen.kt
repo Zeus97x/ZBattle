@@ -62,6 +62,8 @@ import com.zeus97x.zbattle.core.battle.BattleState
 import com.zeus97x.zbattle.core.battle.Combatant
 import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.Outcome
+import com.zeus97x.zbattle.core.battle.RepeatEnd
+import com.zeus97x.zbattle.core.battle.RepeatSession
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -140,6 +142,9 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Pill("Turn ${battle.turn + 1}", container = p.accentDark, content = p.onAccent, icon = Icons.Filled.Bolt)
                 Pill("Next: ${battle.enemyIntent}")
+            }
+            state.repeat?.takeIf { it.running }?.let { r ->
+                Pill("Repeat ${r.played + 1} of ${r.target} · ${r.wins} won", container = p.accentDark, content = p.onAccent)
             }
             if (battle.team.size > 1) TeamStrip(battle)
             if (state.autoFight) {
@@ -261,7 +266,8 @@ private fun ResultPanel(state: AppState, result: BattleResult) {
     }
     val detail = when {
         result.outcome == Outcome.Victory && result.firstVictory -> "+${result.xpGained} XP shared by the creatures that fought"
-        result.outcome == Outcome.Victory -> "Rematch won · practice battles give no XP (encounter rewards arrive with steps/ZCubes)."
+        result.replay && result.xpGained > 0 -> "Rematch won · +${result.xpGained} replay XP"
+        result.outcome == Outcome.Victory -> "Rematch won · replay rewards are reduced and still awaiting approval, so this one pays 0 XP."
         result.outcome == Outcome.Defeat -> "No rewards. Your companion recovers fully after each battle."
         else -> "No rewards."
     }
@@ -290,7 +296,47 @@ private fun ResultPanel(state: AppState, result: BattleResult) {
                 }
             }
         }
+        state.repeat?.takeIf { !it.running && it.encounterId == result.encounterId }?.let { r -> RepeatSummary(r) }
+        val encounter = Encounters.byId(result.encounterId)
+        if (encounter != null && result.outcome == Outcome.Victory && result.encounterId in state.settings.progress.defeated) {
+            ZCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(Dimens.cardPadding), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Repeat this battle · choose how many", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
+                    Text(
+                        "Auto battles back to back, each at full HP. Stops on a defeat or if you leave. No items are used and no first-clear rewards repeat.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = p.textSecondary,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        RepeatSession.CHOICES.forEach { n ->
+                            SecondaryButton("$n", onClick = { state.startRepeat(encounter, n) }, modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
         PrimaryButton("Continue", onClick = { state.finishBattle() }, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+private fun RepeatSummary(r: RepeatSession) {
+    val p = Z.colors
+    ZCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(Dimens.cardPadding), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("Repeat session", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
+            Text("${r.played} of ${r.target} battles · ${r.wins} won · +${r.xp} XP", style = MaterialTheme.typography.bodyLarge, color = p.textPrimary)
+            Text(
+                when (r.end) {
+                    RepeatEnd.Completed -> "Finished."
+                    RepeatEnd.Defeat -> "Stopped after a defeat."
+                    RepeatEnd.Interrupted -> "Stopped because it was interrupted. Start it again when you're ready."
+                    null -> ""
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = p.textSecondary,
+            )
+        }
     }
 }
 

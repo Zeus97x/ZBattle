@@ -63,6 +63,8 @@ data class BattleResult(
     val gains: List<XpGain> = emptyList(),
 ) {
     val xpGained: Long get() = gains.sumOf { it.xp }
+    /** A victory over an encounter that was already cleared (pays replay rewards, never a first-clear ticket). */
+    val replay: Boolean get() = outcome == Outcome.Victory && !firstVictory
     fun gainFor(uid: Long): XpGain? = gains.firstOrNull { it.uid == uid }
 }
 
@@ -114,6 +116,8 @@ data class BattleProgress(
     val party: List<Long> = emptyList(),
     /** Evolution unlock history (CLAUDE-005 B3). */
     val evolution: EvolutionLedger = EvolutionLedger(),
+    /** Highest battle id already settled (CLAUDE-005 B5). A battle id at or below it can never pay again. */
+    val settledThrough: Long = 0,
 ) {
     /** Party used for the next battle: the chosen members that are still owned, else the first owned creatures. */
     val partyMembers: List<OwnedCreature>
@@ -183,11 +187,17 @@ data class BattleProgress(
 
     private fun settle(finished: BattleState): BattleProgress {
         val outcome = checkNotNull(finished.outcome)
-        // Idempotency guard: only the battle currently held as active can be settled.
+        // Idempotency guards: only the battle currently held as active can be settled, and an id that
+        // was settled before (e.g. an older copy of a battle restored from a backup) never pays again.
         check(active?.battleId == finished.battleId) { "Battle already settled" }
+        check(finished.battleId > settledThrough) { "Battle already settled" }
         val encounter = Encounters.byId(finished.encounterId)
         val firstVictory = outcome == Outcome.Victory && finished.encounterId !in defeated
-        val xp = if (firstVictory) encounter?.firstWinXp ?: 0 else 0
+        val xp = when {
+            firstVictory -> encounter?.firstWinXp ?: 0
+            outcome == Outcome.Victory -> ReplayRewards.xpFor(encounter)
+            else -> 0
+        }
         // Only creatures that actually fought share the reward, in party order (D-PARTICIPATION).
         val participants = finished.team.map { it.uid }.filter { it in finished.participants && owned(it) != null }
         val shares = PartyXp.share(xp, participants, finished.playerUid)
@@ -201,6 +211,7 @@ data class BattleProgress(
             defeated = if (firstVictory) defeated + finished.encounterId else defeated,
             wins = if (outcome == Outcome.Victory) wins + (finished.encounterId to (wins[finished.encounterId] ?: 0) + 1) else wins,
             active = null,
+            settledThrough = finished.battleId,
             lastResult = BattleResult(finished.battleId, finished.encounterId, outcome, firstVictory, gains),
         )
     }

@@ -446,3 +446,22 @@ Remaining work:
   - `--simulate --party 3` output is recorded in §7.6.
   - `./gradlew -p preview test` → 93 tests, 0 failures (`CampaignProposalTest` 2/2).
 - Next: B5 replay tracking and settlement.
+
+## 2026-10-10 — CLAUDE-005 B5: replay tracking, settlement ledger and repeat sessions (Claude)
+- Branch: `claude/zbattle-b5-replay` (stacked on B4).
+- Decision basis: D-REPLAY-REWARDS (Q7) says to build tracking and duplicate-safe settlement first, with quantities to be approved. D-AUTO-FIGHT (Q2) means repeat sessions are foreground only.
+- Changed paths:
+  - `core/.../battle/Replay.kt` (new)
+  - `core/.../battle/{BattleProgress,BattleProgressCodec,Encounters}.kt`
+  - `ui/{AppState,BattleScreen,Overlays}.kt`
+  - Tests: `core/src/test/.../battle/ReplayTest.kt`, `preview/.../LayoutRenderTest.kt`
+- Save: codec v4 (`settledThrough`), which still reads v1–v3.
+- Verification:
+  - `./gradlew -p preview test` → 99 tests, 0 failures.
+  - Renders checked by eye; at 130% text the repeat buttons wrapped, so their labels were shortened.
+  - Android build not run locally; CI covers it.
+- Open:
+  - Replay quantities (ECONOMY Q-E1/Q-E2).
+  - Coin balance (C1).
+  - D-REPEAT-SESSION confirmation.
+- Next: commit the remaining proposals (backend audit, expedition, elements, catching, advanced combat) as a separate docs PR.

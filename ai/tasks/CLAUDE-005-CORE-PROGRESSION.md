@@ -41,7 +41,7 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 | B2 party/switching | REVIEW | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
 | B3 evolution | REVIEW | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
 | B4 campaign | REVIEW (proposal) | D-CAMPAIGN: proposal + inactive validated config only. |
-| B5 repeat battles | READY | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
+| B5 repeat battles | REVIEW | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
 
 ### B1 implementation
 - `core/.../battle/AutoFight.kt`: `AutoFight.choose`, a pure, legal policy: Skill when ready, otherwise Attack. It never uses items and never retreats. `BattleProgress.autoStep(battleId, turn)` acts only while that battle is active and still on that turn.
@@ -110,3 +110,23 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - **`CampaignProposalTest`:** every row resolves against `CreatureCatalog` and `RegionCatalog`, the shipped encounter is unchanged, and runtime still has exactly 1 playable encounter (the proposal is inactive).
 - **Reconciled with the economy proposal:** the JSON uses Option B XP. The resulting curve mismatch for a party of 3 is documented in §7.6 and left for Zeus97x (Q-F).
 - **Not built:** no runtime campaign, no unlock gates, no new opponent stats until D-CAMPAIGN is approved.
+
+### B5 implementation (branch `claude/zbattle-b5-replay`)
+- **Replay tracking:**
+  - `BattleResult.replay` (a victory over an already-cleared encounter); the `wins` counts include replays.
+  - The first-clear claim (`defeated`) is set once, and no first-clear reward repeats.
+  - `ReplayRewards.xpByKind` / `coinsByKind` are null (inactive), so replays pay 0 until the D-REPLAY-REWARDS quantities (ECONOMY-PROPOSAL §5) are approved. Coins have no balance until C1.
+- **Duplicate-safe settlement:**
+  - `BattleProgress.settledThrough`: battle ids only grow and each settles at most once, so a restored older copy of a battle can't pay again.
+  - This is on top of the existing active-battle guard.
+- **HP:** each separate encounter starts at full HP; a reopened active battle keeps its saved HP (tested).
+- **Repeat sessions (`RepeatSession`):**
+  - Only for already-cleared encounters; 3, 5 or 10 battles (D-REPEAT-SESSION proposal, max 10).
+  - Played by foreground auto-fight, never saved, with progress shown in battle and a summary on the results screen.
+  - Ends on reaching the target, on a defeat or retreat, or on any interruption (Back, Retreat, a tapped move, leaving the screen, app `onStop`). The player restarts it explicitly.
+- **Save v4:** `settledThrough`; older saves derive it.
+- **Tests:**
+  - `ReplayTest` (5).
+  - `LayoutRenderTest.repeatSessionRunsBoundedAutoReplaysAndStopsOnInterruption`.
+  - Renders 26 and 27 at 412dp, 360dp and 360dp with 130% text.
+  - Total: 99 tests, 0 failures.

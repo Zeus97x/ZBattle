@@ -22,7 +22,11 @@ data class Encounter(
     val level: Int get() = CreatureStats.opponentLevel(area.stage, boss)
     val stats: StatBlock get() = CreatureStats.forOpponent(area.stage, boss)
     val label: String get() = if (boss) "Boss ${creature.name}" else "Wild ${creature.name}"
+    /** Campaign kind (B4 proposal kinds). Today's ZPet-rule boss is the area guardian role. */
+    val kind: EncounterKind get() = if (boss) EncounterKind.LocationBoss else EncounterKind.Wild
 }
+
+enum class EncounterKind { Wild, MiniBoss, StageBoss, LocationBoss, RegionBoss }
 
 object Encounters {
     /**
