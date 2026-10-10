@@ -17,9 +17,12 @@ import java.util.Base64
  * - v2 (CLAUDE-005 B2): chosen party, party battles (team, active member, participants,
  *   pending replacement) and per-participant XP results. v1 saves are migrated on read: the
  *   single fighter becomes a one-member team, and the old result is credited to the lead.
+ * - v3 (CLAUDE-005 B3): companion identity (companionId, rarity, nickname, origin, source revision)
+ *   and the evolution ledger. Older saves read with no companionId (assigned once by the app and
+ *   saved), rarity 0 (D-NATIVE-SPECIES), ZBattle origin and an empty ledger.
  */
 object BattleProgressCodec {
-    const val VERSION = 2
+    const val VERSION = 3
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -28,7 +31,11 @@ object BattleProgressCodec {
             d.writeLong(progress.nextUid)
             d.writeLong(progress.nextBattleId)
             d.writeInt(progress.creatures.size)
-            progress.creatures.forEach { d.writeLong(it.uid); d.writeUTF(it.creatureId); d.writeLong(it.xp) }
+            progress.creatures.forEach { c ->
+                d.writeLong(c.uid); d.writeUTF(c.creatureId); d.writeLong(c.xp)
+                d.writeUTF(c.companionId ?: ""); d.writeInt(c.rarity); d.writeUTF(c.nickname ?: "")
+                d.writeUTF(c.origin.name); d.writeLong(c.sourceRevision)
+            }
             d.writeInt(progress.defeated.size)
             progress.defeated.sorted().forEach(d::writeUTF)
             d.writeInt(progress.wins.size)
@@ -43,6 +50,12 @@ object BattleProgressCodec {
                 d.writeInt(r.gains.size)
                 r.gains.forEach { g -> d.writeLong(g.uid); d.writeLong(g.xp); d.writeInt(g.levelBefore); d.writeInt(g.levelAfter) }
             }
+            val ledger = progress.evolution
+            d.writeInt(ledger.processed.size); ledger.processed.sorted().forEach(d::writeUTF)
+            d.writeInt(ledger.claims.size)
+            ledger.claims.forEach { d.writeUTF(it.companionId); d.writeInt(it.stage); d.writeUTF(it.source.name) }
+            d.writeInt(ledger.outbound.size)
+            ledger.outbound.forEach { writeUnlock(d, it) }
         }
         return Base64.getEncoder().encodeToString(bytes.toByteArray())
     }
@@ -54,7 +67,15 @@ object BattleProgressCodec {
             if (version !in 1..VERSION) throw IOException("Unknown battle save version")
             val nextUid = d.readLong()
             val nextBattleId = d.readLong()
-            val creatures = List(count(d, 500)) { OwnedCreature(d.readLong(), d.readUTF(), d.readLong()) }
+            val creatures = List(count(d, 500)) {
+                if (version >= 3) {
+                    OwnedCreature(
+                        uid = d.readLong(), creatureId = d.readUTF(), xp = d.readLong(),
+                        companionId = d.readUTF().ifEmpty { null }, rarity = d.readInt(), nickname = d.readUTF().ifEmpty { null },
+                        origin = CompanionOrigin.valueOf(d.readUTF()), sourceRevision = d.readLong(),
+                    )
+                } else OwnedCreature(d.readLong(), d.readUTF(), d.readLong())
+            }
             val defeated = List(count(d, 10_000)) { d.readUTF() }.toSet()
             val wins = List(count(d, 10_000)) { d.readUTF() to d.readInt() }.toMap()
             val party = if (version >= 2) List(count(d, BattleEngine.PARTY_SIZE)) { d.readLong() } else emptyList()
@@ -69,6 +90,11 @@ object BattleProgressCodec {
                 val gains = creatures.firstOrNull()?.let { listOf(XpGain(it.uid, xp, before, after)) } ?: emptyList()
                 BattleResult(battleId, encounterId, outcome, first, gains)
             }
+            val ledger = if (version >= 3) EvolutionLedger(
+                processed = List(count(d, 10_000)) { d.readUTF() }.toSet(),
+                claims = List(count(d, 10_000)) { ChallengeClaim(d.readUTF(), d.readInt(), UnlockSource.valueOf(d.readUTF())) },
+                outbound = List(count(d, 10_000)) { readUnlock(d) },
+            ) else EvolutionLedger()
             if (d.available() != 0) throw IOException("Trailing data")
             if (nextUid < 1 || nextBattleId < 1) throw IOException("Invalid counters")
             val uids = creatures.map { it.uid }
@@ -77,7 +103,10 @@ object BattleProgressCodec {
             if (party.toSet().size != party.size || party.any { it !in uids }) throw IOException("Invalid party")
             if (active != null && (active.battleId >= nextBattleId || active.team.any { it.uid !in uids })) throw IOException("Invalid active battle")
             if (last != null && last.gains.any { it.xp < 0 }) throw IOException("Invalid result")
-            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party)
+            val ids = creatures.mapNotNull { it.companionId }
+            if (ids.toSet().size != ids.size) throw IOException("Duplicate companion ids")
+            if (ledger.outbound.any { !it.validated || it.toForm !in 0..5 }) throw IOException("Invalid outbound unlock")
+            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party, ledger)
         }
     } catch (e: Exception) {
         throw IllegalStateException("Battle save unreadable; raw data retained for recovery", e)
@@ -155,6 +184,12 @@ object BattleProgressCodec {
         ) throw IOException("Invalid battle counters")
         return state
     }
+
+    private fun writeUnlock(d: DataOutputStream, u: EvolutionUnlock) {
+        d.writeUTF(u.eventId); d.writeUTF(u.companionId); d.writeInt(u.toForm); d.writeUTF(u.source.name); d.writeBoolean(u.validated)
+    }
+
+    private fun readUnlock(d: DataInputStream) = EvolutionUnlock(d.readUTF(), d.readUTF(), d.readInt(), UnlockSource.valueOf(d.readUTF()), d.readBoolean())
 
     private fun writeCombatant(d: DataOutputStream, c: Combatant) {
         d.writeUTF(c.creatureId)

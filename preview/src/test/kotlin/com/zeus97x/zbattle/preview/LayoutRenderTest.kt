@@ -120,6 +120,22 @@ class LayoutRenderTest {
     )
 
     @Test
+    fun companionIdsAreAssignedOnceAndPersisted() {
+        val store = InMemorySettingsStore(sliceArea.copy(progress = sliceArea.progress.copy(creatures = sliceArea.progress.creatures.map { it.copy(companionId = null) })))
+        var n = 0
+        val ids = { "00000000-0000-4000-8000-%012d".format(++n) }
+        val first = AppState(store, newCompanionId = ids)
+        val id = first.settings.progress.lead!!.companionId
+        assertEquals("00000000-0000-4000-8000-000000000001", id)
+        assertEquals(id, store.load().progress.lead!!.companionId, "saved immediately")
+        assertEquals(id, AppState(store, newCompanionId = ids).settings.progress.lead!!.companionId, "never regenerated")
+        assertEquals(1, n)
+        val fresh = AppState(InMemorySettingsStore(), newCompanionId = ids)
+        fresh.completeSetup(PetMaster("Zeus", MasterStyle.Knight, MasterGender.Male, "inkling"))
+        assertEquals("00000000-0000-4000-8000-000000000002", fresh.settings.progress.lead!!.companionId)
+    }
+
+    @Test
     fun partyFlowThroughAppState() {
         val store = InMemorySettingsStore(trio)
         val state = AppState(store, NavState(listOf(Route.Home, Route.Challenges(0))))

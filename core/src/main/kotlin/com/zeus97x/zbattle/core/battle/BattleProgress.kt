@@ -3,14 +3,49 @@ package com.zeus97x.zbattle.core.battle
 import com.zeus97x.zbattle.core.Area
 import com.zeus97x.zbattle.core.CreatureCatalog
 
-/** A creature the player owns in ZBattle. Separate from ZPet; never written back. */
-data class OwnedCreature(val uid: Long, val creatureId: String, val xp: Long) {
+/**
+ * A creature the player owns in ZBattle. Separate from ZPet; never written back.
+ *
+ * Identity (CLAUDE-005 B3, D-EVOLUTION / D-NATIVE-SPECIES): [uid] is the local id and
+ * [companionId] the cross-app UUID, assigned once and persisted. Species = family + [rarity], and it
+ * stays separate from both the instance and the form ([creatureId] is the current form). Evolving
+ * keeps uid, companionId, rarity, nickname, origin and XP.
+ */
+data class OwnedCreature(
+    val uid: Long,
+    val creatureId: String,
+    /** Combat XP (ZBattle-owned). */
+    val xp: Long,
+    val companionId: String? = null,
+    /** Canonical ZPet rarity id 0..3 (Common/Heroic/Mythic/Celestial; shown as Common/Rare/Epic/Legendary). */
+    val rarity: Int = 0,
+    val nickname: String? = null,
+    val origin: CompanionOrigin = CompanionOrigin.ZBattle,
+    /** Last accepted origin-app snapshot revision (0 = none). */
+    val sourceRevision: Long = 0,
+) {
     init {
         require(uid > 0 && xp >= 0) { "Invalid owned creature" }
         require(CreatureCatalog.byId(creatureId) != null) { "Unknown creature $creatureId" }
+        require(rarity in 0..3) { "Invalid rarity" }
+        require(companionId == null || UUID_PATTERN.matches(companionId)) { "Invalid companion id" }
+        require(nickname == null || nickname.length in 1..NICKNAME_MAX) { "Invalid nickname" }
+        require(sourceRevision >= 0) { "Invalid revision" }
     }
 
     val creature get() = CreatureCatalog.require(creatureId)
+    val formIndex: Int get() = creature.formIndex
+    val branch: Branch get() = FormGraph.branchOf(formIndex)
+    /** Contract species id `family:rarity`. */
+    val speciesId: String get() = "${creature.family.index}:$rarity"
+    val displayName: String get() = nickname ?: creature.name
+
+    companion object {
+        const val NICKNAME_MAX = 24
+        val UUID_PATTERN = Regex("^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
+        /** D-RARITY display names for canonical ids 0..3. */
+        val RARITY_NAMES = listOf("Common", "Rare", "Epic", "Legendary")
+    }
     val level: Int get() = Leveling.levelFor(xp)
     val stats: StatBlock get() = CreatureStats.forCreature(creature, level)
 }
@@ -77,6 +112,8 @@ data class BattleProgress(
     val lastResult: BattleResult? = null,
     /** Chosen party (owned uids, lead first, at most [BattleEngine.PARTY_SIZE]). Empty = default order. */
     val party: List<Long> = emptyList(),
+    /** Evolution unlock history (CLAUDE-005 B3). */
+    val evolution: EvolutionLedger = EvolutionLedger(),
 ) {
     /** Party used for the next battle: the chosen members that are still owned, else the first owned creatures. */
     val partyMembers: List<OwnedCreature>

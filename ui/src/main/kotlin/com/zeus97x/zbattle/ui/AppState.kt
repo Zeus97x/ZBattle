@@ -20,11 +20,17 @@ import com.zeus97x.zbattle.core.battle.BattleState
 import com.zeus97x.zbattle.core.battle.Encounter
 import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.autoStep
+import com.zeus97x.zbattle.core.battle.withCompanionIds
 
 /** UI state holder shared by every screen. Settings are persisted through [store] on change. */
 @Stable
-class AppState(private val store: SettingsStore, initialNav: NavState? = null) {
-    var settings by mutableStateOf(store.load().withSeededStarter())
+class AppState(
+    private val store: SettingsStore,
+    initialNav: NavState? = null,
+    /** Source of new companion UUIDs (CLAUDE-005 B3); injectable for tests. */
+    private val newCompanionId: () -> String = { java.util.UUID.randomUUID().toString() },
+) {
+    var settings by mutableStateOf(normalized(store.load()))
         private set
     var nav by mutableStateOf(initialNav ?: resumeNav(settings))
         private set
@@ -60,8 +66,19 @@ class AppState(private val store: SettingsStore, initialNav: NavState? = null) {
         return true
     }
 
+    /**
+     * Seeds the starter and assigns each companion its UUID exactly once. Called on load and after
+     * every change; the init block saves straight away, so an id is never regenerated on a later launch.
+     */
+    private fun normalized(s: PlayerSettings): PlayerSettings =
+        s.withSeededStarter().let { it.copy(progress = it.progress.withCompanionIds(newCompanionId)) }
+
+    init {
+        if (settings != store.load()) store.save(settings)
+    }
+
     fun updateSettings(transform: (PlayerSettings) -> PlayerSettings) {
-        val next = transform(settings)
+        val next = normalized(transform(settings))
         if (next != settings) {
             settings = next
             store.save(next)
@@ -73,7 +90,7 @@ class AppState(private val store: SettingsStore, initialNav: NavState? = null) {
 
     /** Saves the first-run Pet Master, grants the starter and opens Home. */
     fun completeSetup(master: PetMaster) {
-        updateSettings { it.copy(master = master).withSeededStarter() }
+        updateSettings { it.copy(master = master) }
         nav = NavState()
     }
 
