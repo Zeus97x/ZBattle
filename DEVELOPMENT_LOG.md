@@ -658,3 +658,4 @@ Remaining work:
   - The render shows HP 62 (52 + Heart Charm 10). The charm controls are below the visible part of the sheet in the harness.
 - Rules: no `rulesRevision` change. Engine rules are unchanged; stats include the item.
 - Next: D-CURVE simulation with the real engine (party of 3, switching, items, equipment).
+- CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
