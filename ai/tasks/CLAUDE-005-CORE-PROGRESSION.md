@@ -46,7 +46,7 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 ### B1 implementation
 - `core/.../battle/AutoFight.kt`: `AutoFight.choose`, a pure, legal policy: Skill when ready, otherwise Attack. It never uses items and never retreats. `BattleProgress.autoStep(battleId, turn)` acts only while that battle is active and still on that turn.
 - `ui/AppState.kt`: `autoFight` lives in memory only and is never saved. `startAutoFight`, `stopAutoFight` and `autoFightStep` are guarded. A dialog pauses auto. Back, Retreat, a tapped move, settlement and leaving the screen each stop it.
-- `ui/BattleScreen.kt`: one `LaunchedEffect(battleId, turn)` scheduler with a 900 ms pause (400 ms when animations are off), an "Auto battle / Stop auto" button and an "auto on" notice.
+- `ui/BattleScreen.kt`: one `LaunchedEffect(battleId, turn)` scheduler with a 900 ms pause (400 ms when animations are off), an "Auto battle / Stop auto" button and an "auto on" notice. *(2026-10-10, PR #19: the separate button was removed at Zeus97x's request; holding Attack starts auto, and Attack reads "Stop" while auto runs.)*
 - `app/MainActivity.kt`: `onStop` stops auto, which makes it foreground-only.
 - No engine, reward or save-format change. `rulesRevision` is unchanged.
 - Tests:

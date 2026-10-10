@@ -507,3 +507,18 @@ Remaining work:
   - Maven Central returned HTTP 429 to this container, so Gradle was run with a scratchpad-only init script pointing at Google's Maven Central mirror. No repository build file changed.
   - Android assemble, lint and TalkBack on a device were not run here; CI covers assemble and lint.
 - Next: Phase B boundary. Report to Zeus97x for approval; do not start Phase C runtime work until it is approved.
+
+## 2026-10-10 — Auto battle moved onto a long press of Attack (Claude)
+- Request: Zeus97x wants auto battle started by holding the Attack button instead of a separate button.
+- Changes (`ui/BattleScreen.kt`):
+  - The "Auto battle / Stop auto" button is removed.
+  - New `AttackButton`: tap = Attack. Long press = start auto battle, with haptic feedback.
+  - While auto runs, the button reads "Stop", and a tap ends auto without making a move. Tapping any other move still takes control and makes that move.
+  - It is a clickable surface (Material `Button` has no long-click). It keeps the 54dp minimum and has TalkBack labels for "Attack", "Stop auto battle" and the long-press action "Start auto battle".
+  - The battle screen shows "Tip: hold Attack to battle automatically." when auto is off.
+  - `AppState` auto-fight logic, foreground-only behaviour and repeat sessions are unchanged.
+  - Docs updated: `ai/tasks/CLAUDE-005-CORE-PROGRESSION.md` (B1 note) and `ai/proposals/ECONOMY-PROPOSAL.md` (stop wording).
+- Verification:
+  - `./gradlew -p preview test` (local mirror init script) → 102 tests, 0 failures.
+  - Renders `05-battle` (412dp) and `05c-battle-auto` (360dp, 130% text) checked by eye. "Auto · Stop" was cut off at 130% text, so the label became "Stop".
+  - Not verified: the long-press gesture and haptics on a device (the render harness cannot press and hold), plus Android assemble and lint (left to CI).

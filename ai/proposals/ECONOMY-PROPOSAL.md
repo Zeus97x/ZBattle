@@ -122,7 +122,7 @@ Only the three categories that exist in `PreviewContent.ShopCategory` are used. 
 
 General rules *(proposed)*:
 - Item use is a **new manual action** that takes the player's turn. It deals 0 damage, the opponent still strikes, and the Skill cooldown ticks down by 1 as on Attack (ZPet Potion parity).
-- **Auto-fight never uses items.** The Item button is disabled while auto runs. The player must tap "Stop auto" first.
+- **Auto-fight never uses items.** The Item button is disabled while auto runs. The player must stop auto first (tap the Attack button, which reads "Stop" while auto runs).
 - At most **1 item per turn** and **5 items per battle**.
 - Items are consumed when used and stay spent on defeat or retreat. They are not refunded.
 - HP resets to full at each new encounter (Q7), so healing items are only for within one fight.
