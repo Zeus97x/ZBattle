@@ -98,7 +98,7 @@ fun ItemShopScreen(state: AppState, initialCategory: ShopCategory) {
             title = "Item Shop",
             subtitle = "Demo catalogue · purchases disabled",
             onBack = { state.back() },
-            actions = { StatChip(Icons.Filled.MonetizationOn, "0", "coins", Modifier.padding(end = 4.dp)) },
+            actions = { StatChip(Icons.Filled.MonetizationOn, formatCoins(state.settings.progress.inventory.coins), "coins", Modifier.padding(end = 4.dp)) },
         )
         LazyColumn(
             state = rememberLazyListState(),

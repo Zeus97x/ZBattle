@@ -1,6 +1,7 @@
 package com.zeus97x.zbattle.core.battle
 
 import com.zeus97x.zbattle.core.CreatureCatalog
+import com.zeus97x.zbattle.core.economy.Inventory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -22,9 +23,11 @@ import java.util.Base64
  *   saved), rarity 0 (D-NATIVE-SPECIES), ZBattle origin and an empty ledger.
  * - v4 (CLAUDE-005 B5): `settledThrough`. Older saves derive it: every id below the active battle
  *   (or below `nextBattleId` when idle) was already settled.
+ * - v5 (CLAUDE-006 C1): inventory (balances, applied transaction ids, id sequence). Older saves read
+ *   with an empty inventory; the starter kit is then granted once by [BattleProgress.withStarter].
  */
 object BattleProgressCodec {
-    const val VERSION = 4
+    const val VERSION = 5
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -59,6 +62,10 @@ object BattleProgressCodec {
             d.writeInt(ledger.outbound.size)
             ledger.outbound.forEach { writeUnlock(d, it) }
             d.writeLong(progress.settledThrough)
+            val inv = progress.inventory
+            d.writeInt(inv.balances.size); inv.balances.toSortedMap().forEach { (k, v) -> d.writeUTF(k); d.writeLong(v) }
+            d.writeInt(inv.applied.size); inv.applied.sorted().forEach(d::writeUTF)
+            d.writeLong(inv.nextSeq)
         }
         return Base64.getEncoder().encodeToString(bytes.toByteArray())
     }
@@ -99,6 +106,13 @@ object BattleProgressCodec {
                 outbound = List(count(d, 10_000)) { readUnlock(d) },
             ) else EvolutionLedger()
             val settledThrough = if (version >= 4) d.readLong() else (active?.battleId ?: nextBattleId) - 1
+            val inventory = if (version >= 5) Inventory(
+                balances = List(count(d, 1_000)) { d.readUTF() to d.readLong() }.let { pairs ->
+                    pairs.toMap().also { if (it.size != pairs.size) throw IOException("Duplicate inventory entry") }
+                },
+                applied = List(count(d, 1_000_000)) { d.readUTF() }.toSet(),
+                nextSeq = d.readLong(),
+            ) else Inventory()
             if (d.available() != 0) throw IOException("Trailing data")
             if (settledThrough < 0 || settledThrough >= nextBattleId || (active != null && active.battleId <= settledThrough)) throw IOException("Invalid settlement marker")
             if (nextUid < 1 || nextBattleId < 1) throw IOException("Invalid counters")
@@ -111,7 +125,7 @@ object BattleProgressCodec {
             val ids = creatures.mapNotNull { it.companionId }
             if (ids.toSet().size != ids.size) throw IOException("Duplicate companion ids")
             if (ledger.outbound.any { !it.validated || it.toForm !in 0..5 }) throw IOException("Invalid outbound unlock")
-            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party, ledger, settledThrough)
+            BattleProgress(creatures, nextUid, nextBattleId, defeated, wins, active, last, party, ledger, settledThrough, inventory)
         }
     } catch (e: Exception) {
         throw IllegalStateException("Battle save unreadable; raw data retained for recovery", e)

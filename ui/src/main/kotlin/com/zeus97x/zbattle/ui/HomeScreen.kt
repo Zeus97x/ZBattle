@@ -131,9 +131,9 @@ private fun HomeHeader(state: AppState) {
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            // New local profile: nothing earned yet. Real values arrive with the progression/economy tasks.
+            // XP here is still a placeholder; coins are the real balance (CLAUDE-006 C1).
             StatChip(Icons.Filled.Star, "0", "XP")
-            StatChip(Icons.Filled.MonetizationOn, "0", "coins")
+            StatChip(Icons.Filled.MonetizationOn, formatCoins(state.settings.progress.inventory.coins), "coins")
         }
     }
 }

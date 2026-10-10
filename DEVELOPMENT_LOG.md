@@ -537,3 +537,25 @@ Remaining work:
   - `--simulate --party 3` (best single member, Python mirror) still wins every boss from group 0 upwards with a Young form, so D-CURVE needs the real-engine party simulation before opponent stats are final.
   - Doc links OK.
 - Next: C1 inventory and ledger.
+
+## 2026-10-10 — CLAUDE-006 C1: inventory and transaction ledger (Claude)
+- Branch: `claude/zbattle-c1-inventory` (stacked on `claude/zbattle-decisions-batch2`). Items: EXT-021.
+- Decision basis: D-SHOP and D-ECONOMY-XP (batch 2), ECONOMY §4 caps.
+- Changes:
+  - New `core/.../economy/Items.kt`: item catalogue with stable production ids and the approved prices.
+    - Consumables: potion, super-potion, ember-vial, sapping-dust.
+    - Equipment: four charms, tiers 1 and 2.
+    - Four cosmetics.
+    - Tickets: rare, epic, legendary (never sold).
+    - ZCubes: basic, great, ultra, listed but not purchasable until catching exists. Mythic is absent.
+    - No materials. Deferred items are absent.
+  - New `core/.../economy/Inventory.kt`: balances plus applied transaction ids. Each transaction is all-or-nothing and is rejected on a duplicate id, an unknown item, underflow or going over the cap. The starter kit (100 coins, 3 Potions) is granted once under transaction id `starter-kit`.
+  - `BattleProgress.inventory`. `withStarter` also grants the kit once, which covers saves made before C1 (the app calls it on every load).
+  - `BattleProgressCodec` v5 appends the inventory; v1–v4 read with an empty inventory.
+  - Home and Item Shop show the real coin balance.
+  - Tests: new `core/src/test/.../economy/InventoryTest.kt` (8). `ContractMigrationFixtureTest` now loads the v1 golden file through `withStarter`, as the app does.
+- Verification:
+  - `./gradlew -p preview test` (local mirror init script) → 110 tests, 0 failures.
+  - Render `01-home` (360dp, 130% text) shows "100 coins".
+  - Android assemble and lint left to CI.
+- Next: C2 battle rewards.
