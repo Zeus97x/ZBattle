@@ -8,6 +8,11 @@ Written by Claude, 2026-10-09 (America/Toronto). Read this first, then `DEVELOPM
 - **PR:** [#2](https://github.com/Zeus97x/ZBattle/pull/2) — open, not merged; merging needs the user's approval.
 - **Base:** main `b1fa4c5`.
 
+> **Update (CLAUDE-002 and CLAUDE-003, both merged):** parts of this summary describe the state after CLAUDE-001 only.
+> - Battles: there is now a real battle against Wild Voltmaw at Olympian Foothills, with stats, XP and levels, and a saved, resumable battle with rewards paid once. See `ai/tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md`.
+> - Artwork: the 12 region maps and 48 location heroes ship as WebP. See `ai/tasks/CLAUDE-003-ARTWORK-INTEGRATION.md`.
+> - Still placeholders: battle scenery, branding, opponents, items, badges, avatars and ZCubes (see `ai/ZCUBES_PLAN.md`).
+
 ## Status at a glance
 | Area | State |
 |---|---|

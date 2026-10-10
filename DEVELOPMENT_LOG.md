@@ -246,3 +246,18 @@ Remaining work:
 - Remaining: battle scenery (separate art phase); standalone branding (launcher icon/splash unchanged); choosing among the 7 variants; ZCube art.
 - Next step: open the PR, read CI, fix any failure, record the results, and set CLAUDE-003 to REVIEW.
 - CI result (CLAUDE-003): PR #6 run 38015181723 on head `72f7008`. `./gradlew :core:test :app:assembleDebug :app:lintDebug` and `./gradlew -p preview test` both passed; the APK with the WebP scenery is in artifact `zbattle-ui-validation`. Task status → REVIEW (`ai/tasks/CLAUDE-003-ARTWORK-INTEGRATION.md`, `ai/README.md`). A device check of image quality and Travel scrolling is still pending.
+
+## 2026-10-09 (late evening) — CLAUDE-001/002/003 marked Done (Claude)
+- Request: Zeus97x asked to mark the tasks done after checking that everything was completed, then to run a build on `main` without monitoring it.
+- Audit against each task's acceptance list:
+  - **CLAUDE-001:** build, navigation, existing pets, previews only, 360dp/large-font renders all met. The device-found nav-bar overlap was fixed in CLAUDE-002.
+  - **CLAUDE-002:** stats/levels, a completable real fight, results, no duplicate rewards, versioned save with resume, nav-bar fix, full-circle Home button, ZCubes plan, double battles deferred — all met. The nav-bar fix still needs Zeus97x's device confirmation.
+  - **CLAUDE-003:** 60 keys resolve, checksums verified, both Egyptian and both Greek groups distinct, renders and CI green — all met.
+  - ZPet `RegionCatalog.java` re-checked on ZPet main `1adcedb`: still blob `cfb3b696`, unchanged, so all 48 names still match.
+- Changes (docs only):
+  - The three task files set to DONE with merge references (PR #2 `2051a4b`, PR #5 `7024d1a`, PR #6 `08a59c3`).
+  - `ai/README.md` task board updated.
+  - Root `README.md` status brought up to date.
+  - `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` given an update note, so ChatGPT does not read the old preview/no-art statements as current.
+- Housekeeping noted, not done: PR #3 (CLAUDE-002 docs, included in #5) and PR #4 (artwork, included in #6) are open but redundant; Zeus97x can close them.
+- Build: "Android UI foundation checks" was dispatched on `main` at the user's request and is not monitored by Claude. Result: see the Actions tab.

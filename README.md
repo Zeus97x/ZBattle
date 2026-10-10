@@ -8,7 +8,13 @@ The existing creature collection is in `ZBattle-ZPet-Assets/`. Reuse created pet
 
 Player imports remain planned one-way from ZPet to ZBattle; ZBattle progress must never write back to ZPet.
 
-Status: Android UI foundation (CLAUDE-001) is in review on branch `claude/zbattle-ui-foundation` — Kotlin + Jetpack Compose shell with all nine layouts, existing ZPet creatures and placeholders for pending art. Battle, economy, events and unlocks are explicitly previews. See [DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md) for verified progress.
+Status: the Android app is on `main`.
+
+- **CLAUDE-001:** Kotlin + Compose UI foundation (nine layouts) and Pet Master setup.
+- **CLAUDE-002:** first real battle (stats, levels, engine, saved progress) against Wild Voltmaw at Olympian Foothills.
+- **CLAUDE-003:** region maps and location scenery.
+
+Other opponents, economy, events, catching (ZCubes) and double battles are still previews or planned. See [DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md) for verified progress.
 
 ## Build (CLAUDE-001 branch)
 
