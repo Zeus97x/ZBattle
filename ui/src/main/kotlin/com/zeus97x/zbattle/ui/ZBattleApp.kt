@@ -1,6 +1,7 @@
 package com.zeus97x.zbattle.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -123,45 +124,54 @@ private fun Tab.icon(): ImageVector = when (this) {
     Tab.Profile -> Icons.Filled.Person
 }
 
-/** Collection | Shop | raised Home | Events | Profile. */
+/**
+ * Collection | Shop | raised Home | Events | Profile.
+ * The raised Home circle is drawn in its own layer above the bar's Surface: a Surface clips its
+ * children, which previously flattened the top of the circle.
+ */
 @Composable
 fun BottomBar(selected: Tab, onSelect: (Tab) -> Unit) {
     val p = Z.colors
-    Surface(color = p.surface, shadowElevation = 8.dp) {
-        Row(
-            Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).height(Dimens.bottomBarHeight),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Tab.entries.forEach { tab ->
-                val isSelected = tab == selected
-                Box(
-                    Modifier
-                        .weight(1f)
-                        .height(Dimens.bottomBarHeight)
-                        .selectable(selected = isSelected, role = Role.Tab, onClick = { onSelect(tab) }),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (tab == Tab.Home) {
-                        Box(
-                            Modifier
-                                .offset(y = (-14).dp)
-                                .size(Dimens.homeActionSize)
-                                .shadow(10.dp, CircleShape)
-                                .clip(CircleShape)
-                                .background(p.headerGradient)
-                                .semantics { contentDescription = "Home" },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(Icons.Filled.Bolt, contentDescription = null, tint = p.onAccent, modifier = Modifier.size(34.dp))
-                        }
-                    } else {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(tab.icon(), contentDescription = null, tint = if (isSelected) p.accent else p.textSecondary, modifier = Modifier.size(24.dp))
-                            FitText(tab.label, color = if (isSelected) p.textPrimary else p.textSecondary)
+    Box(Modifier.fillMaxWidth()) {
+        Surface(color = p.surface, shadowElevation = 8.dp) {
+            Row(
+                Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).height(Dimens.bottomBarHeight),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Tab.entries.forEach { tab ->
+                    val isSelected = tab == selected
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .height(Dimens.bottomBarHeight)
+                            .then(if (tab == Tab.Home) Modifier else Modifier.selectable(selected = isSelected, role = Role.Tab, onClick = { onSelect(tab) })),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (tab != Tab.Home) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(tab.icon(), contentDescription = null, tint = if (isSelected) p.accent else p.textSecondary, modifier = Modifier.size(24.dp))
+                                FitText(tab.label, color = if (isSelected) p.textPrimary else p.textSecondary)
+                            }
                         }
                     }
                 }
             }
+        }
+        // Full circle, raised by a third of its size, never clipped by the bar or screen edge.
+        Box(
+            Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = -(Dimens.homeActionSize / 3))
+                .size(Dimens.homeActionSize)
+                .shadow(10.dp, CircleShape)
+                .clip(CircleShape)
+                .background(p.headerGradient)
+                .border(3.dp, p.surface, CircleShape)
+                .selectable(selected = selected == Tab.Home, role = Role.Tab, onClick = { onSelect(Tab.Home) })
+                .semantics { contentDescription = "Home" },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Filled.Bolt, contentDescription = null, tint = p.onAccent, modifier = Modifier.size(34.dp))
         }
     }
 }

@@ -61,7 +61,7 @@ import com.zeus97x.zbattle.core.Route
 fun HomeScreen(state: AppState) {
     val p = Z.colors
     val area = state.settings.currentArea
-    val party = state.settings.party
+    val party = state.settings.ownedParty
     LazyColumn(
         state = rememberLazyListState(),
         modifier = Modifier.fillMaxSize(),
@@ -81,19 +81,19 @@ fun HomeScreen(state: AppState) {
         }
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = Dimens.screenPadding), horizontalArrangement = Arrangement.spacedBy(Dimens.gapSmall)) {
-                items(party, key = { it.id }) { creature ->
+                items(party, key = { it.uid }) { owned ->
                     CreatureCard(
-                        creature,
+                        owned.creature,
                         modifier = Modifier.width(144.dp),
-                        onClick = { state.show(Overlay.CreatureDetail(creature.id)) },
-                        caption = "Starter companion · Lv 1",
+                        onClick = { state.show(Overlay.CreatureDetail(owned.creatureId)) },
+                        caption = "Lv ${owned.level} · ${owned.xp % 100}/100 XP",
                     )
                 }
             }
         }
         item {
             Text(
-                "More companions arrive with encounters and the planned one-way ZPet import. Battle progress never returns to ZPet.",
+                "More companions arrive with ZCubes catching and the planned one-way ZPet import. Battle progress never returns to ZPet.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = p.textSecondary,
                 modifier = Modifier.padding(horizontal = Dimens.screenPadding),

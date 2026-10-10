@@ -6,11 +6,11 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 | Task | Owner | Status | Scope |
 |---|---|---|---|
 | [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Merged — PR #2 | Android UI foundation using existing ZPet assets and new-art placeholders |
-| [CLAUDE-002](tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md) | Claude | Ready | Battle vertical slice: stats, real battle engine, saved progress, Android bottom-inset fix, full-circle lightning nav, ZCubes planning; double battles deferred |
+| [CLAUDE-002](tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md) | Claude | In progress — branch claude/zbattle-battle-vertical-slice, PR pending | Battle vertical slice: stats, real battle engine, saved progress, Android bottom-inset fix, full-circle lightning nav, ZCubes planning; double battles deferred |
 | Artwork phase 1 | ChatGPT | Branding preview made; approval/export pending | Logo, app icon, splash |
 | Artwork phases 2-8 | ChatGPT | Planned, not started | Maps, location scenery, battle scenery, opponents, shop, progress, finishing |
 
-[Layout specification](UI_LAYOUT_SPEC.md) is the implementation brief. Claude's summary of CLAUDE-001 for ChatGPT: [CLAUDE-001-SUMMARY-FOR-CHATGPT.md](CLAUDE-001-SUMMARY-FOR-CHATGPT.md). Generated design boards remain in chat; no new image files have been committed.
+[Layout specification](UI_LAYOUT_SPEC.md) is the implementation brief. ZCubes catching plan: [ZCUBES_PLAN.md](ZCUBES_PLAN.md). Claude's summary of CLAUDE-001 for ChatGPT: [CLAUDE-001-SUMMARY-FOR-CHATGPT.md](CLAUDE-001-SUMMARY-FOR-CHATGPT.md). Generated design boards remain in chat; no new image files have been committed.
 
 ## Collaboration
 Claim a task by recording owner, branch, base commit, status and start time in its task file. One owner per implementation task. Work in a feature branch and return a PR, not direct code writes to main. Check main and open work before starting.

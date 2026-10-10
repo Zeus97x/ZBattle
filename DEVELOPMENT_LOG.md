@@ -157,3 +157,55 @@ Verification:
 Remaining work:
 - Claude to implement CLAUDE-002 on a dedicated branch and open a PR.
 - ChatGPT to design ZCube visuals/tiers when that art phase is approved.
+
+## 2026-10-09 (evening) — CLAUDE-002 battle vertical slice (Claude)
+- Status: implemented on branch `claude/zbattle-battle-vertical-slice`. The PR is opened after this commit; CI results are recorded in a follow-up entry. Not merged.
+- Request: Zeus97x asked Claude to implement CLAUDE-002 from PR #3 (`ai/tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md`):
+  - Fix the battle controls sitting under the Android navigation bar, which Zeus97x confirmed with a device screenshot.
+  - Make the centre lightning button a full circle.
+  - Build the first real battle: stats, engine and saved progress.
+  - Plan ZCubes.
+  - No double battles.
+- Base: branched from PR #3 head `5b15a62` (main `2051a4b` + CLAUDE-002 docs), so this PR also carries PR #3's four documentation commits.
+- ZPet baseline (read-only, ZPet main `1adcedb`; nothing written to ZPet):
+  - `Progression.java`: form stats, level curve and save-codec style.
+  - `AdventureState.java`: battle formulas, enemy stats by area stage, family advantage, skill names, heavy strike every third turn, 50-turn limit, encounter rule, 60/200 XP and once-only settlement.
+  - `SpeciesCatalog.java`: catch chances and rarity rolls, recorded for ZCubes.
+  - `FriendBattle`/`RankedRules`: reviewed and not used, because they are server-equalised PvP rules.
+- Changes:
+  - `core/src/main/kotlin/com/zeus97x/zbattle/core/battle/` (new):
+    - `Stats.kt`: `Leveling`, `CreatureStats`, `Skills`, `SkillEffect`.
+    - `Encounters.kt`: one playable encounter, Wild Voltmaw at Olympian Foothills, slot 0.
+    - `BattleEngine.kt`: pure, deterministic turns.
+    - `BattleProgress.kt`: owned creatures, XP, defeated encounters, wins, active battle, last result and idempotent settlement.
+    - `BattleProgressCodec.kt`: versioned Base64 schema v1 with validation.
+  - `core/.../Profile.kt`: `PlayerSettings.progress`, `ownedParty`, `withSeededStarter()`.
+  - `ui/.../AppState.kt`:
+    - start, act, retreat and finish actions for battles
+    - reopening the app resumes into an active battle
+    - Back inside a battle asks to retreat
+  - `ui/.../BattleScreen.kt` (rewritten):
+    - real HP, levels, turn counter and enemy intent
+    - battle log; Skill cooldown shown on the button
+    - Switch explains there is only one companion
+    - results screen
+    - nav-bar padding on the action panel; icon stacked above the label at large font
+  - `ui/.../ChallengesScreen.kt`: real `EncounterCard` (Challenge / Resume / Rematch), area progress with opponents defeated, and a Preview badge on placeholder cards.
+  - `ui/.../Overlays.kt`:
+    - challenge confirmation for real vs preview opponents
+    - retreat ends the battle with no reward
+    - the creature detail sheet shows level, XP, stats and skill for owned creatures
+  - `ui/.../ZBattleApp.kt`: the Home circle is drawn above the bar `Surface` (which had clipped it), with a ring.
+  - `ui/.../HomeScreen.kt`: party cards show level and XP.
+  - `ui/.../DoubleBattleScreen.kt`: says "deferred".
+  - `app/.../PrefsSettingsStore.kt`: saves and loads `battleProgress`; unreadable data is moved to `battleProgress.unreadable`.
+  - Tests: `core/src/test/.../battle/{StatsTest,BattleEngineTest,BattleProgressTest}.kt`. `preview/.../LayoutRenderTest.kt` gains battle, result, real-challenge, retreat and owned-detail renders plus an AppState battle-flow test covering resume and no double rewards.
+  - Docs:
+    - `ai/ZCUBES_PLAN.md` (new): tiers, art keys, ZPet catch baseline, proposals.
+    - Task file: claim and completion report.
+    - `ai/README.md` and `app/src/main/assets/art/README.md` (ZCube keys).
+    - `docs/screenshots/claude-002/`: renders plus the device "before" screenshot.
+- Battle rules chosen: see the task file's completion report. Mid-battle recovery is RESUME. Only the first victory per encounter pays XP; rematches are practice.
+- Verification: `./gradlew -p preview test` passed with 55 tests. Renders were inspected at 412dp, 360dp and 360dp with 1.3× font. Desktop renders cannot show Android system-bar insets, so the nav-bar fix needs a phone check. Android compile, lint and APK are pending on the PR's CI run.
+- Remaining: device confirmation of the inset fix; rosters for the other 47 areas and bosses; ZCubes catching; economy; Guard/Potion actions; evolution; double battles (deferred).
+- Next step: open the PR, read CI and fix any failure, record the results, and set the task to REVIEW.

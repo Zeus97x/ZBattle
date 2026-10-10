@@ -1,5 +1,8 @@
 package com.zeus97x.zbattle.core
 
+import com.zeus97x.zbattle.core.battle.BattleProgress
+import com.zeus97x.zbattle.core.battle.OwnedCreature
+
 /** Locally persisted player state. No cloud account, no ZPet write-back. */
 data class PlayerSettings(
     /** Null until first-run setup ("Begin your journey") is completed. */
@@ -11,12 +14,19 @@ data class PlayerSettings(
     val battleAnimations: Boolean = true,
     val currentAreaIndex: Int = 0,
     val visitedAreas: Set<Int> = setOf(0),
+    /** Owned creatures, XP/levels, encounter results and any active battle (CLAUDE-002). */
+    val progress: BattleProgress = BattleProgress(),
 ) {
     val currentArea: Area get() = RegionCatalog.area(currentAreaIndex)
     val displayName: String get() = master?.name ?: "Pet Master"
 
-    /** Companions the player actually has: the chosen starter. More arrive with encounters/ZPet import. */
-    val party: List<Creature> get() = listOfNotNull(master?.starter)
+    /** Owned creatures; the chosen starter until encounters/ZCubes/ZPet import add more. */
+    val ownedParty: List<OwnedCreature> get() = progress.creatures
+    val party: List<Creature> get() = ownedParty.map { it.creature }
+
+    /** Makes sure a saved Pet Master owns their starter (new setups and pre-CLAUDE-002 saves). */
+    fun withSeededStarter(): PlayerSettings =
+        master?.let { copy(progress = progress.withStarter(it.starterId)) } ?: this
 
     fun travelTo(area: Area): PlayerSettings =
         copy(currentAreaIndex = area.index, visitedAreas = visitedAreas + area.index)

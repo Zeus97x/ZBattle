@@ -3,7 +3,7 @@
 Updated: 2026-10-09 America/Toronto  
 Repository: Zeus97x/ZBattle  
 Recommended owner: Claude  
-Status: READY  
+Status: IN PROGRESS — claimed by Claude 2026-10-09 ~21:00 America/Toronto; branch claude/zbattle-battle-vertical-slice (based on PR #3 head 5b15a62, which is main 2051a4b + this task's docs)  
 Priority: High  
 Base branch: main  
 Suggested branch: claude/zbattle-battle-vertical-slice  
@@ -235,3 +235,67 @@ When done:
    - Device/UI verification.
    - Remaining placeholders.
 6. Note whether ChatGPT should design ZCube visuals next.
+
+## Completion report (Claude, 2026-10-09)
+
+### Gameplay implemented
+- **Stats and levels** (`core/.../battle/Stats.kt`):
+  - Form base stats come from ZPet `Progression.stats()`.
+  - Level is 1 + XP/100, capped at 50 (ZPet).
+  - Max HP is 45 + 3×level + guard (ZPet).
+  - Provisional per-level growth: +1 power per 3 levels, +1 guard per 4, +1 speed per 5. ZPet grows stats through step-funded training instead.
+  - Opponent stats follow ZPet's area-stage formula. Each family has one signature skill (ZPet names) with Burn or Weaken.
+- **One real opponent** (`Encounters.kt`): Wild Voltmaw, Lv 2, slot 0 of Olympian Foothills.
+  - It is chosen by ZPet's encounter rule: the young form of the area's region family.
+  - It awards 60 XP on the first win only (ZPet amount).
+  - Every other opponent card stays a labelled preview.
+- **Battle engine** (`BattleEngine.kt`): deterministic and pure (every move returns new state); adapted from ZPet `AdventureState.Battle`.
+  - Attack and Skill rules:
+
+    | Action | Damage | Extra |
+    |---|---|---|
+    | Attack | max(2, power+5−guard/2) | — |
+    | Skill | max(3, power+9−guard/2 ± family advantage) | 3-turn cooldown; Burn or Weaken for 3 turns |
+
+  - Turns and endings:
+    - The opponent lands a heavy strike (+5) every third turn, and the screen shows that intent in advance.
+    - The faster creature acts first.
+    - A battle ends when either side faints. Reaching 50 turns counts as a defeat.
+  - Retreat ends the battle with no rewards.
+  - Switch explains that only one companion exists.
+  - Guard and Potion from ZPet are not included. They are not in the approved action grid, and potions need the economy task.
+- **Results screen:** Victory, Defeat or Retreat, with XP gained, level change and an XP bar.
+
+### Save behaviour
+- **Format** (`BattleProgress.kt`, `BattleProgressCodec.kt`):
+  - Versioned binary schema v1, stored as Base64 in SharedPreferences `zbattle.settings.v1` → `battleProgress`.
+  - Holds owned creatures (uid, species, XP), encounters already beaten, win counts, the active battle and the last result.
+- **Unreadable data** is moved to `battleProgress.unreadable` and never deleted. The player keeps going with fresh progress, and their starter is re-granted.
+- **Mid-battle recovery is RESUME.** The battle is saved after every turn. Reopening the app goes straight back into the battle.
+- **No double rewards:**
+  - Rewards are applied in the same state change that ends a battle, and only if that battle is still the active one.
+  - Reopening or acknowledging a result cannot pay again.
+  - Only the first victory against an encounter pays XP. Rematches are practice until step-funded encounters or ZCubes exist.
+- **Starter:** existing CLAUDE-001 saves are migrated by granting the chosen starter once.
+
+### UI fixes from the device test
+- **Battle controls:** they now pad for the system navigation bar (`WindowInsets.navigationBars`). The bottom bar is hidden in battle, so nothing else did that.
+- **Home button:** the centre lightning action is drawn above the bar's `Surface`, which had been clipping its top. It is now a full circle with a surface-coloured ring.
+- **Large text:** at 1.3× font the action buttons stack the icon above the label.
+
+### Not done / deferred
+- Double battles. The screen now says "deferred".
+- Catching. ZCubes are planned only; see `ai/ZCUBES_PLAN.md`.
+- Opponent rosters for all 48 areas and the region bosses.
+- Steps and unlock rules.
+- Economy and coins.
+- Switching between multiple creatures.
+- Guard and Potion actions.
+- Evolution in ZBattle.
+
+### Verification
+- See `DEVELOPMENT_LOG.md` (CLAUDE-002 entry) and the PR's Actions run.
+- No device test by Claude: there is no device access from this environment.
+
+### Next for ChatGPT
+Design the ZCube tiers (art keys in `ai/ZCUBES_PLAN.md`). Battle scenery for Olympian Foothills (`location/area-00/battle`) would also make the slice look finished.
