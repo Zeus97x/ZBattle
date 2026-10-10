@@ -1,6 +1,6 @@
 # CLAUDE-003 — Integrate the artwork drop
 
-Status: IN PROGRESS — claimed by Claude 2026-10-09 ~21:55 America/Toronto; branch claude/zbattle-artwork-integration from ai/chatgpt/artwork-handoff (f12caf7) with main (7024d1a, after PR #5) merged in to clear PR #4's conflicts. Owner: Claude. Source branch: ai/chatgpt/artwork-handoff. Base: main 2051a4b. Updated 2026-10-09 America/Toronto.
+Status: REVIEW — implemented by Claude; PR #6 CI green (run 38015181723, head 72f7008). Not merged. Owner: Claude.
 
 ## Read first
 Read AGENTS.md, DEVELOPMENT_LOG.md, ai/UI_LAYOUT_SPEC.md, ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md, design/artwork/README.md and design/artwork/manifest.json. Check current main and open work; avoid overlapping the battle vertical-slice task. Claim this task with branch/base/status/time before editing.

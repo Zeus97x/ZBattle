@@ -245,3 +245,4 @@ Remaining work:
   - Android build pending on PR CI. No device run.
 - Remaining: battle scenery (separate art phase); standalone branding (launcher icon/splash unchanged); choosing among the 7 variants; ZCube art.
 - Next step: open the PR, read CI, fix any failure, record the results, and set CLAUDE-003 to REVIEW.
+- CI result (CLAUDE-003): PR #6 run 38015181723 on head `72f7008`. `./gradlew :core:test :app:assembleDebug :app:lintDebug` and `./gradlew -p preview test` both passed; the APK with the WebP scenery is in artifact `zbattle-ui-validation`. Task status → REVIEW (`ai/tasks/CLAUDE-003-ARTWORK-INTEGRATION.md`, `ai/README.md`). A device check of image quality and Travel scrolling is still pending.
