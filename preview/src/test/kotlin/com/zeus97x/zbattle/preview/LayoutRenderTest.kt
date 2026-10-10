@@ -199,7 +199,7 @@ class LayoutRenderTest {
         assertEquals(700, saved.coins)
         assertEquals(1, saved["cosmetic-trainer-frame"])
         assertEquals(com.zeus97x.zbattle.core.economy.BuyRefusal.AtCap, state.buy("cosmetic-trainer-frame"))
-        assertEquals(com.zeus97x.zbattle.core.economy.BuyRefusal.Unavailable, state.buy("potion"))
+        assertEquals(com.zeus97x.zbattle.core.economy.BuyRefusal.Unavailable, state.buy("zcube-basic"))
         assertEquals(saved, store.load().progress.inventory, "refusals save nothing")
     }
 

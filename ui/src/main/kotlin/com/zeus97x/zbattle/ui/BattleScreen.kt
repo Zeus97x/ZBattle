@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -74,7 +75,9 @@ import com.zeus97x.zbattle.core.battle.Outcome
 import com.zeus97x.zbattle.core.battle.RepeatEnd
 import com.zeus97x.zbattle.core.battle.RepeatSession
 import com.zeus97x.zbattle.core.battle.description
+import com.zeus97x.zbattle.core.battle.BattleEngine
 import com.zeus97x.zbattle.core.economy.ItemCatalog
+import com.zeus97x.zbattle.core.economy.ItemKind
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -127,6 +130,7 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
         }
     }
     var picking by remember(battle.battleId) { mutableStateOf(false) }
+    var pickingItem by remember(battle.battleId) { mutableStateOf(false) }
     DisposableEffect(Unit) { onDispose { state.stopAutoFight() } }
 
     Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
@@ -160,7 +164,7 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             }
             if (battle.team.size > 1) TeamStrip(battle)
             if (state.autoFight) {
-                Text("Auto battle on · tap Stop to end it, or any other move to take control. No items are used.", style = MaterialTheme.typography.bodyMedium, color = p.accent)
+                Text("Auto battle on · tap Stop to end it, or any other move to take control. Auto never uses items.", style = MaterialTheme.typography.bodyMedium, color = p.accent)
             } else {
                 Text("Tip: hold Attack to battle automatically.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
             }
@@ -175,7 +179,7 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             }
             Text(
                 "${battle.skill.name} · ${battle.skillStatus} · ${battle.skill.effect.label}: ${battle.skill.effect.description}. " +
-                    "Usable every ${com.zeus97x.zbattle.core.battle.BattleEngine.SKILL_COOLDOWN + 1} turns.",
+                    "Usable every ${BattleEngine.SKILL_COOLDOWN + 1} turns.",
                 style = MaterialTheme.typography.labelMedium,
                 color = p.textSecondary,
             )
@@ -191,6 +195,32 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             .padding(Dimens.screenPadding),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        if (pickingItem && !battle.awaitingReplacement) {
+            Text(
+                "Items · uses your turn, then the opponent attacks · ${battle.itemsLeft} of ${BattleEngine.MAX_ITEMS_PER_BATTLE} left",
+                style = MaterialTheme.typography.titleSmall,
+                color = p.textPrimary,
+            )
+            val inventory = state.settings.progress.inventory
+            val usable = ItemCatalog.ofKind(ItemKind.Consumable).filter { inventory[it.id] > 0 }
+            if (usable.isEmpty()) Text("No battle items. Buy some in the Shop.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
+            usable.forEach { item ->
+                val refusal = state.settings.progress.itemRefusal(item.id)
+                ActionButton(
+                    "${item.name} ×${inventory[item.id]}" + (refusal?.let { " · $it" } ?: ""),
+                    Icons.Filled.LocalDrink,
+                    Modifier.fillMaxWidth(),
+                    primary = true,
+                    enabled = refusal == null,
+                ) {
+                    pickingItem = false
+                    notice = null
+                    state.useItem(item.id)
+                }
+            }
+            ActionButton("Cancel", Icons.Filled.DirectionsRun, Modifier.fillMaxWidth()) { pickingItem = false }
+            return@Column
+        }
         if (battle.awaitingReplacement || picking) {
             Text(
                 if (battle.awaitingReplacement) "${battle.player.creature.name} fainted · choose who fights next (no turn used)"
@@ -235,6 +265,11 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            ActionButton("Items", Icons.Filled.LocalDrink, Modifier.weight(1f)) {
+                state.stopAutoFight()
+                notice = null
+                pickingItem = true
+            }
             ActionButton("Switch", Icons.Filled.SwapHoriz, Modifier.weight(1f)) {
                 if (battle.canSwitch) {
                     state.stopAutoFight()
@@ -244,10 +279,10 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                     else "Only one companion in your party · more arrive with ZCubes and the ZPet import."
                 }
             }
-            ActionButton("Retreat", Icons.Filled.DirectionsRun, Modifier.weight(1f)) {
-                state.stopAutoFight()
-                state.show(Overlay.ConfirmRetreat)
-            }
+        }
+        ActionButton("Retreat", Icons.Filled.DirectionsRun, Modifier.fillMaxWidth()) {
+            state.stopAutoFight()
+            state.show(Overlay.ConfirmRetreat)
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.zeus97x.zbattle.core.battle
 
+import com.zeus97x.zbattle.core.economy.ItemEffect
+
 import com.zeus97x.zbattle.core.CreatureCatalog
 
 enum class BattleAction { Attack, Skill }
@@ -46,6 +48,8 @@ data class BattleState(
     val participants: Set<Long> = emptySet(),
     /** The active creature fainted and others can still fight: the player must pick a replacement (free). */
     val awaitingReplacement: Boolean = false,
+    /** Battle items used (CLAUDE-006, D-SHOP: at most 5 per battle). */
+    val itemsUsed: Int = 0,
     val log: List<String> = emptyList(),
     val outcome: Outcome? = null,
 ) {
@@ -77,6 +81,9 @@ data class BattleState(
         else -> "Ready after $skillCooldown more turns"
     }
 
+    /** Battle items used so far; at most [BattleEngine.MAX_ITEMS_PER_BATTLE] (D-SHOP). */
+    val itemsLeft: Int get() = BattleEngine.MAX_ITEMS_PER_BATTLE - itemsUsed
+
     /** Effects still running on the opponent, with the turns left; empty when none (EXT-020). */
     val activeEffects: List<String> get() = buildList {
         if (burnTurns > 0) add("${SkillEffect.Burn.label} · ${turnsLeft(burnTurns)}")
@@ -93,8 +100,7 @@ val SkillEffect.description: String get() = when (this) {
 }
 
 /**
- * Deterministic turn rules (ZPet `AdventureState.Battle.move`, minus Guard/Potion which ZBattle
- * has not approved yet):
+ * Deterministic turn rules (ZPet `AdventureState.Battle.move`, minus Guard):
  * - Attack: max(2, power + 5 − enemyGuard/2).
  * - Skill: max(3, power + 9 − enemyGuard/2 + family advantage), then 3-turn cooldown and Burn/Weaken.
  * - Opponent: max(2, power + 4 − guard/2), +5 on every third turn, −3 while weakened.
@@ -106,7 +112,14 @@ val SkillEffect.description: String get() = when (this) {
  * - When the active creature faints and another can fight, the player picks a replacement. That
  *   choice costs no turn and the opponent does not act. Defeat only when every member has fainted.
  * - Skill cooldown is per creature and only counts down on that creature's own Attack turns
- *   (D-SWITCH-COOLDOWN proposal; the single-creature behaviour is unchanged).
+ *   (D-SWITCH-COOLDOWN, confirmed in batch 2; the single-creature behaviour is unchanged).
+ * Battle items (D-SHOP, batch 2; ECONOMY §7.1):
+ * - Using an item takes the player's turn and deals no damage; the opponent still strikes and the
+ *   Skill cooldown ticks down as on Attack (ZPet Potion parity). At most 5 items per battle.
+ * - Heal restores up to max HP and can't be used at full HP. Burn/Weaken items set the effect to its
+ *   full length (refresh, never stack), exactly like the Skill effect.
+ * - A creature knocked out before it moves uses no item ([BattleState.itemsUsed] doesn't change).
+ * - Auto-fight never uses items.
  */
 object BattleEngine {
     const val TURN_LIMIT = 50
@@ -114,12 +127,14 @@ object BattleEngine {
     const val EFFECT_TURNS = 3
     const val EFFECT_AMOUNT = 3
     const val PARTY_SIZE = 3
+    const val MAX_ITEMS_PER_BATTLE = 5
 
     /**
      * Contract `rulesRevision` for BattleCompleted records (CONTRACT-v0.2). Bump whenever combat rules
-     * change: 1 = CLAUDE-002 single fighter, 2 = CLAUDE-005 B2 party of 3 with switching.
+     * change: 1 = CLAUDE-002 single fighter, 2 = CLAUDE-005 B2 party of 3 with switching,
+     * 3 = CLAUDE-006 battle items.
      */
-    const val RULES_REVISION = "zbattle-rules-2"
+    const val RULES_REVISION = "zbattle-rules-3"
 
     /** A fighter entering battle at full HP (every separate encounter starts fresh, D-REPLAY-REWARDS). */
     data class Entrant(val uid: Long, val creatureId: String, val level: Int)
@@ -146,8 +161,28 @@ object BattleEngine {
 
     fun act(state: BattleState, action: BattleAction): BattleState {
         check(!state.over) { "Battle is over" }
-        check(!state.awaitingReplacement) { "Choose a replacement first" }
         if (action == BattleAction.Skill) check(state.skillCooldown == 0) { "Skill is cooling down" }
+        return resolve(state, action, null)
+    }
+
+    /** Why [effect] can't be used right now, or null when it can. */
+    fun itemRefusal(state: BattleState, effect: ItemEffect): String? = when {
+        state.over || state.awaitingReplacement -> "Not now"
+        state.itemsUsed >= MAX_ITEMS_PER_BATTLE -> "$MAX_ITEMS_PER_BATTLE items already used this battle"
+        effect is ItemEffect.Heal && state.player.hp >= state.player.maxHp -> "Already at full HP"
+        else -> null
+    }
+
+    /** Uses one battle item named [itemName]. Costs the turn; see the class notes. */
+    fun useItem(state: BattleState, effect: ItemEffect, itemName: String): BattleState {
+        itemRefusal(state, effect)?.let { error(it) }
+        return resolve(state, BattleAction.Attack, effect to itemName)
+    }
+
+    /** One player turn: Attack, Skill, or (when [item] is set) a battle item. */
+    private fun resolve(state: BattleState, action: BattleAction, item: Pair<ItemEffect, String>?): BattleState {
+        check(!state.over) { "Battle is over" }
+        check(!state.awaitingReplacement) { "Choose a replacement first" }
 
         val turn = state.turn + 1
         val player = state.player
@@ -159,7 +194,15 @@ object BattleEngine {
         var weaken = state.weakenTurns
         val hit: Int
         val cooldown: Int
-        if (action == BattleAction.Skill) {
+        if (item != null) {
+            hit = 0
+            cooldown = maxOf(0, state.skillCooldown - 1)
+            when (item.first) {
+                ItemEffect.ApplyBurn -> burn = EFFECT_TURNS
+                ItemEffect.ApplyWeaken -> weaken = EFFECT_TURNS
+                is ItemEffect.Heal -> Unit
+            }
+        } else if (action == BattleAction.Skill) {
             val advantage = Skills.advantage(player.creature.family.index, enemy.creature.family.index)
             hit = maxOf(3, player.power + 9 - enemy.guard / 2 + advantage)
             cooldown = SKILL_COOLDOWN
@@ -184,10 +227,23 @@ object BattleEngine {
 
         if (enemyFirst) enemyStrikes()
         val acted = playerHp > 0
-        if (acted) {
+        if (acted && item != null) {
+            val (effect, name) = item
+            when (effect) {
+                is ItemEffect.Heal -> {
+                    val healed = minOf(effect.hp, player.maxHp - playerHp)
+                    playerHp += healed
+                    lines += "${player.creature.name} uses $name: +$healed HP."
+                }
+                ItemEffect.ApplyBurn -> lines += "${player.creature.name} uses $name. ${enemy.creature.name} is affected by ${SkillEffect.Burn.label}."
+                ItemEffect.ApplyWeaken -> lines += "${player.creature.name} uses $name. ${enemy.creature.name} is affected by ${SkillEffect.Weaken.label}."
+            }
+        } else if (acted) {
             enemyHp = maxOf(0, enemyHp - hit)
             lines += "${player.creature.name} uses $moveName for $hit."
             if (action == BattleAction.Skill) lines += "${enemy.creature.name} is affected by ${skill.effect.label}."
+        }
+        if (acted) {
             if (burn > 0 && enemyHp > 0) {
                 enemyHp = maxOf(0, enemyHp - EFFECT_AMOUNT)
                 burn--
@@ -205,7 +261,8 @@ object BattleEngine {
         }
         val team = state.team.toMutableList()
         team[state.activeIndex] = state.active.copy(combatant = player.copy(hp = playerHp), skillCooldown = finalCooldown)
-        return finishTurn(state, team, turn, enemy.copy(hp = enemyHp), burn, weaken, lines, if (acted) state.participants + state.playerUid else state.participants)
+        val used = if (acted && item != null) state.copy(itemsUsed = state.itemsUsed + 1) else state
+        return finishTurn(used, team, turn, enemy.copy(hp = enemyHp), burn, weaken, lines, if (acted) state.participants + state.playerUid else state.participants)
     }
 
     /** Brings in bench member [toIndex]. Costs the player's turn; the opponent takes its normal turn. */

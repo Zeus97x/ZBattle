@@ -82,3 +82,4 @@ Every item in phases C–G is runtime work in a phase that has not been approved
 - EXT-021 (C1 inventory ledger): **Review** on `claude/zbattle-c1-inventory`.
 - EXT-022 (C2 first-clear/replay rewards): **Review** on `claude/zbattle-c2-rewards`. Tickets are paid by kind; no boss is playable until the campaign runtime is active.
 - Shop purchases (D-SHOP): **Review** on `claude/zbattle-c-shop`. Cosmetics purchasable; consumables/equipment shown but gated until their PRs; ZCubes gated until catching.
+- Battle items (D-SHOP): **Review** on `claude/zbattle-c-items`. `rulesRevision` is now `zbattle-rules-3`; consumables can be bought and used.
