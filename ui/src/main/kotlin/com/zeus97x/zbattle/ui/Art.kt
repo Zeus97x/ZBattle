@@ -1,0 +1,143 @@
+package com.zeus97x.zbattle.ui
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Landscape
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.zeus97x.zbattle.core.ArtCatalog
+import com.zeus97x.zbattle.core.ArtFit
+import com.zeus97x.zbattle.core.ArtKey
+import com.zeus97x.zbattle.core.PlaceholderStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/** Platform image source. Android reads APK assets; the JVM harness reads the repo files. */
+interface ArtLoader {
+    /** Already-decoded bitmap for [path], without doing I/O. */
+    fun cached(path: String): ImageBitmap?
+    /** Decodes [path] (downsampled), or returns null when no such asset exists. Off main thread. */
+    fun load(path: String): ImageBitmap?
+}
+
+object NoArtLoader : ArtLoader {
+    override fun cached(path: String): ImageBitmap? = null
+    override fun load(path: String): ImageBitmap? = null
+}
+
+val LocalArtLoader = staticCompositionLocalOf<ArtLoader> { NoArtLoader }
+
+@Composable
+fun rememberArt(key: ArtKey): ImageBitmap? {
+    val loader = LocalArtLoader.current
+    val candidates = remember(key) { ArtCatalog.candidates(key) }
+    // Cached bitmaps show on the first frame; others decode off the main thread, then recompose.
+    var image by remember(key, loader) { mutableStateOf(candidates.firstNotNullOfOrNull(loader::cached)) }
+    LaunchedEffect(key, loader) {
+        if (image == null && candidates.isNotEmpty()) {
+            image = withContext(Dispatchers.IO) { candidates.firstNotNullOfOrNull(loader::load) }
+        }
+    }
+    return image
+}
+
+private fun PlaceholderStyle.icon(): ImageVector = when (this) {
+    PlaceholderStyle.Creature -> Icons.Filled.Pets
+    PlaceholderStyle.Brand -> Icons.Filled.Bolt
+    PlaceholderStyle.Map -> Icons.Filled.Map
+    PlaceholderStyle.Scenery -> Icons.Filled.Landscape
+    PlaceholderStyle.Portrait -> Icons.Filled.Person
+    PlaceholderStyle.Item -> Icons.Filled.Inventory2
+    PlaceholderStyle.Badge -> Icons.Filled.EmojiEvents
+}
+
+/**
+ * Draws the artwork for [key] or, until that art exists, a restrained themed gradient with a
+ * native icon. Creature art uses contain/fit with alpha; scenery uses crop/cover.
+ */
+@Composable
+fun ArtworkSlot(
+    key: ArtKey,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    placeholderLabel: String? = null,
+    placeholderAlignment: Alignment = Alignment.Center,
+) {
+    val image = rememberArt(key)
+    Box(modifier, contentAlignment = Alignment.Center) {
+        if (image != null) {
+            Image(
+                bitmap = image,
+                contentDescription = contentDescription,
+                contentScale = if (key.fit == ArtFit.Cover) ContentScale.Crop else ContentScale.Fit,
+                modifier = Modifier.matchParentSize(),
+            )
+        } else {
+            ArtPlaceholder(key.placeholder, contentDescription, placeholderLabel, Modifier.matchParentSize(), placeholderAlignment)
+        }
+    }
+}
+
+@Composable
+fun ArtPlaceholder(
+    style: PlaceholderStyle,
+    contentDescription: String?,
+    label: String?,
+    modifier: Modifier = Modifier,
+    alignment: Alignment = Alignment.Center,
+) {
+    val p = Z.colors
+    val brush = remember(style, p) {
+        when (style) {
+            // Scenery always carries white overlay text, so its placeholder stays dark in both themes.
+            PlaceholderStyle.Scenery, PlaceholderStyle.Map ->
+                Brush.linearGradient(listOf(DarkPalette.elevated, DarkPalette.surface, DarkPalette.accentDark.copy(alpha = 0.35f)))
+            PlaceholderStyle.Creature -> Brush.radialGradient(listOf(p.elevated, p.surface))
+            else -> Brush.linearGradient(listOf(p.elevated, p.surface))
+        }
+    }
+    Box(modifier.background(brush), contentAlignment = alignment) {
+        Column(if (label != null) Modifier.padding(vertical = 20.dp) else Modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            val scenery = style == PlaceholderStyle.Scenery || style == PlaceholderStyle.Map
+            val tint = if (scenery) DarkPalette.textSecondary else p.textSecondary
+            Icon(style.icon(), contentDescription = contentDescription, tint = tint.copy(alpha = 0.7f), modifier = Modifier.size(32.dp))
+            if (label != null) {
+                Text(
+                    label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = tint,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+            }
+        }
+    }
+}
