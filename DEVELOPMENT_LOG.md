@@ -129,3 +129,31 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Changes in this commit: task status → REVIEW (`ai/tasks/CLAUDE-001-UI-FOUNDATION.md`, `ai/README.md`); `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` status table and remaining-work list updated.
 - Not verified: no emulator/device run (insets, gestures, predictive back, rotation, TalkBack still need a device check).
 - Next step: user review of PR #2; on approval merge and close PR #1's superseded Java shell; then device testing and ChatGPT art drops.
+
+## 2026-10-09 — ChatGPT — CLAUDE-002 battle vertical slice handoff
+
+Request/problem:
+- Zeus97x tested the merged ZBattle UI foundation and reported Android navigation bar overlap on Battle controls.
+- The bottom center lightning button should be a clean full circle.
+- The catching tool/item name is now **ZCubes** and needs future tiered visual design.
+- Zeus97x provided the gameplay backlog and asked to package the next work as a Claude PR/task, with double battles deferred.
+
+What changed:
+- Added `ai/tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md`.
+- Added `ai/tasks/CLAUDE-002-HANDOFF.md`.
+- Updated `ai/README.md` so Claude can pick up the next approved task.
+
+Implementation notes:
+- This is a documentation and handoff PR only.
+- Scope is stats, battle engine and saved battle progress as the first gameplay vertical slice.
+- ZPet should be used as a baseline only where useful for catalogue/encounter/rarity concepts.
+- ZBattle must keep separate progress and never write back to ZPet.
+- Double battles are explicitly deferred.
+
+Verification:
+- Documentation prepared from current `main` after PR #2 merge.
+- No app code changed and no build was run for this documentation-only task setup.
+
+Remaining work:
+- Claude to implement CLAUDE-002 on a dedicated branch and open a PR.
+- ChatGPT to design ZCube visuals/tiers when that art phase is approved.
