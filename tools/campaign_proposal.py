@@ -8,7 +8,8 @@
                                                   auto policy, with a party of N splitting XP
 
 Creature ids are parsed independently from Creatures.kt. Formulas were drafted in the proposal and
-first-win XP follows ECONOMY-PROPOSAL Option B (see ai/proposals/CAMPAIGN-PROPOSAL.md section 7).
+first-win XP follows D-ECONOMY-XP (decision batch 2): 300 XP per ordinary area, +150 per region boss.
+Layout approved (D-CAMPAIGN); opponent stats stay provisional until the D-CURVE party simulation.
 """
 import collections, json, re, sys
 from pathlib import Path
@@ -17,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CREATURES = ROOT / "core/src/main/kotlin/com/zeus97x/zbattle/core/Creatures.kt"
 ENCOUNTERS = ROOT / "core/src/main/kotlin/com/zeus97x/zbattle/core/battle/Encounters.kt"
 OUT = ROOT / "ai/proposals/campaign-proposal.json"
-REVISION = "campaign-proposal-1"
+REVISION = "campaign-proposal-2"
 LEGACY = {"id": "area-00/slot-0", "areaIndex": 0, "slot": 0, "kind": "wild", "creatureId": "voltmaw", "opponentLevel": 2, "firstWinXp": 60}
 
 # Art-blocked groups 9..11 use an interim family of the same family%3 class (advantage maths unchanged).
@@ -29,7 +30,7 @@ LAYOUT = {
     2: [("wild", 1), ("wild", 4), ("mini_boss", 2), ("wild", 4), ("stage_boss", 2), ("location_boss", 5)],
     3: [("wild", 1), ("wild", 4), ("mini_boss", 2), ("wild", 2), ("stage_boss", 4), ("location_boss", 5), ("region_boss", 3)],
 }
-XP = {"wild": 30, "mini_boss": 60, "stage_boss": 100, "location_boss": 150, "region_boss": 250}  # ECONOMY Option B
+XP = {"wild": 20, "mini_boss": 40, "stage_boss": 80, "location_boss": 120, "region_boss": 150}  # D-ECONOMY-XP (batch 2)
 LEVEL_BONUS = {"wild": 0, "mini_boss": 1, "stage_boss": 2, "location_boss": 3, "region_boss": 4}
 STAT_BONUS = {"wild": (0, 0, 0, 0), "mini_boss": (1, 0, 0, 8), "stage_boss": (1, 1, 0, 12), "location_boss": (2, 1, 0, 18), "region_boss": (3, 2, 0, 25)}
 KINDS = list(XP)
@@ -69,8 +70,9 @@ def build():
 
 
 def write():
-    note = "PROPOSED, inactive (D-CAMPAIGN). firstWinXp uses ECONOMY-PROPOSAL Option B for every slot except the shipped area-00/slot-0 (60, unchanged)."
-    lines = ["{", f'  "revision": "{REVISION}",', '  "status": "PROPOSED",', f"  \"note\": {json.dumps(note)},", '  "encounters": [']
+    note = ("Layout APPROVED (D-CAMPAIGN, batch 2); runtime still inactive. firstWinXp follows D-ECONOMY-XP except the "
+            "shipped area-00/slot-0 (60, unchanged). Opponent stats are PROVISIONAL until the D-CURVE party simulation is reviewed.")
+    lines = ["{", f'  "revision": "{REVISION}",', '  "status": "APPROVED_LAYOUT",', f"  \"note\": {json.dumps(note)},", '  "encounters": [']
     enc = build()
     lines += ["    " + json.dumps(e) + ("," if i < len(enc) - 1 else "") for i, e in enumerate(enc)]
     OUT.write_text("\n".join(lines + ["  ]", "}"]) + "\n")
@@ -82,8 +84,8 @@ def validate():
     ids = {cid: (fi, k) for fi, forms in fams.items() for k, cid in enumerate(forms)}
     doc = json.loads(OUT.read_text())
     errs = []
-    if doc.get("revision") != REVISION or doc.get("status") != "PROPOSED":
-        errs.append("revision/status must be campaign-proposal-1 / PROPOSED (proposal stays inactive)")
+    if doc.get("revision") != REVISION or doc.get("status") != "APPROVED_LAYOUT":
+        errs.append(f"revision/status must be {REVISION} / APPROVED_LAYOUT (runtime stays inactive until D-CURVE)")
     enc = doc["encounters"]
     if enc != build():
         errs.append("JSON differs from the formulas in this tool; run --write")

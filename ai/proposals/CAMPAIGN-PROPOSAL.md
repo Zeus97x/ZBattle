@@ -12,6 +12,8 @@ Companion files:
   - with no flag, validates it against `Creatures.kt` and the shipped encounter (this runs in CI)
   - `--simulate --party N` mirrors `BattleEngine` and the auto policy to estimate win rates
 
+> **Decision batch 2 (Zeus97x, 2026-10-10): layout approved (D-CAMPAIGN), Q-F answered with option (c) (D-CURVE).** First-win XP now follows D-ECONOMY-XP (300 per ordinary area + 150 per region boss; the shipped encounter keeps 60). Opponent stats stay **provisional** until a simulation of the real three-member party, switching, evolution and equipment is reviewed; bosses must be a meaningful challenge. `campaign-proposal.json` is revision 2, status `APPROVED_LAYOUT`, and the runtime still ships only `area-00/slot-0`.
+
 > **Claude review note (2026-10-10).** Claude reconciled this draft with [ECONOMY-PROPOSAL.md](ECONOMY-PROPOSAL.md) before committing it. The JSON now uses the economy's **Option B** first-win XP; the shipped `area-00/slot-0` keeps 60. The draft's XP of 10/15/20/30/50 was tuned for a lone starter, and Zeus97x has since decided on a party of 3 with split XP. Section 7.6 shows the effect: the opponent curve and the XP values can't both stay as drafted. That choice is open question **Q-F**.
 
 ## 1. Summary

@@ -45,12 +45,12 @@ Phase B is at its boundary: B1–B5 are merged. The remaining B items either nee
 | EXT-010 | Done | `BattleScreen` single `LaunchedEffect(battleId, turn)`; `BattleProgress.autoStep` ignores stale or duplicate steps. PR #11 |
 | EXT-011 | Done | `MainActivity.onStop`, navigation, dialogs and settlement stop auto-fight; `RepeatSession.interrupted()` never resumes by itself. PRs #11, #17 |
 | EXT-012 | Done | `RepeatSession` counts played, wins and XP from settled `BattleResult`s, with end reason `Completed/Defeat/Interrupted`. PR #17 |
-| EXT-013 | Partial | Bounded repeat sessions (3/5/10), stop on defeat, replays only of cleared encounters; there is no playable boss yet. **Gap:** replay quantities pay 0 until ECONOMY Q-E1/Q-E2 are approved; D-REPEAT-SESSION (max 10) is unconfirmed |
-| EXT-014 | Done | Party of 3, switching and the participant ledger (`PartyBattleTest`, 10 tests). PR #14. D-PARTY-XP and D-SWITCH-COOLDOWN still need confirmation |
+| EXT-013 | Partial | Bounded repeat sessions (3/5/10), stop on defeat, replays only of cleared encounters. D-REPEAT-SESSION and D-REPLAY-RATE confirmed (batch 2). **Gap:** replay quantities become active in C2 |
+| EXT-014 | Done | Party of 3, switching and the participant ledger (`PartyBattleTest`, 10 tests). PR #14. D-PARTY-XP and D-SWITCH-COOLDOWN confirmed in batch 2 |
 | EXT-015 | Done | `BattleProgressCodec` v4 reads v1–v4; frozen v1 golden file (`ContractMigrationFixtureTest`). PRs #14, #15, #17 |
-| EXT-016 | Blocked | Identity, form guard and unlock ledger done (`Evolution.kt`, PR #15). Activation needs **D-EVOLUTION-THRESHOLDS** (Zeus97x + ChatGPT + ZPet Claude) |
-| EXT-017 | Partial | Stable `Encounter.id` and `EncounterKind`; `ai/proposals/campaign-proposal.json` validated but inactive. Runtime still has exactly one playable encounter, by design. **Gap:** registry loading waits for D-CAMPAIGN approval |
-| EXT-018 | Blocked | Needs approval of `ai/proposals/CAMPAIGN-PROPOSAL.md`, including Q-F (difficulty versus Option B XP) |
+| EXT-016 | Blocked | Identity, form guard and unlock ledger done (`Evolution.kt`, PR #15). Activation needs **D-EVOLUTION-THRESHOLDS**; batch 2 says wait for a coordinated ZPet/ZBattle decision |
+| EXT-017 | Partial | Stable `Encounter.id` and `EncounterKind`; `ai/proposals/campaign-proposal.json` validated but inactive. Runtime still has exactly one playable encounter, by design. **Gap:** D-CAMPAIGN approved (batch 2); registry loading waits for the D-CURVE simulation to fix opponent stats |
+| EXT-018 | Blocked | Layout and XP approved (batch 2, config revision 2). Waits for the D-CURVE simulation (real party, switching, equipment) before opponent stats are final |
 | EXT-019 | Done | `BattleProgress.settle`: retreat and defeat pay 0; `settledThrough` and the active-id guard prevent double settlement (`ReplayTest`, `BattleProgressTest`) |
 | EXT-020 | Review | Owner Claude; branch `ccr-79612a33-kjesjl`, base `400d46b`. Already present: enemy intent pill (`BattleState.enemyIntent`), outcome screen, ≥54dp action buttons, 360/412dp and 130% renders. Added: Skill readiness in words (`skillStatus`, also the button's TalkBack state), opponent effect pills with turns left (`activeEffects`), effect descriptions built from engine constants, a polite live region on the battle log, and merged HP panels for screen readers. No rule or value changes; `RULES_REVISION` unchanged |
 
@@ -59,7 +59,7 @@ Every item in phases C–G is runtime work in a phase that has not been approved
 
 | Phase | Items | Inputs needed before work starts |
 |---|---|---|
-| C (CLAUDE-006) | EXT-021–030 | Approval of `ECONOMY-PROPOSAL.md` (coins C1, replay Q-E1/Q-E2). Ticket tables are already recorded (Rare 70/30; Epic 50/35/15; Legendary 40/30/21/9) and D-WEEK-WINDOW is decided (EXT-028 is anchored, not rolling). EXT-029 exclusives are blocked by D-EXCLUSIVE-POOL (ChatGPT designs and art). EXT-025 uses existing art only |
+| C (CLAUDE-006) | EXT-021–030 | **Approved by decision batch 2; in progress** (see CLAUDE-006 plan). Previously needed: approval of `ECONOMY-PROPOSAL.md` (coins C1, replay Q-E1/Q-E2). Ticket tables are already recorded (Rare 70/30; Epic 50/35/15; Legendary 40/30/21/9) and D-WEEK-WINDOW is decided (EXT-028 is anchored, not rolling). EXT-029 exclusives are blocked by D-EXCLUSIVE-POOL (ChatGPT designs and art). EXT-025 uses existing art only |
 | D (CLAUDE-007) | EXT-031–040 | D-CONTRACT-ACCEPT (ZPet adoption of v0.2), D-BACKEND choice from `BACKEND-AUDIT.md`, and a matching ZPet producer. EXT-036/037 also need deployment authorization. D-ORIGIN-ROUNDING (EXT-032) is decided |
 | E (CLAUDE-008) | EXT-041–046 | Approval of `EXPEDITION-PROPOSAL.md` values with the ZPet owner; Phase D transport. D-PARTICIPATION is decided and the B2 ledger already records participants |
 | F (CLAUDE-009) | EXT-047–054 | Approval of `ADVANCED-COMBAT-PROPOSAL.md` and `ELEMENTS-PROPOSAL.md`; ZPet personality/relationship producers (EXT-053/054); approved dialogue text (EXT-052) |
@@ -74,3 +74,8 @@ Every item in phases C–G is runtime work in a phase that has not been approved
   3. Confirm the B2 open items D-PARTY-XP, D-SWITCH-COOLDOWN and D-REPEAT-SESSION.
   4. Supply D-EVOLUTION-THRESHOLDS, with ChatGPT and ZPet Claude. This unblocks EXT-016.
 - **Next:** finish EXT-020, then stop at the Phase B boundary for approval before any Phase C runtime work.
+
+## Checkpoint (2026-10-10, decision batch 2)
+- Phase C approved. Decisions recorded in `ai/integration/DECISIONS.md` (batch 2); campaign config regenerated as revision 2 with the approved XP (16 240 first-win XP).
+- The existing quick simulation (`campaign_proposal.py --simulate --party 3`, best single member) still shows bosses that are too easy, so D-CURVE needs the real-engine party simulation before stats are final.
+- Next: C1 inventory and ledger.

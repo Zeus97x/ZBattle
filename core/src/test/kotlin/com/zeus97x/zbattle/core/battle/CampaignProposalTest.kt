@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * CLAUDE-005 B4: the campaign PROPOSAL (ai/proposals/campaign-proposal.json) stays inactive, and every
+ * CLAUDE-005 B4: the campaign config (ai/proposals/campaign-proposal.json; layout approved, stats provisional) stays inactive, and every
  * row resolves against the real Kotlin catalogue. The Python validator checks it independently in CI.
  */
 class CampaignProposalTest {
@@ -19,7 +19,7 @@ class CampaignProposalTest {
 
     @Test
     fun proposalResolvesAgainstTheCatalogue() {
-        assertTrue(json.contains("\"status\": \"PROPOSED\""))
+        assertTrue(json.contains("\"status\": \"APPROVED_LAYOUT\""))
         assertEquals(300, rows.size)
         rows.forEach { r ->
             val creature = CreatureCatalog.byId(r[7])
@@ -34,6 +34,6 @@ class CampaignProposalTest {
         val legacy = rows.first()
         val shipped = Encounters.playable.single()
         assertEquals(listOf(shipped.id, "wild", shipped.creature.id, shipped.level.toString(), shipped.firstWinXp.toString()), listOf(legacy[1], legacy[6], legacy[7], legacy[8], legacy[9]))
-        assertEquals(1, Encounters.playable.size, "campaign content stays inactive until D-CAMPAIGN is approved")
+        assertEquals(1, Encounters.playable.size, "campaign content stays inactive until D-CURVE fixes opponent stats")
     }
 }

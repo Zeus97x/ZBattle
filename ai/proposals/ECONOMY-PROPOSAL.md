@@ -3,6 +3,8 @@
 > **PROPOSAL — inactive; values need Zeus97x approval (D-ECONOMY, D-REPLAY-REWARDS).**
 > Nothing here is implemented or canon. Every number marked *(proposed)* is a draft for review. The only fixed values are the owner decisions listed in §1. Prepared 2026-10-10 (America/Toronto), read-only from ZBattle and the ZPet clone. No repository was modified.
 
+> **Decision batch 2 (Zeus97x, 2026-10-10): approved with changes.** First-win XP is Wild 20 / Mini 40 / Stage 80 / Location 120 / Region 150 (not Option B); coins as proposed; replay 25% rounded down before sharing; no location-boss ticket; S1 split; §7 consumables, equipment, cosmetics and prices approved; Basic/Great/Ultra ZCubes only; no materials; starter kit 100 coins + 3 Potions; deferred items stay deferred. Q-E4 (daily replay coin cap) and Q-E13 (retroactive tickets) were not answered. See [DECISIONS.md](../integration/DECISIONS.md) batch 2.
+
 > **Claude review note (2026-10-10).** This draft was written before [CAMPAIGN-PROPOSAL.md](CAMPAIGN-PROPOSAL.md) existed, so the simulation in §10 uses its own reference layout (8 wild per area). The campaign proposal uses 3 wild per area plus the same bosses. The campaign JSON now uses this document's **Option B** XP, and the combined effect for a party of 3 is analysed in CAMPAIGN-PROPOSAL §7.6 (open question Q-F). Replay quantities in §5 are **not active**: B5 ships replay tracking with a replay XP/coin table that pays 0 until these values are approved. Coins have no balance in the save until C1.
 
 ---
