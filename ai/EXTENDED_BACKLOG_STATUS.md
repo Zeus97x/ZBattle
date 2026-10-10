@@ -86,3 +86,4 @@ Every item in phases C–G is runtime work in a phase that has not been approved
 - Equipment slot (D-SHOP): **Review** on `claude/zbattle-c-equipment`. Charms are now purchasable and equippable between battles.
 - D-CURVE simulation: **Review** on `claude/zbattle-c-curve-sim` (`ai/proposals/CURVE-SIMULATION.md`). Recommends multiplicative boss scaling (candidate B); awaiting approval before EXT-017/018 activation.
 - C3 ticket rolls (EXT-023/024): **Review** on `claude/zbattle-c3-tickets`. Tables, the persisted outcome and atomic redemption are built; redemption is **blocked** on D-TICKET-POOL. EXT-025 (results UI) waits for it.
+- C4 mystical timer (EXT-028): **Review** on `claude/zbattle-c4-mystical-timer`. Pure logic and tests only. EXT-026/027/029/030 are blocked on the campaign runtime (D-CURVE-STATS), mystical boss definitions and D-EXCLUSIVE-POOL.

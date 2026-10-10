@@ -704,3 +704,15 @@ Remaining work:
   - `PrefsSettingsStore` (app module) was not compiled locally (dl.google.com is blocked); CI covers it.
 - Next: Phase C checkpoint. C4/C5 mystical bosses need the campaign runtime (D-CURVE-STATS approval) and D-EXCLUSIVE-POOL.
 - CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
+
+## 2026-10-10 — CLAUDE-006 C4: mystical boss timer rules (Claude)
+- Branch: `claude/zbattle-c4-mystical-timer` (stacked on C3). Item: EXT-028. Decision basis: D-WEEK-WINDOW (Q10), D-OFFLINE-TRUST.
+- New `core/.../economy/MysticalTimer.kt` (pure logic, not wired to the UI or the save):
+  - A 168-hour cycle anchored at the first victory, a 15-win cap, and a 4-hour cooldown after each victory.
+  - The first victory after expiry anchors the next cycle. Unused wins don't carry over.
+  - A device clock behind the last victory blocks the boss instead of resetting. This is not tamper-proof; that is Phase D authority.
+  - `MysticalTimers` keeps per-boss timers independent.
+- Tests: new `MysticalTimerTest` (5): the 4-hour boundary at −1 ms/+0, the 15th/16th win and the exact cycle end, a new anchor at the later victory, no carry-over, clock rollback, independence.
+- Verification: `./gradlew -p preview test` (local mirror) → 141 tests, 0 failures. `campaign_proposal.py` OK.
+- Blocked: mystical boss ids and rosters, unlock at 3/6/9/12 completed regions (needs the live campaign, so D-CURVE-STATS), exclusive pool (D-EXCLUSIVE-POOL), and wiring into the save once the bosses exist.
+- Phase C checkpoint: reported to Zeus97x.
