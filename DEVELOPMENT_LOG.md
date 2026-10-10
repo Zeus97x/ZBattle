@@ -465,3 +465,11 @@ Remaining work:
   - Coin balance (C1).
   - D-REPEAT-SESSION confirmation.
 - Next: commit the remaining proposals (backend audit, expedition, elements, catching, advanced combat) as a separate docs PR.
+
+## 2026-10-10 — Decision proposals: backend audit, expedition, elements, catching, advanced combat (Claude)
+- Branch: `claude/zbattle-decision-proposals` (stacked on B5).
+- Decision basis: Q12, Q13 (read-only backend audit) and Q17–Q20 (separate decision documents, inactive and configurable).
+- How it was made: helper agents drafted each document in Claude's scratchpad from read-only evidence in the ZBattle repo and the ZPet clone (1adcedb). Claude reviewed them before committing. Checks: no secrets, keys, project refs or the owner email are reproduced; each document carries an inactive/proposal banner.
+- The backend audit used repository files only; the live Supabase project was **not** inspected (OQ6). Nothing was deployed or created.
+- Paths: `ai/proposals/{BACKEND-AUDIT,EXPEDITION-PROPOSAL,ELEMENTS-PROPOSAL,CATCHING-PROPOSAL,ADVANCED-COMBAT-PROPOSAL,README}.md`, `ai/README.md`.
+- Verification: `python3 tools/check_doc_links.py` → OK. Docs only.

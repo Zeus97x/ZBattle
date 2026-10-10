@@ -24,12 +24,12 @@ Decisions are in [DECISIONS.md](integration/DECISIONS.md). Each item is a small 
 | Item | Owner | Status |
 |---|---|---|
 | Decision record + task board | Claude | Review |
-| Contract v0.2 amendments (Q8, Q14, Q15, Q16) + new bundle hash + ZPet handoff (Q3) | Claude (ZBattle side); ZPet Claude adopts | Ready |
-| B2 party of 3 + switching | Claude | Ready |
-| B3 evolution identity + unlock ledger (thresholds inactive) | Claude | Ready |
-| B4 campaign proposal + inactive config | Claude | Ready |
-| B5 replay tracking + settlement ledger + repeat sessions (quantities inactive) | Claude | Ready |
-| Proposals: economy, backend audit, expedition, elements, catching, advanced combat | Claude | Ready |
+| Contract v0.2 amendments (Q8, Q14, Q15, Q16) + new bundle hash + ZPet handoff (Q3) | Claude (ZBattle side); ZPet Claude adopts | Review; awaiting ZPet Claude adoption |
+| B2 party of 3 + switching | Claude | Review |
+| B3 evolution identity + unlock ledger (thresholds inactive) | Claude | Review |
+| B4 campaign proposal + inactive config | Claude | Review |
+| B5 replay tracking + settlement ledger + repeat sessions (quantities inactive) | Claude | Review |
+| Proposals: economy, backend audit, expedition, elements, catching, advanced combat | Claude | Review |
 
 ## Current work
 | Task | Owner | Status | Scope |
