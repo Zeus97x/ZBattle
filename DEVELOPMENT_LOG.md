@@ -522,3 +522,18 @@ Remaining work:
   - `./gradlew -p preview test` (local mirror init script) → 102 tests, 0 failures.
   - Renders `05-battle` (412dp) and `05c-battle-auto` (360dp, 130% text) checked by eye. "Auto · Stop" was cut off at 130% text, so the label became "Stop".
   - Not verified: the long-press gesture and haptics on a device (the render harness cannot press and hold), plus Android assemble and lint (left to CI).
+
+## 2026-10-10 — Decision batch 2 recorded; Phase C approved (Claude)
+- Request: Zeus97x answered the Phase B boundary questions 1–11 and approved Phase C in small PRs.
+- Branch: `claude/zbattle-decisions-batch2`, stacked on `ccr-79612a33-kjesjl` (PR #19, unmerged) at `24fd0d5`. Phase C uses small stacked branches because Zeus97x asked for small PRs.
+- Changes:
+  - `ai/integration/DECISIONS.md`: batch 2 table (D-PHASE-C, D-ECONOMY-XP, D-REPLAY-RATE, D-LOCATION-TICKET, D-PARTY-XP, D-CURVE, D-SWITCH-COOLDOWN, D-REPEAT-SESSION, D-CAMPAIGN, D-SHOP, D-EVOLUTION-THRESHOLDS) and a refreshed open list. Q-E4 (daily replay coin cap) and Q-E13 (retroactive tickets) were not answered: the cap is built inactive, and the proposal's "no retroactive tickets" is followed (no boss was playable, so nothing is lost).
+  - `tools/campaign_proposal.py` and `ai/proposals/campaign-proposal.json`: revision 2, status `APPROVED_LAYOUT`, first-win XP Wild 20 / Mini 40 / Stage 80 / Location 120 / Region 150 (shipped encounter keeps 60). `CampaignProposalTest` updated. Runtime still ships only `area-00/slot-0`.
+  - Banners added to `ECONOMY-PROPOSAL.md` and `CAMPAIGN-PROPOSAL.md`.
+  - `CLAUDE-006` claimed, with the planned PR order.
+  - `ai/README.md` board and `ai/EXTENDED_BACKLOG_STATUS.md` updated.
+- Verification:
+  - `python3 tools/campaign_proposal.py` → OK, 300 encounters, 16 240 first-win XP (300 × 48 + 150 × 12 + 40).
+  - `--simulate --party 3` (best single member, Python mirror) still wins every boss from group 0 upwards with a Young form, so D-CURVE needs the real-engine party simulation before opponent stats are final.
+  - Doc links OK.
+- Next: C1 inventory and ledger.

@@ -12,7 +12,7 @@ Claude owns implementation-heavy work. ChatGPT owns design/artwork/coordination.
 |---|---|---|
 | A | [CLAUDE-004](tasks/CLAUDE-004-CONTRACT-AUDIT.md) | Review: contract v0.2 + fixtures; awaiting Zeus97x and ZPet owner (D-CONTRACT-ACCEPT) |
 | B | [CLAUDE-005](tasks/CLAUDE-005-CORE-PROGRESSION.md) | B1–B5 merged (#11, #14–#17); at phase boundary. Open: EXT-020 accessibility; decisions D-PARTY-XP, D-SWITCH-COOLDOWN, D-REPEAT-SESSION, D-EVOLUTION-THRESHOLDS, D-CAMPAIGN approval |
-| C | [CLAUDE-006](tasks/CLAUDE-006-BOSS-REWARDS.md) | Queued: decisions recorded (Q8–Q11); economy proposal pending approval; needs phase approval |
+| C | [CLAUDE-006](tasks/CLAUDE-006-BOSS-REWARDS.md) | In progress: approved by decision batch 2; small stacked PRs starting with C1 inventory |
 | D | [CLAUDE-007](tasks/CLAUDE-007-CROSS-APP-BRIDGE.md) | Queued: origin/bond/inbox |
 | E | [CLAUDE-008](tasks/CLAUDE-008-EXPEDITION-EVENTS.md) | Queued: expedition integration |
 | F | [CLAUDE-009](tasks/CLAUDE-009-ADVANCED-COMBAT.md) | Queued: advanced combat |

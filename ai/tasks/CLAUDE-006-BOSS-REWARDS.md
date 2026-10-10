@@ -1,7 +1,11 @@
 # CLAUDE-006 — Phase C: Boss economy, tickets and mystical bosses
 Updated 2026-10-10 America/Toronto.
-Owner: Claude (unclaimed). Status: Blocked on B and economy/content decisions.
-Claim fields: implementation branch, base commit, start time, subtask owner and current PR — fill before edits.
+Owner: Claude. Status: IN PROGRESS — authorized by decision batch 2 (D-PHASE-C, 2026-10-10).
+Claim fields:
+- Branches: stacked `claude/zbattle-decisions-batch2` → C1… (one small PR each), based on `ccr-79612a33-kjesjl` (PR #19, unmerged) at `24fd0d5`
+- Started: 2026-10-10 America/Toronto
+- Subtask owner: Claude
+- Progress: [EXTENDED_BACKLOG_STATUS.md](../EXTENDED_BACKLOG_STATUS.md) (EXT-021–030)
 
 ## Read first
 AGENTS.md, DEVELOPMENT_LOG.md, ai/README.md, ai/CROSS_APP_ROADMAP.md, ai/integration/CONTRACT-v0.1.md and relevant preceding task summaries. Inspect latest main and active PRs; never overwrite concurrent changes.
@@ -32,3 +36,15 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 
 ## Decision batch 1 (Zeus97x, 2026-10-10)
 Decisions affecting this task are recorded in [DECISIONS.md](../integration/DECISIONS.md) (Q2–Q21). Proposed values stay inactive until approved. Status is unchanged: this task still waits on Phase B and on its own approvals.
+
+## Decision batch 2 (Zeus97x, 2026-10-10) — Phase C approved
+See [DECISIONS.md](../integration/DECISIONS.md) batch 2. Planned PR order (each small, stacked, never auto-merged):
+1. Record decisions; campaign config XP (docs/config only).
+2. C1 inventory + transaction ledger (coins, consumables, equipment, cosmetics, tickets; `material` kind reserved), save migration, starter kit 100 coins + 3 Potions, stable production item ids.
+3. C2 battle rewards: approved first-win XP/coins, 25% replay before sharing, first-clear tickets (mini Rare, stage Epic, region Legendary; none for location boss).
+4. Shop purchases with approved prices (ZCubes listed but not sold until catching exists).
+5. Item battle action (manual only, uses the turn, max 5 per battle), `rulesRevision` bump.
+6. Equipment slot (one per creature) applied to stats.
+7. D-CURVE simulation with the real engine: party of 3, switching, equipment; evolution flagged as pending.
+8. Ticket rolls (C3 tables) with one persisted outcome per ticket.
+9. Mystical bosses (C4/C5): eligibility and timers after the campaign is live; exclusive pool stays gated.
