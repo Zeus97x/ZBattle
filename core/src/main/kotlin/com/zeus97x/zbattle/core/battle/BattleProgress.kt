@@ -2,6 +2,7 @@ package com.zeus97x.zbattle.core.battle
 
 import com.zeus97x.zbattle.core.Area
 import com.zeus97x.zbattle.core.CreatureCatalog
+import com.zeus97x.zbattle.core.economy.Inventory
 
 /**
  * A creature the player owns in ZBattle. Separate from ZPet; never written back.
@@ -118,6 +119,8 @@ data class BattleProgress(
     val evolution: EvolutionLedger = EvolutionLedger(),
     /** Highest battle id already settled (CLAUDE-005 B5). A battle id at or below it can never pay again. */
     val settledThrough: Long = 0,
+    /** Coins, items and tickets (CLAUDE-006 C1). Saved with the battle so rewards settle atomically. */
+    val inventory: Inventory = Inventory(),
 ) {
     /** Party used for the next battle: the chosen members that are still owned, else the first owned creatures. */
     val partyMembers: List<OwnedCreature>
@@ -154,10 +157,13 @@ data class BattleProgress(
 
     fun winsIn(area: Area): Int = wins.filterKeys { it.startsWith("${area.id}/") }.values.sum()
 
-    /** Grants the chosen starter once; existing saves keep their creatures. */
+    /**
+     * Grants the chosen starter once; existing saves keep their creatures. Also grants the starter
+     * kit once (D-SHOP), which covers saves made before the inventory existed.
+     */
     fun withStarter(creatureId: String): BattleProgress =
-        if (creatures.isNotEmpty()) this
-        else copy(creatures = listOf(OwnedCreature(nextUid, creatureId, 0)), nextUid = nextUid + 1)
+        (if (creatures.isNotEmpty()) this else copy(creatures = listOf(OwnedCreature(nextUid, creatureId, 0)), nextUid = nextUid + 1))
+            .copy(inventory = inventory.withStarterKit())
 
     fun startBattle(encounter: Encounter): BattleProgress {
         check(active == null) { "Finish or retreat from the current battle first" }

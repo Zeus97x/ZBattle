@@ -300,3 +300,6 @@ fun CircleThumb(creature: Creature, size: androidx.compose.ui.unit.Dp, modifier:
             .padding(4.dp),
     )
 }
+
+/** Coin balance with thousands separators (e.g. 12,500). */
+fun formatCoins(coins: Long): String = "%,d".format(java.util.Locale.ROOT, coins)

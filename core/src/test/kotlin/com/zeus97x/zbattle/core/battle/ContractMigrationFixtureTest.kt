@@ -29,7 +29,8 @@ class ContractMigrationFixtureTest {
     fun frozenV1GoldenMigratesToCurrentProgress() {
         val raw = golden.readText().trim()
         assertEquals(1, java.util.Base64.getDecoder().decode(raw).let { it[3].toInt() }, "golden stays a v1 save")
-        val migrated = BattleProgressCodec.decode(raw)
+        // The app applies withStarter on every load (AppState), which grants the C1 starter kit once.
+        val migrated = BattleProgressCodec.decode(raw).withStarter("cindlet")
         assertEquals(sample(), migrated)
         assertEquals(migrated, BattleProgressCodec.decode(BattleProgressCodec.encode(migrated)), "re-saved as v2 without loss")
     }
