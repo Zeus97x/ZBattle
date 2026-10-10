@@ -36,19 +36,22 @@ class BattleProgressTest {
     }
 
     @Test
-    fun firstVictoryPaysXpOnceAndRematchesArePractice() {
+    fun firstVictoryPaysFullRewardsOnceAndRematchesPayAQuarter() {
         val won = winOnce(fresh())
         val result = assertNotNull(won.lastResult)
         assertEquals(Outcome.Victory, result.outcome)
         assertTrue(result.firstVictory)
         assertEquals(60, result.xpGained)
         assertEquals(60, won.lead!!.xp)
+        assertEquals(20, result.coins)
+        assertEquals(120, won.inventory.coins, "starter kit 100 + first win 20")
         assertTrue(encounter.id in won.defeated)
         assertNull(won.active)
 
         val rematch = winOnce(won.dismissResult())
-        assertEquals(0, rematch.lastResult!!.xpGained)
-        assertEquals(60, rematch.lead!!.xp)
+        assertEquals(15, rematch.lastResult!!.xpGained)
+        assertEquals(75, rematch.lead!!.xp)
+        assertEquals(125, rematch.inventory.coins)
         assertEquals(2, rematch.wins[encounter.id])
     }
 

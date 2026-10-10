@@ -1,23 +1,51 @@
 package com.zeus97x.zbattle.core.battle
 
+import com.zeus97x.zbattle.core.economy.ItemCatalog
+
+/** What one settled victory pays before XP is shared. */
+data class Payout(val xp: Long, val coins: Long, val ticketItemId: String?) {
+    companion object {
+        val NONE = Payout(0, 0, null)
+    }
+}
+
 /**
- * Replay rewards and repeat sessions (CLAUDE-005 B5, D-REPLAY-REWARDS decided 2026-10-10).
+ * Battle rewards (CLAUDE-006 C2; decision batch 2, 2026-10-10).
  *
- * - Repeat victories earn reduced XP/coins and never a repeat first-clear ticket.
- * - Quantities need approval, so the tables below are null (inactive) and replays pay 0 for now.
- *   ECONOMY-PROPOSAL §5 has the proposed values.
+ * - First win, by kind: XP 20/40/80/120/150 and coins 20/50/80/120/250 (D-ECONOMY-XP). The shipped
+ *   `area-00/slot-0` keeps its 60 XP ([Encounter.firstWinXp]).
+ * - First-clear tickets (Q9, D-LOCATION-TICKET): mini boss Rare, stage boss Epic, region boss
+ *   Legendary; none for wild or location bosses. Never on replay.
+ * - Replay (D-REPLAY-RATE): 25% of the first-win XP and coins, rounded down, before XP is shared.
  * - Each separate encounter starts at full HP; reopening an active battle keeps its saved HP.
  * - Settlement is duplicate-safe: battle ids only grow and each id settles at most once
  *   ([BattleProgress.settledThrough]).
  */
-object ReplayRewards {
-    /** Replay XP per kind. Inactive until D-REPLAY-REWARDS quantities are approved. */
-    val xpByKind: Map<EncounterKind, Long>? = null
-    /** Replay coins per kind. Inactive; there is no coin balance in the save until Phase C1. */
-    val coinsByKind: Map<EncounterKind, Long>? = null
+object BattleRewards {
+    val firstWinXp: Map<EncounterKind, Long> = mapOf(
+        EncounterKind.Wild to 20, EncounterKind.MiniBoss to 40, EncounterKind.StageBoss to 80,
+        EncounterKind.LocationBoss to 120, EncounterKind.RegionBoss to 150,
+    )
+    val firstWinCoins: Map<EncounterKind, Long> = mapOf(
+        EncounterKind.Wild to 20, EncounterKind.MiniBoss to 50, EncounterKind.StageBoss to 80,
+        EncounterKind.LocationBoss to 120, EncounterKind.RegionBoss to 250,
+    )
+    val ticket: Map<EncounterKind, String> = mapOf(
+        EncounterKind.MiniBoss to ItemCatalog.TICKET_RARE,
+        EncounterKind.StageBoss to ItemCatalog.TICKET_EPIC,
+        EncounterKind.RegionBoss to ItemCatalog.TICKET_LEGENDARY,
+    )
+    const val REPLAY_PERCENT = 25L
 
-    fun xpFor(encounter: Encounter?, table: Map<EncounterKind, Long>? = xpByKind): Long =
-        encounter?.let { table?.get(it.kind) } ?: 0
+    /** ECONOMY Q-E4 (daily replay coin cap, 300) was not answered: kept inactive. */
+    val dailyReplayCoinCap: Long? = null
+
+    fun firstWin(encounter: Encounter): Payout =
+        Payout(encounter.firstWinXp, firstWinCoins.getValue(encounter.kind), ticket[encounter.kind])
+
+    fun replay(encounter: Encounter): Payout = firstWin(encounter).let {
+        Payout(it.xp * REPLAY_PERCENT / 100, it.coins * REPLAY_PERCENT / 100, null)
+    }
 }
 
 enum class RepeatEnd { Completed, Defeat, Interrupted }
@@ -32,6 +60,7 @@ data class RepeatSession(
     val played: Int = 0,
     val wins: Int = 0,
     val xp: Long = 0,
+    val coins: Long = 0,
     val end: RepeatEnd? = null,
 ) {
     init {
@@ -44,7 +73,7 @@ data class RepeatSession(
     fun record(result: BattleResult): RepeatSession {
         if (!running || result.encounterId != encounterId) return this
         val won = result.outcome == Outcome.Victory
-        val next = copy(played = played + 1, wins = wins + if (won) 1 else 0, xp = xp + result.xpGained)
+        val next = copy(played = played + 1, wins = wins + if (won) 1 else 0, xp = xp + result.xpGained, coins = coins + result.coins)
         return when {
             !won -> next.copy(end = RepeatEnd.Defeat)
             next.played >= target -> next.copy(end = RepeatEnd.Completed)

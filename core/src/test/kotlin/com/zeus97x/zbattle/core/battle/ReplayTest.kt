@@ -17,19 +17,18 @@ class ReplayTest {
     }
 
     @Test
-    fun replaysAreTrackedAndPayNothingUntilQuantitiesAreApproved() {
+    fun replaysAreTrackedAndPayAQuarter() {
         val first = win(BattleProgress().withStarter("cindlet"))
         assertTrue(first.lastResult!!.firstVictory)
         assertFalse(first.lastResult!!.replay)
         val second = win(first)
         assertTrue(second.lastResult!!.replay)
-        assertEquals(0, second.lastResult!!.xpGained)
+        // D-REPLAY-RATE: 25% of the shipped encounter's 60 XP and 20 coins, rounded down.
+        assertEquals(15, second.lastResult!!.xpGained)
+        assertEquals(5, second.lastResult!!.coins)
+        assertEquals(null, second.lastResult!!.ticket)
         assertEquals(2, second.wins[encounter.id])
         assertEquals(setOf(encounter.id), second.defeated, "first-clear claimed once")
-        assertEquals(null, ReplayRewards.xpByKind)
-        assertEquals(null, ReplayRewards.coinsByKind)
-        // The mechanism pays once a table is approved (test-only value, not a proposal).
-        assertEquals(7, ReplayRewards.xpFor(encounter, table = mapOf(EncounterKind.Wild to 7L)))
     }
 
     @Test

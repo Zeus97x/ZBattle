@@ -559,3 +559,32 @@ Remaining work:
   - Render `01-home` (360dp, 130% text) shows "100 coins".
   - Android assemble and lint left to CI.
 - Next: C2 battle rewards.
+
+## 2026-10-10 — CLAUDE-006 C2: battle rewards (Claude)
+- Branch: `claude/zbattle-c2-rewards` (stacked on C1). Items: EXT-022, EXT-013 quantities.
+- Decision basis: D-ECONOMY-XP, D-REPLAY-RATE, D-LOCATION-TICKET, D-PARTY-XP (batch 2) and Q9.
+- Changes:
+  - `core/.../battle/Replay.kt`: `ReplayRewards` (inactive tables) is replaced by `BattleRewards`.
+    - First-win XP by kind: 20/40/80/120/150. First-win coins: 20/50/80/120/250.
+    - First-clear tickets: mini → Rare, stage → Epic, region → Legendary.
+    - Replay pays 25% (rounded down) of XP and coins, with no ticket.
+    - `dailyReplayCoinCap` is null, because Q-E4 was not answered.
+  - `RepeatSession` also sums coins.
+  - `Encounters.kt`: `kind` is now a constructor field. The shipped `area-00/slot-0` keeps 60 XP (`LEGACY_FIRST_WIN_XP`).
+  - `BattleProgress.settle`:
+    - XP is shared as before.
+    - Coins and the ticket go into the inventory as one transaction, `battle-<battleId>`, in the same state change.
+    - A full wallet or ticket stack is credited up to its cap, so settlement never fails.
+    - `BattleResult` records coins and the ticket.
+  - Codec v6 stores them; older results read as 0 coins and no ticket.
+  - Results screen shows coins, a "+1 … ticket · first clear" pill, and coins in the repeat summary.
+  - Battles won before C2 get no back-pay (the v1 golden test asserts it).
+- Tests:
+  - New `BattleRewardsTest` (4): tickets by kind and never on replay; 25% rounding (region 37/62, shipped 15/5) and the 7-XP split 2/2/3; wallet cap; one transaction per battle.
+  - Updated: `BattleProgressTest`, `ReplayTest`, `ContractMigrationFixtureTest` and the `LayoutRenderTest` repeat flow (3 replays = +45 XP, +15 coins).
+- Verification:
+  - `./gradlew -p preview test` (local mirror) → 114 tests, 0 failures.
+  - Render `26-replay-result` (360dp, 130% text) shows "+15 XP · +5 coins".
+  - No playable boss exists yet, so the ticket pill is unit-tested but not rendered.
+- Next: shop purchases.
+- CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
