@@ -1,6 +1,6 @@
 # CLAUDE-005 — Phase B: Core progression and auto battle
 Updated 2026-10-10 America/Toronto.
-Owner: Claude. Status: IN PROGRESS — B1 in review; B2–B5 blocked on decisions.
+Owner: Claude. Status: IN PROGRESS — B1 in review (#11); B2–B5 authorized by Zeus97x decision batch 1 (2026-10-10).
 Claim fields:
 - Implementation branch: `claude/zbattle-b1-auto-fight` (stacked on `claude/zbattle-phase-a-contract`, Phase A PR not yet merged)
 - Base commit: d24ade8
@@ -38,10 +38,10 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 | Step | Status | Notes |
 |---|---|---|
 | B1 auto-fight | REVIEW | Built on the proposed D-AUTO-FIGHT scope (foreground only, no items, stops on interruption). Zeus97x still has to confirm that scope. |
-| B2 party/switching | BLOCKED | D-PARTY: party size and switch turn cost |
-| B3 evolution | BLOCKED | D-EVOLUTION |
-| B4 campaign | BLOCKED | D-CAMPAIGN: stage counts, rosters, gates, difficulty |
-| B5 repeat battles | BLOCKED | D-REPLAY-REWARDS |
+| B2 party/switching | READY | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
+| B3 evolution | READY | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
+| B4 campaign | READY (proposal) | D-CAMPAIGN: proposal + inactive validated config only. |
+| B5 repeat battles | READY | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
 
 ### B1 implementation
 - `core/.../battle/AutoFight.kt`: `AutoFight.choose`, a pure, legal policy: Skill when ready, otherwise Attack. It never uses items and never retreats. `BattleProgress.autoStep(battleId, turn)` acts only while that battle is active and still on that turn.

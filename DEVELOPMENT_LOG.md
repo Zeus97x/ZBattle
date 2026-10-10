@@ -365,3 +365,16 @@ Remaining work:
   - 21 numbered questions mapped to the `ai/integration/DECISIONS.md` ids, each with an answer line
 - Verification: `python3 tools/check_doc_links.py` → OK. Docs only.
 - Next: wait for answers. Q4 unblocks B2.
+
+## 2026-10-10 — Decision batch 1 recorded (Claude)
+- Request: Zeus97x approved decisions Q2–Q21 and authorized the B2–B5 batch plus the requested proposals. Rules: record the decisions before coding; no merge, PR closing, deployment or release; write only the ZBattle repo.
+- Branch: `claude/zbattle-decisions-batch1`, stacked on `claude/zbattle-b1-auto-fight`.
+- Changes:
+  - `ai/integration/DECISIONS.md` rewritten with every decision, its consequence, and four new open items raised by implementation (D-PARTY-XP, D-SWITCH-COOLDOWN, D-EVOLUTION-THRESHOLDS, D-REPEAT-SESSION).
+  - `ai/README.md`: board updated.
+  - `ai/tasks/CLAUDE-005..010`: statuses updated.
+  - `ai/integration/ZPET-HANDOFF-A3.md`: Q3 ownership (ZPet Claude adopts) and the note that the bundle hash will change.
+  - `ai/proposals/README.md`: index of the coming proposals.
+  - `ai/PHASE-A-B1-SUMMARY-AND-QUESTIONS.md`: marked answered.
+- Verification: `python3 tools/check_doc_links.py`, `python3 tools/validate_contract.py`.
+- Next: contract amendments, then B2.

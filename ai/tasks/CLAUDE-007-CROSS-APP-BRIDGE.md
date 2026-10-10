@@ -28,3 +28,6 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 - **Blocked on decisions** ([DECISIONS.md](../integration/DECISIONS.md)): D-NATIVE-SPECIES and D-CONTRACT-ACCEPT (D1), D-ORIGIN-ROUNDING (D2), D-BACKEND (D3/D4), D-OFFLINE-TRUST (D5).
 - **Bounded scope:** D1 implements the BattleProgress v2 save with `companionId` (see `fixtures/migration/`) once D-CONTRACT-ACCEPT is met. D2 needs a ZPet bond producer (gap G4) and D-ORIGIN-ROUNDING. D3 is a read-only backend audit before any plan; no deployment.
 - **Contract impact:** implements rules R1–R12 server-side; `tools/validate_contract.py` sequences are the acceptance tests. See [CONTRACT-v0.2.md](../integration/CONTRACT-v0.2.md).
+
+## Decision batch 1 (Zeus97x, 2026-10-10)
+Decisions affecting this task are recorded in [DECISIONS.md](../integration/DECISIONS.md) (Q2–Q21). Proposed values stay inactive until approved. Status is unchanged: this task still waits on Phase B and on its own approvals.

@@ -1,32 +1,55 @@
-# Decision register — ZBattle × ZPet (Phase A, CLAUDE-004 / A3)
+# Decision register — ZBattle × ZPet
 
-Updated 2026-10-10 (America/Toronto). Every unresolved gameplay or architecture choice has an owner and lists the phase it blocks. Claude does not invent values for any of these. A recommendation is only a proposal backed by evidence. Status is **Open** unless stated.
+- Created: 2026-10-10 (America/Toronto) in Phase A (CLAUDE-004 / A3).
+- Updated: 2026-10-10 with **Zeus97x's decision batch 1**, which answers Q2–Q21 from [PHASE-A-B1-SUMMARY-AND-QUESTIONS.md](../PHASE-A-B1-SUMMARY-AND-QUESTIONS.md). The decisions are recorded here before any code that uses them.
+
+Claude does not invent values. Where a decision asks for a proposal, the proposal is a separate document. Its values stay **inactive** (configured but switched off) until Zeus97x approves them.
+
+| Status | Meaning |
+|---|---|
+| **Decided** | Approved by Zeus97x; may be implemented. |
+| **Decided — proposal requested** | Direction approved; values must come back for approval. |
+| **Decided — gated** | Approved, but blocked on content, art or cross-app delivery. |
+| **Open** | Not decided. |
 
 Owners:
-- **Zeus97x:** product owner, final say.
-- **ZPet owner:** the ZPet project's maintainer or assistant.
-- **ChatGPT:** design and art direction.
-- **Claude:** proposes from evidence.
+- **Zeus97x:** product owner.
+- **ZPet Claude:** the Claude session working in the ZPet repository.
+- **ChatGPT:** design and artwork.
+- **Claude:** this ZBattle session.
 
-| ID | Question | Evidence / options | Recommendation (proposal) | Owner | Blocks |
-|---|---|---|---|---|---|
-| D-RARITY | Map ZPet rarities to ticket tiers? | ZPet: Common/Heroic/Mythic/Celestial (`SpeciesCatalog`). Roadmap: Common/Rare/Epic/Legendary. | 1:1 by index, keeping ZPet ids (`family:rarity`) | Zeus97x + ZPet owner | C2, C3, ZCubes |
-| D-NATIVE-SPECIES | Which `speciesId` does a ZBattle-native creature get? | ZBattle stores form names only; every ZBattle-owned creature today is a starter | `family:0` (Common), as in the migration fixture | Zeus97x + ZPet owner | D1 |
-| D-ELEMENT | Element system | Neither app has element data; both use `family % 3` advantage | Keep the current advantage until element metadata is approved; `elementId` stays null | Zeus97x + ChatGPT | F, G2, (D2 if elements change stats) |
-| D-ORIGIN-ROUNDING | Origin bonus rounding, and does 0% bond still give +10%? | v0.1 formula gives 1.10 at 0% bond | Integer basis points with floor per stat (v0.2 §1 G6); confirm the 0%-bond base | Zeus97x | D2 |
-| D-EVOLUTION | Independent ZBattle evolution? Correction policy when a source form must go down? | ZPet owns imported forms (quests + level); ZBattle has no evolution | No independent evolution for imported companions; native companions TBD. Form corrections only by an explicit ZPet-issued correction flag in a future revision | Zeus97x + ZPet owner | B3, D |
-| D-PARTICIPATION | Do losses, retreats or practice battles earn expedition credit? | Contract R12 currently counts non-practice victories only | Victories only, until approved | Zeus97x | E1 |
-| D-BACKEND | Reuse ZPet's Supabase project for ZBattle accounts and events, or use a separate one? Guest → account linking? | ZPet: Supabase Auth plus service-only `zpet_dispatch`; ZBattle has no network code | Read-only audit first (D3), then a plan for approval. No deployment. | Zeus97x | D3–D5 |
-| D-OFFLINE-TRUST | What may an offline/unverified result unlock? | Steps and local battles are client-reported (flagged, not verified) | Show unverified results as pending; only server-settled results transfer | Zeus97x | D5, C timers |
-| D-WEEK-WINDOW | Mystical boss limit: anchored 168-hour window or trailing 7 days? | Roadmap notes the two readings conflict | Anchored 168h per boss (needs no timestamp ledger) | Zeus97x | C4 |
-| D-CAMPAIGN | Stage counts, rosters per area, gates, difficulty curve | One real encounter today; ZPet rule: area family, boss every 10th | Needs approved content; Claude will not invent it | Zeus97x + ChatGPT | B4 |
-| D-REPLAY-REWARDS | XP/coins/tickets for replays | Rematches currently pay 0 XP | Decide before auto/repeat battles | Zeus97x | B5, C2 |
-| D-AUTO-FIGHT | Auto-fight scope (foreground only? item use?) | Roadmap proposes foreground only, no item use, stop on interruption | As proposed. **Built provisionally in B1** (`claude/zbattle-b1-auto-fight`); confirm or change. | Zeus97x | B1 (merge) |
-| D-PARTY | Party size and switch turn cost | Contract allows up to 6 participants | Pending | Zeus97x | B2 |
-| D-ECONOMY | Coins, prices, ticket repeatability and quantities | Coins fixed at 0; no shop pricing | Pending | Zeus97x | C1, C2 |
-| D-EXCLUSIVE-POOL | Mystical exclusive ZPet/item pools | Empty; must not substitute ordinary rewards | Keep mystical encounters unavailable until defined | Zeus97x + ChatGPT | C5 |
-| D-EXPEDITION | Durations, acceleration, 50% cap, walking credit | Illustrative only in roadmap | Pending; ZPet-owned configuration | ZPet owner + Zeus97x | E |
-| D-ZCUBES | Catch odds, tiers, prices, acquisition | ZPet catch chances 80/65/50/35 by rarity, plus pity; proposals in `ai/ZCUBES_PLAN.md` | Pending | Zeus97x + ChatGPT | catching task |
-| D-ADV-COMBAT | Duo activation, Last Stand, weather, rivalry values | Deferred; none implemented | Pending | Zeus97x | F |
-| D-LEGACY | Legacy eligibility, lineage, emblems | ZPet-owned; no data exists | Pending | ZPet owner + ChatGPT | G |
-| D-CONTRACT-ACCEPT | Accept contract v0.2 as the shared baseline | This PR; the ZPet copy must match the bundle hash | Review fixtures, then mirror them in ZPet | Zeus97x + ZPet owner | Phase A gate → B |
+## Decided (batch 1, 2026-10-10)
+
+| ID | Q | Decision (Zeus97x) | Implementation consequence | Blocks / used by |
+|---|---|---|---|---|
+| D-AUTO-FIGHT | Q2 | Foreground only, no automatic items, stops on interruption. Keep the Stop control. | B1 as built (PR #11) stands. | B1 ✔ |
+| D-CONTRACT-ACCEPT | Q3 | ZPet Claude owns adoption. It reviews v0.2 against ZPet's real saves, copies schemas/fixtures unchanged, verifies the full bundle hash and supplies a real migration fixture. Incompatibilities are reported **before** acceptance. Neither copy is silently altered. | Claude (ZBattle) updates the handoff and does not write to ZPet. A contract change made here gets a new hash and is announced in the handoff. | Phase A gate |
+| D-PARTY | Q4 | Party of **3**, one active creature. Switching **consumes the player's turn**: the enemy takes its normal turn, with no extra free hit. Replacing a **fainted** creature does **not** consume a turn. | B2 | B2 |
+| D-EVOLUTION | Q5 | Both games support evolution. Identity, rarity, branch, nickname and progress are preserved. ZBattle owns combat XP; ZPet owns walking/care progress. Shared evolution needs **validated unlock events** and never downgrades on an ordinary stale snapshot. Founder Stage 4 unlocks through **either** game's challenge, not both. Until cross-app delivery exists, imported forms are preserved and nothing pretends to synchronize. | B3 builds the identity model, the monotonic form guard and the unlock-event ledger. Thresholds stay inactive (see D-EVOLUTION-THRESHOLDS). | B3, D |
+| D-CAMPAIGN | Q6 | Prepare a campaign **proposal** from existing catalogue creatures and exact region/location ids: stage counts, bosses, unlocks, difficulty. Do not invent creatures or finalize content. | B4: proposal document plus an inactive, validated config. Runtime stays on approved encounters only. | B4 |
+| D-REPLAY-REWARDS | Q7 | Repeat victories earn **reduced** XP/coins and **no** repeat first-clear tickets. Each separate encounter starts at full HP; reopening an active battle keeps its saved HP. Replay quantities need approval. Tracking and duplicate-safe settlement come first. | B5: replay tracking, settlement ledger and repeat sessions. Replay quantities are configured but inactive (pay 0) until approved. | B5, C2 |
+| D-RARITY | Q8 | ZPet Common/Heroic/Mythic/Celestial = ZBattle Common/Rare/Epic/Legendary. The canonical ids stay as they are (`family:rarity`, rarity 0–3). | Display mapping only; no id changes. Contract §1 G2 notes it. | C2, C3, ZCubes |
+| D-ECONOMY | Q9 | Prepare an economy **proposal**: battle rewards, replay reductions, shop prices, consumables. Keep the one-ticket first-clear boss rewards (mini-boss → 1 Rare, stage boss → 1 Epic, region boss → 1 Legendary). Other quantities need approval. | Proposal document; ticket rule recorded. | C1, C2 |
+| D-WEEK-WINDOW | Q10 | Each mystical boss has its own fixed **168-hour cycle starting at its first victory**, capped at **15 wins**, plus a **4-hour cooldown** after each victory. The first victory after a cycle expires anchors the next cycle. Unused wins don't carry over. | C4 | C4 |
+| D-EXCLUSIVE-POOL | Q11 | Exclusive designs are with ChatGPT. Exclusive rewards stay gated until catalogue ids, eligibility rules and approved runtime art are supplied. Founder availability never becomes a mystical drop automatically. | C5 stays unavailable. | C5 |
+| D-BACKEND | Q12 | Audit the existing backend **read-only** and recommend how both apps use accounts and shared records. No deployment and no new backend resources. | Audit document. | D3–D5 |
+| D-OFFLINE-TRUST | Q13 | Offline play keeps local progress. Cross-app rewards and progression stay **pending** until the approved delivery authority validates them. A server receiving a phone report is **not** verification by itself; the actual validation must be documented. | Contract `verification` semantics; backend audit lists the real validation. | D5, C timers |
+| D-NATIVE-SPECIES | Q14 | Native starters use the existing **Common** family species (`family:0`), once the catalogue mappings are validated. Species stays separate from the instance UUID and the evolution form. | B3 identity model; already in the migration fixture. | D1 |
+| D-ORIGIN-ROUNDING | Q15 | A **verified** ZPet-origin companion gets +10% even at 0% bond. Bonus % = `10 + 2.5 × floor(bondPercent / 25)`, capped at 20. It applies once to unmodified derived stats, the final stat is rounded down, and it never compounds on re-import. **Unknown bond = 0%** (the bonus is kept, not removed). | Contract §1 G4/G6 amended (v0.2 draft, new bundle hash). | D2 |
+| D-PARTICIPATION | Q16 | Expedition battle acceleration needs a qualifying **victory** and actual **participation** by that companion. Losses, retreats and rewardless practice are excluded. Battle events are deduplicated. | Contract R12 confirmed. B2 keeps a participant ledger. | E1 |
+| D-EXPEDITION | Q17 | Prepare a recommended design as a separate decision document; values stay configurable and inactive. | Proposal document. | E |
+| D-ELEMENT | Q18 | Prepare a recommended design as a separate decision document. The existing family advantage stays operational until elements are approved. | Proposal document; `elementId` stays null. | F, G2 |
+| D-ZCUBES | Q19 | Prepare a recommended catching design as a separate decision document; inactive until approved. | Proposal document. | catching task |
+| D-ADV-COMBAT | Q20 | Prepare a recommended advanced-combat design as a separate decision document; inactive until approved. | Proposal document. | F |
+| D-LEGACY | Q21 | Legacy requires **two fully bonded companions** and a **chosen successor**. Lineage and generation history are preserved. Prestige is cosmetic, with no combat bonus beyond the 20% bond cap. Detailed successor rules and artwork are pending. | Recorded. Lineage schema already forbids combat fields. | G |
+
+## Still open (raised while implementing batch 1)
+
+| ID | Question | Proposal | Owner | Blocks |
+|---|---|---|---|---|
+| D-PARTY-XP | How is first-win/replay XP shared among up to 3 participants? | Split evenly among participants (round down; remainder to the creature that landed the final hit). Total XP doesn't grow with party size. Implemented as a config switch. | Zeus97x | B2 (single-creature behaviour unchanged) |
+| D-SWITCH-COOLDOWN | Does each creature keep its own Skill cooldown across switches? | Per-creature cooldown that only counts down on turns that creature acts. | Zeus97x | B2 |
+| D-EVOLUTION-THRESHOLDS | Combat-XP thresholds and challenges per form, and Founder definitions | None; inactive until supplied | Zeus97x + ChatGPT + ZPet Claude | B3 activation |
+| D-REPEAT-SESSION | Maximum battles per repeat session | 10 (a UI bound, not a reward value) | Zeus97x | B5 |
+
+Proposal documents live in [../proposals/](../proposals/README.md).
