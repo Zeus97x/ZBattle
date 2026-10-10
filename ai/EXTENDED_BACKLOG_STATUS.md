@@ -84,3 +84,4 @@ Every item in phases C–G is runtime work in a phase that has not been approved
 - Shop purchases (D-SHOP): **Review** on `claude/zbattle-c-shop`. Cosmetics purchasable; consumables/equipment shown but gated until their PRs; ZCubes gated until catching.
 - Battle items (D-SHOP): **Review** on `claude/zbattle-c-items`. `rulesRevision` is now `zbattle-rules-3`; consumables can be bought and used.
 - Equipment slot (D-SHOP): **Review** on `claude/zbattle-c-equipment`. Charms are now purchasable and equippable between battles.
+- D-CURVE simulation: **Review** on `claude/zbattle-c-curve-sim` (`ai/proposals/CURVE-SIMULATION.md`). Recommends multiplicative boss scaling (candidate B); awaiting approval before EXT-017/018 activation.

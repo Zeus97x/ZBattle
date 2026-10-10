@@ -11,3 +11,4 @@ Zeus97x's decision batch 1 (2026-10-10, see [DECISIONS.md](../integration/DECISI
 | [ELEMENTS-PROPOSAL.md](ELEMENTS-PROPOSAL.md) | D-ELEMENT (Q18) | Proposal, inactive; family advantage stays as is |
 | [CATCHING-PROPOSAL.md](CATCHING-PROPOSAL.md) | D-ZCUBES (Q19) | Proposal, inactive; builds on ZCUBES_PLAN.md |
 | [ADVANCED-COMBAT-PROPOSAL.md](ADVANCED-COMBAT-PROPOSAL.md) | D-ADV-COMBAT (Q20) | Proposal, inactive; every mechanic behind its own flag |
+- [CURVE-SIMULATION.md](CURVE-SIMULATION.md): D-CURVE real-engine simulation of the approved campaign; recommends multiplicative boss scaling (awaiting approval).

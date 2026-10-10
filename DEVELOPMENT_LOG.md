@@ -658,3 +658,25 @@ Remaining work:
   - The render shows HP 62 (52 + Heart Charm 10). The charm controls are below the visible part of the sheet in the harness.
 - Rules: no `rulesRevision` change. Engine rules are unchanged; stats include the item.
 - Next: D-CURVE simulation with the real engine (party of 3, switching, items, equipment).
+
+## 2026-10-10 — D-CURVE: real-engine campaign simulation (Claude)
+- Branch: `claude/zbattle-c-curve-sim` (stacked on the equipment branch). Decision basis: D-CURVE (batch 2).
+- Changes:
+  - Test-only `core/src/test/.../battle/CurveSimulation.kt` and `CurveSimulationTest.kt`.
+    - Plays the approved 300-encounter layout through the real `BattleEngine` (rules 3) with all 84 Baby-form trios.
+    - The party is on curve (split XP).
+    - Three styles: auto; Potions + switching + Fang Charm I; and the same with Fang Charm II.
+    - `writeReport` writes `core/build/curve-simulation.md`. `ZBATTLE_CURVE_SEARCH=1|2|3` runs the flat-scale grid, the per-kind flat search and the multiplicative search.
+  - Proposal `ai/proposals/CURVE-SIMULATION.md`, also indexed in `ai/proposals/README.md`.
+- Findings:
+  - The B4 stats are too easy: 100% everywhere, and bosses leave about as much HP as wilds.
+  - The wild ramp is well shaped (about 78% HP left in every group).
+  - Flat boss bonuses lose effect as stats grow and cause 0–100% swings between groups.
+  - Multiplicative boss scaling keeps the challenge even. Candidate B is recommended: bosses ×(HP %, power+guard %) of 200/110, 250/110, 300/110, 350/110. On auto that leaves about 53/42/33/25% HP, against 78% for wilds.
+  - The final region boss is a wall at the level-50 cap.
+- Not simulated: evolution (D-EVOLUTION-THRESHOLDS is open). Every result is the Baby-form worst case and must be re-run once thresholds exist.
+- Verification:
+  - `./gradlew -p preview test` (local mirror) → 131 tests, 0 failures; `writeReport` takes about 3 s.
+  - Doc links OK.
+- Blocked: campaign runtime activation (EXT-017/018) waits for approval of the opponent stat rule (questions 1–2 in CURVE-SIMULATION.md).
+- Next: ticket rolls (C3).
