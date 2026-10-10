@@ -1,5 +1,7 @@
 package com.zeus97x.zbattle.core.battle
 
+import com.zeus97x.zbattle.core.economy.StatBonus
+
 import com.zeus97x.zbattle.core.Creature
 import com.zeus97x.zbattle.core.FormStage
 
@@ -12,7 +14,11 @@ import com.zeus97x.zbattle.core.FormStage
  * ZPet grows stats through step-funded training; ZBattle has no training yet, so it adds a small
  * per-level growth instead (documented, easy to rebalance). ZBattle progress never writes to ZPet.
  */
-data class StatBlock(val maxHp: Int, val power: Int, val guard: Int, val speed: Int)
+data class StatBlock(val maxHp: Int, val power: Int, val guard: Int, val speed: Int) {
+    /** Adds an equipment bonus (CLAUDE-006, ECONOMY §7.2: flat, applied once). */
+    operator fun plus(bonus: StatBonus?): StatBlock =
+        if (bonus == null) this else StatBlock(maxHp + bonus.maxHp, power + bonus.power, guard + bonus.guard, speed + bonus.speed)
+}
 
 object Leveling {
     const val MAX_LEVEL = 50

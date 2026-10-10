@@ -114,6 +114,12 @@ class LayoutRenderTest {
         q
     })
 
+    /** CLAUDE-006 equipment: Cindlet wearing a Heart Charm with a Fang Charm in the bag. */
+    private val charmed = richSettings.let { s ->
+        val bag = s.progress.inventory.applyOrThrow(Transaction("render-charms", mapOf("heart-charm-1" to 1L, "fang-charm-1" to 1L)))
+        s.copy(progress = s.progress.copy(inventory = bag).let { it.equip(it.lead!!.uid, "heart-charm-1") })
+    }
+
     /** CLAUDE-005 B2: three owned creatures (all with created art). */
     private val trio = sliceArea.copy(progress = sliceArea.progress.let {
         it.copy(creatures = it.creatures + OwnedCreature(it.nextUid, "sparklit", 120) + OwnedCreature(it.nextUid + 1, "inkling", 40), nextUid = it.nextUid + 2)
@@ -135,6 +141,7 @@ class LayoutRenderTest {
         Triple("24-party-result", battleNav, trioWon),
         Triple("25-party-detail", NavState(listOf(Route.Home), Overlay.CreatureDetail("inkling")), trio),
         Triple("26-replay-result", battleNav, afterReplay),
+        Triple("28-owned-detail-charm", NavState(listOf(Route.Home), Overlay.CreatureDetail("cindlet")), charmed),
     )
 
     @Test
