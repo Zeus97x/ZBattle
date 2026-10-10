@@ -59,9 +59,8 @@ fun rememberArt(key: ArtKey): ImageBitmap? {
     val candidates = remember(key) { ArtCatalog.candidates(key) }
     val initial = remember(key, loader) { candidates.firstNotNullOfOrNull(loader::cached) }
     val image by produceState(initial, key, loader) {
-        if (value == null && candidates.isNotEmpty()) {
-            value = withContext(Dispatchers.IO) { candidates.firstNotNullOfOrNull(loader::load) }
-        }
+        // Assigned at the top level of the producer (Compose lint ProduceStateDoesNotAssignValue).
+        value = value ?: withContext(Dispatchers.IO) { candidates.firstNotNullOfOrNull(loader::load) }
     }
     return image
 }
