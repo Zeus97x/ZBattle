@@ -80,3 +80,4 @@ Every item in phases C–G is runtime work in a phase that has not been approved
 - The existing quick simulation (`campaign_proposal.py --simulate --party 3`, best single member) still shows bosses that are too easy, so D-CURVE needs the real-engine party simulation before stats are final.
 - Next: C1 inventory and ledger.
 - EXT-021 (C1 inventory ledger): **Review** on `claude/zbattle-c1-inventory`.
+- EXT-022 (C2 first-clear/replay rewards): **Review** on `claude/zbattle-c2-rewards`. Tickets are paid by kind; no boss is playable until the campaign runtime is active.

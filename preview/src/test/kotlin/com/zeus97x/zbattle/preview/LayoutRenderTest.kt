@@ -160,7 +160,9 @@ class LayoutRenderTest {
         assertEquals(3, r.wins)
         assertEquals(false, state.autoFight)
         assertEquals(4, store.load().progress.wins[encounter.id], "1 first clear + 3 replays")
-        assertEquals(xpBefore, store.load().progress.lead!!.xp, "replays pay 0 until quantities are approved")
+        assertEquals(xpBefore + 3 * 15, store.load().progress.lead!!.xp, "three replays at 25% of 60 XP")
+        assertEquals(15L * 3, r.xp)
+        assertEquals(5L * 3, r.coins)
 
         state.finishBattle()
         assertEquals(null, state.repeat)

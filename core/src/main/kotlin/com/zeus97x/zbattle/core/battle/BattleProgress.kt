@@ -3,6 +3,8 @@ package com.zeus97x.zbattle.core.battle
 import com.zeus97x.zbattle.core.Area
 import com.zeus97x.zbattle.core.CreatureCatalog
 import com.zeus97x.zbattle.core.economy.Inventory
+import com.zeus97x.zbattle.core.economy.ItemCatalog
+import com.zeus97x.zbattle.core.economy.Transaction
 
 /**
  * A creature the player owns in ZBattle. Separate from ZPet; never written back.
@@ -62,6 +64,10 @@ data class BattleResult(
     val firstVictory: Boolean,
     /** One entry per participant (D-PARTICIPATION); empty when nothing was paid or nobody acted. */
     val gains: List<XpGain> = emptyList(),
+    /** Coins credited (C2); never more than the wallet cap allowed. */
+    val coins: Long = 0,
+    /** Ticket item id granted for a first clear (C2), or null. */
+    val ticket: String? = null,
 ) {
     val xpGained: Long get() = gains.sumOf { it.xp }
     /** A victory over an encounter that was already cleared (pays replay rewards, never a first-clear ticket). */
@@ -199,11 +205,22 @@ data class BattleProgress(
         check(finished.battleId > settledThrough) { "Battle already settled" }
         val encounter = Encounters.byId(finished.encounterId)
         val firstVictory = outcome == Outcome.Victory && finished.encounterId !in defeated
-        val xp = when {
-            firstVictory -> encounter?.firstWinXp ?: 0
-            outcome == Outcome.Victory -> ReplayRewards.xpFor(encounter)
-            else -> 0
+        val payout = when {
+            encounter == null -> Payout.NONE
+            firstVictory -> BattleRewards.firstWin(encounter)
+            outcome == Outcome.Victory -> BattleRewards.replay(encounter)
+            else -> Payout.NONE
         }
+        val xp = payout.xp
+        // Coins and tickets go to the inventory in the same state change, under the battle's id.
+        // A full wallet or ticket stack is credited up to its cap rather than failing the settlement.
+        val coins = minOf(payout.coins, ItemCatalog.COIN_CAP - inventory.coins)
+        val ticket = payout.ticketItemId?.takeIf { inventory[it] < ItemCatalog.require(it).cap }
+        val deltas = buildMap {
+            if (coins > 0) put(ItemCatalog.COINS, coins)
+            if (ticket != null) put(ticket, 1L)
+        }
+        val paid = if (deltas.isEmpty()) inventory else inventory.applyOrThrow(Transaction("battle-${finished.battleId}", deltas))
         // Only creatures that actually fought share the reward, in party order (D-PARTICIPATION).
         val participants = finished.team.map { it.uid }.filter { it in finished.participants && owned(it) != null }
         val shares = PartyXp.share(xp, participants, finished.playerUid)
@@ -218,7 +235,8 @@ data class BattleProgress(
             wins = if (outcome == Outcome.Victory) wins + (finished.encounterId to (wins[finished.encounterId] ?: 0) + 1) else wins,
             active = null,
             settledThrough = finished.battleId,
-            lastResult = BattleResult(finished.battleId, finished.encounterId, outcome, firstVictory, gains),
+            lastResult = BattleResult(finished.battleId, finished.encounterId, outcome, firstVictory, gains, coins, ticket),
+            inventory = paid,
         )
     }
 }

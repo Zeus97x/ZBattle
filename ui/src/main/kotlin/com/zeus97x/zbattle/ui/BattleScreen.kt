@@ -74,6 +74,7 @@ import com.zeus97x.zbattle.core.battle.Outcome
 import com.zeus97x.zbattle.core.battle.RepeatEnd
 import com.zeus97x.zbattle.core.battle.RepeatSession
 import com.zeus97x.zbattle.core.battle.description
+import com.zeus97x.zbattle.core.economy.ItemCatalog
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -293,10 +294,10 @@ private fun ResultPanel(state: AppState, result: BattleResult) {
         Outcome.Defeat -> "Defeated"
         Outcome.Retreat -> "Retreated"
     }
+    val coins = if (result.coins > 0) " · +${formatCoins(result.coins)} coins" else ""
     val detail = when {
-        result.outcome == Outcome.Victory && result.firstVictory -> "+${result.xpGained} XP shared by the creatures that fought"
-        result.replay && result.xpGained > 0 -> "Rematch won · +${result.xpGained} replay XP"
-        result.outcome == Outcome.Victory -> "Rematch won · replay rewards are reduced and still awaiting approval, so this one pays 0 XP."
+        result.outcome == Outcome.Victory && result.firstVictory -> "+${result.xpGained} XP shared by the creatures that fought$coins"
+        result.replay -> "Rematch won · replays pay a quarter: +${result.xpGained} XP$coins"
         result.outcome == Outcome.Defeat -> "No rewards. Your companion recovers fully after each battle."
         else -> "No rewards."
     }
@@ -308,6 +309,9 @@ private fun ResultPanel(state: AppState, result: BattleResult) {
         Icon(Icons.Filled.EmojiEvents, contentDescription = null, tint = if (result.outcome == Outcome.Victory) p.accent else p.textSecondary, modifier = Modifier.size(64.dp))
         Text(title, style = MaterialTheme.typography.headlineMedium, color = p.textPrimary)
         Text(detail, style = MaterialTheme.typography.bodyLarge, color = p.textSecondary)
+        result.ticket?.let { ItemCatalog.get(it) }?.let { ticket ->
+            Pill("+1 ${ticket.name} · first clear", container = p.accentDark, content = p.onAccent, icon = Icons.Filled.EmojiEvents)
+        }
         val shown = result.gains.mapNotNull { g -> state.settings.progress.owned(g.uid)?.let { it to g } }
             .ifEmpty { state.settings.ownedParty.take(1).map { it to null } }
         shown.forEach { (owned, gain) ->
@@ -354,7 +358,7 @@ private fun RepeatSummary(r: RepeatSession) {
     ZCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(Dimens.cardPadding), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text("Repeat session", style = MaterialTheme.typography.titleMedium, color = p.textPrimary)
-            Text("${r.played} of ${r.target} battles · ${r.wins} won · +${r.xp} XP", style = MaterialTheme.typography.bodyLarge, color = p.textPrimary)
+            Text("${r.played} of ${r.target} battles · ${r.wins} won · +${r.xp} XP · +${formatCoins(r.coins)} coins", style = MaterialTheme.typography.bodyLarge, color = p.textPrimary)
             Text(
                 when (r.end) {
                     RepeatEnd.Completed -> "Finished."

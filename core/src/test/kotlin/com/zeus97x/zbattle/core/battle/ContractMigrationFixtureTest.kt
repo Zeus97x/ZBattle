@@ -31,7 +31,9 @@ class ContractMigrationFixtureTest {
         assertEquals(1, java.util.Base64.getDecoder().decode(raw).let { it[3].toInt() }, "golden stays a v1 save")
         // The app applies withStarter on every load (AppState), which grants the C1 starter kit once.
         val migrated = BattleProgressCodec.decode(raw).withStarter("cindlet")
-        assertEquals(sample(), migrated)
+        // Battles won before C2 existed are not paid coins retroactively (D-RETRO-TICKETS / no back-pay).
+        assertEquals(sample().copy(inventory = migrated.inventory), migrated)
+        assertEquals(com.zeus97x.zbattle.core.economy.Inventory().withStarterKit(), migrated.inventory)
         assertEquals(migrated, BattleProgressCodec.decode(BattleProgressCodec.encode(migrated)), "re-saved as v2 without loss")
     }
 

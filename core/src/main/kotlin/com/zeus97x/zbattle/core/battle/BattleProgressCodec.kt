@@ -2,6 +2,8 @@ package com.zeus97x.zbattle.core.battle
 
 import com.zeus97x.zbattle.core.CreatureCatalog
 import com.zeus97x.zbattle.core.economy.Inventory
+import com.zeus97x.zbattle.core.economy.ItemCatalog
+import com.zeus97x.zbattle.core.economy.ItemKind
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -25,9 +27,11 @@ import java.util.Base64
  *   (or below `nextBattleId` when idle) was already settled.
  * - v5 (CLAUDE-006 C1): inventory (balances, applied transaction ids, id sequence). Older saves read
  *   with an empty inventory; the starter kit is then granted once by [BattleProgress.withStarter].
+ * - v6 (CLAUDE-006 C2): the last result also records coins and the ticket paid. Older results read
+ *   as 0 coins and no ticket (nothing was paid then).
  */
 object BattleProgressCodec {
-    const val VERSION = 5
+    const val VERSION = 6
 
     fun encode(progress: BattleProgress): String {
         val bytes = ByteArrayOutputStream()
@@ -54,6 +58,7 @@ object BattleProgressCodec {
                 d.writeLong(r.battleId); d.writeUTF(r.encounterId); d.writeUTF(r.outcome.name); d.writeBoolean(r.firstVictory)
                 d.writeInt(r.gains.size)
                 r.gains.forEach { g -> d.writeLong(g.uid); d.writeLong(g.xp); d.writeInt(g.levelBefore); d.writeInt(g.levelAfter) }
+                d.writeLong(r.coins); d.writeUTF(r.ticket ?: "")
             }
             val ledger = progress.evolution
             d.writeInt(ledger.processed.size); ledger.processed.sorted().forEach(d::writeUTF)
@@ -91,8 +96,9 @@ object BattleProgressCodec {
             val party = if (version >= 2) List(count(d, BattleEngine.PARTY_SIZE)) { d.readLong() } else emptyList()
             val active = if (d.readBoolean()) (if (version >= 2) readBattle(d) else readBattleV1(d)) else null
             val last = if (!d.readBoolean()) null else if (version >= 2) {
-                BattleResult(d.readLong(), d.readUTF(), Outcome.valueOf(d.readUTF()), d.readBoolean(),
+                val r = BattleResult(d.readLong(), d.readUTF(), Outcome.valueOf(d.readUTF()), d.readBoolean(),
                     List(count(d, BattleEngine.PARTY_SIZE)) { XpGain(d.readLong(), d.readLong(), d.readInt(), d.readInt()) })
+                if (version >= 6) r.copy(coins = d.readLong(), ticket = d.readUTF().ifEmpty { null }) else r
             } else {
                 val battleId = d.readLong(); val encounterId = d.readUTF(); val outcome = Outcome.valueOf(d.readUTF())
                 val xp = d.readLong(); val before = d.readInt(); val after = d.readInt(); val first = d.readBoolean()
@@ -121,7 +127,8 @@ object BattleProgressCodec {
             if (wins.values.any { it < 0 }) throw IOException("Invalid wins")
             if (party.toSet().size != party.size || party.any { it !in uids }) throw IOException("Invalid party")
             if (active != null && (active.battleId >= nextBattleId || active.team.any { it.uid !in uids })) throw IOException("Invalid active battle")
-            if (last != null && last.gains.any { it.xp < 0 }) throw IOException("Invalid result")
+            if (last != null && (last.gains.any { it.xp < 0 } || last.coins < 0)) throw IOException("Invalid result")
+            if (last?.ticket != null && ItemCatalog.get(last.ticket)?.kind != ItemKind.Ticket) throw IOException("Invalid result ticket")
             val ids = creatures.mapNotNull { it.companionId }
             if (ids.toSet().size != ids.size) throw IOException("Duplicate companion ids")
             if (ledger.outbound.any { !it.validated || it.toForm !in 0..5 }) throw IOException("Invalid outbound unlock")
