@@ -34,7 +34,11 @@ import com.zeus97x.zbattle.core.PreviewContent
 import com.zeus97x.zbattle.core.RegionCatalog
 import com.zeus97x.zbattle.core.Route
 import com.zeus97x.zbattle.core.TravelRules
+import com.zeus97x.zbattle.core.battle.CompanionOrigin
 import com.zeus97x.zbattle.core.battle.Encounters
+import com.zeus97x.zbattle.core.battle.EvolutionRules
+import com.zeus97x.zbattle.core.battle.FormGraph
+import com.zeus97x.zbattle.core.battle.OwnedCreature
 import com.zeus97x.zbattle.core.battle.Skills
 
 /** Shows only catalogue facts; unknown stats are omitted rather than invented. */
@@ -70,6 +74,16 @@ fun CreatureDetailSheet(state: AppState, creatureId: String) {
                 Pill("Speed ${stats.speed}")
             }
             DetailLine("Skill", "${skill.name} · ${skill.effect.label}")
+            DetailLine("Species", "${creature.family.label} · ${OwnedCreature.RARITY_NAMES[owned.rarity]} (${owned.speciesId})")
+            DetailLine(
+                "Evolution",
+                when {
+                    owned.origin == CompanionOrigin.ZPet -> "Form managed by ZPet · kept as imported until cross-app delivery is live"
+                    EvolutionRules.availableCombatEvolutions(owned).isNotEmpty() -> "Ready to evolve"
+                    FormGraph.nextForms(owned.formIndex).isEmpty() -> "Final form"
+                    else -> "Requirements pending approval · identity, rarity, branch, nickname and XP are kept when it evolves"
+                },
+            )
             val progress = state.settings.progress
             val inParty = progress.inParty(owned.uid)
             val isLead = progress.lead?.uid == owned.uid

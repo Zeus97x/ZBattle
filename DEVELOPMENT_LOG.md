@@ -411,3 +411,22 @@ Remaining work:
   - New renders 21–25 checked by eye. Fixed: team strip wrapping at 130% text, stacked party buttons, and the stat pills on the detail sheet.
   - Android assemble and lint not run locally (dl.google.com is blocked); CI runs them on the PR.
 - Next: B3 evolution identity.
+
+## 2026-10-10 — CLAUDE-005 B3: evolution identity and unlock ledger (Claude)
+- Branch: `claude/zbattle-b3-evolution` (stacked on B2).
+- Decision basis: D-EVOLUTION (Q5), D-NATIVE-SPECIES (Q14) and D-RARITY (Q8). Thresholds and Founder definitions are pending, so no evolution can be triggered in-game yet.
+- Changed paths:
+  - `core/.../battle/Evolution.kt` (new)
+  - `core/.../battle/{BattleProgress,BattleProgressCodec}.kt`
+  - `ui/{AppState,Overlays}.kt`
+  - Tests: `core/src/test/.../battle/EvolutionTest.kt` and `preview/.../LayoutRenderTest.kt`
+- Save: codec v3, which reads v1, v2 and v3. Companion UUIDs are assigned once in `AppState` and saved during init, so a v2 save gets stable ids on its first launch.
+- Verification:
+  - `./gradlew -p preview test` → 91 tests, 0 failures.
+  - Detail-sheet render checked by eye.
+  - Android build not run locally; CI covers it.
+- Open:
+  - D-EVOLUTION-THRESHOLDS.
+  - Nickname editing UI.
+  - Delivery of outbound unlocks (Phase D).
+- Next: B4 campaign proposal.

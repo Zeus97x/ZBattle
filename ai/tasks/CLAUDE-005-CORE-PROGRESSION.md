@@ -39,7 +39,7 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 |---|---|---|
 | B1 auto-fight | REVIEW | Built on the proposed D-AUTO-FIGHT scope (foreground only, no items, stops on interruption). Zeus97x still has to confirm that scope. |
 | B2 party/switching | REVIEW | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
-| B3 evolution | READY | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
+| B3 evolution | REVIEW | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
 | B4 campaign | READY (proposal) | D-CAMPAIGN: proposal + inactive validated config only. |
 | B5 repeat battles | READY | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
 
@@ -78,3 +78,25 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
   - `LayoutRenderTest.partyFlowThroughAppState`.
   - Renders 21–25 at 412dp, 360dp and 360dp with 130% text.
   - Total: 81 tests, 0 failures (`./gradlew -p preview test`).
+
+### B3 implementation (branch `claude/zbattle-b3-evolution`)
+- **Identity:** `OwnedCreature` now carries:
+  - `companionId`, a UUID assigned once by `AppState` and saved immediately (`withCompanionIds`)
+  - `rarity`, the canonical id 0–3 with D-RARITY display names
+  - `nickname`, `origin` and `sourceRevision`
+  - derived `speciesId` (`family:rarity`), `formIndex` and `branch`
+
+  Species stays separate from the instance and the form (D-NATIVE-SPECIES: native starters are `family:0`).
+- **`core/.../battle/Evolution.kt`:**
+  - `FormGraph` (ZPet branches; once taken, a branch is kept).
+  - `applyUnlock` accepts only validated, new events and never downgrades. It rejects wrong-authority sources and enforces the challenge-gated stage-4 claim (one game only).
+  - ZBattle unlocks for imported companions are queued in `outbound` as pending delivery, not applied.
+  - `applyFormSnapshot` ignores stale or older revisions and never lowers a form.
+  - `EvolutionRules.combatLevelThresholds = null`: inactive until D-EVOLUTION-THRESHOLDS.
+- **Save v3:** identity fields and the evolution ledger. v1 and v2 saves migrate (no id until the app assigns one, rarity 0, ZBattle origin).
+- **UI:** the creature detail sheet shows species/rarity and evolution status. There is no evolve button while thresholds are inactive.
+- **Not built:**
+  - Nickname editing UI (the data is stored and preserved).
+  - Founder definitions and thresholds (pending).
+  - Cross-app delivery of `outbound` unlocks (Phase D).
+- **Tests:** `EvolutionTest` (9) and `LayoutRenderTest.companionIdsAreAssignedOnceAndPersisted`. Total 91 tests, 0 failures.
