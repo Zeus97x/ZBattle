@@ -261,3 +261,16 @@ Remaining work:
   - `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` given an update note, so ChatGPT does not read the old preview/no-art statements as current.
 - Housekeeping noted, not done: PR #3 (CLAUDE-002 docs, included in #5) and PR #4 (artwork, included in #6) are open but redundant; Zeus97x can close them.
 - Build: "Android UI foundation checks" was dispatched on `main` at the user's request and is not monitored by Claude. Result: see the Actions tab.
+
+## 2026-10-10 — Full A–G cross-app roadmap and Claude handoffs
+- Status: planning/docs complete in feature branch ai/chatgpt/cross-app-roadmap; gameplay and backend unchanged.
+- User asked to prepare all phases of the supplied universal coordination command, giving most implementation to Claude.
+- Read current main ai workspace, running log, actual BattleEngine/BattleProgress/Stats/Encounters and ZCube plan; read ZPet SpeciesCatalog/Progression/CloudClient/HANDOFF and code search read-only. ZBattle open-PR check found none; ZPet #2/#3 were active and remain untouched.
+- Actual baseline: CLAUDE-001/002/003 merged via #2/#5/#6; one real encounter, zero-XP practice rematches, scene assets integrated. No new build/device validation claimed.
+- Added ai/CROSS_APP_ROADMAP.md, ai/integration/CONTRACT-v0.1.md, ai/integration/ZPET-COUNTERPART-HANDOFF.md and ai/tasks/CLAUDE-004 through CLAUDE-010; updated ai/README.md including stale artwork integration bullets.
+- Each phase broken into isolated sub-PRs with paths, authority, prerequisites, acceptance and meaningful checks. Claude implements; ChatGPT exclusively creates artwork after approval; no automated Codex delegation.
+- Proposed contract keeps individual companion identity separate from species/form, once-only origin bonus, source-owned bond/evolution, independent battle XP, reward claim transactions and participation-only expedition events. No deployed API claim.
+- Open decisions recorded: rarity mapping, campaign content/replay rewards, independent battle evolution, rounding, guest migration/event verification, exclusive pools, expedition balancing and true rolling vs first-victory-anchored seven-day timers. Cross-device timer/reward guarantees require authoritative infrastructure, not client UUIDs.
+- Narrow battle-event delivery proposal supersedes old blanket no-reverse-writes only for approved expedition events; no full ZPet save writes.
+- Verification: docs reconciled with retrieved current source; all create/update responses inspected. Contract examples/schema implementation and executable checks assigned to Phase A; docs-only PR, no new app tests, artwork, deployment, merge or release.
+- Resume: Claude claims CLAUDE-004 against current main/planning branch, finalizes reviewed contract/fixtures and returns Phase A checkpoint before B. ZPet project publishes its own reviewed counterpart copy.
