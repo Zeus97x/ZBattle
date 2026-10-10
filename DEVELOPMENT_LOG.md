@@ -473,3 +473,52 @@ Remaining work:
 - The backend audit used repository files only; the live Supabase project was **not** inspected (OQ6). Nothing was deployed or created.
 - Paths: `ai/proposals/{BACKEND-AUDIT,EXPEDITION-PROPOSAL,ELEMENTS-PROPOSAL,CATCHING-PROPOSAL,ADVANCED-COMBAT-PROPOSAL,README}.md`, `ai/README.md`.
 - Verification: `python3 tools/check_doc_links.py` → OK. Docs only.
+
+## 2026-10-10 — Extended backlog (PR #9) reconciled against main (Claude)
+- Request: Zeus97x asked Claude to rebuild the working branch from main and start the PR #9 extended backlog (62 EXT items): skip completed work, claim tasks, keep small PRs, report at phase boundaries.
+- Branch: `ccr-79612a33-kjesjl`, rebuilt from `main` at `400d46b` (PRs #2–#18 merged; PR #8 confirmed merged at `a304c72`).
+- Changes:
+  - New `ai/EXTENDED_BACKLOG_STATUS.md`: each EXT item checked against source and docs. Phase A 7 Done / 1 Partial (EXT-005 lacks `accepted`/`acknowledged` inbox fixtures; held to avoid changing the bundle hash before ZPet review). Phase B 7 Done, 2 Partial, 2 Blocked, EXT-020 claimed. Phases C–G queued pending phase approval, with the inputs each needs.
+  - `ai/README.md` and `ai/tasks/CLAUDE-005-CORE-PROGRESSION.md`: B1–B5 and the proposals marked merged (they still read "Review"); Phase B is at its boundary.
+  - PR #9's own file is not copied or changed; the status file links to the PR.
+- Verification: `python3 tools/check_doc_links.py` → OK; `python3 tools/validate_contract.py` → OK (bundle `77d69eb17081` unchanged); `python3 tools/campaign_proposal.py` → OK. The Gradle preview suite could not resolve dependencies (Maven Central HTTP 429); docs-only change.
+- CI note: the workflow's last `main` run is on `d2f938d`; `400d46b` has not been run in CI.
+- Next: EXT-020 battle accessibility as its own PR, then stop at the Phase B boundary for approval.
+
+## 2026-10-10 — EXT-020: battle status accessibility (Claude)
+- Request: the first open item in the PR #9 queue within approved Phase B (CLAUDE-005). No rules or values change, and `RULES_REVISION` stays `zbattle-rules-2`.
+- Already present before this change: the enemy intent pill, the results screen, action buttons of at least 54dp, and renders at 360/412dp and 130% text.
+- Added:
+  - `core/.../battle/BattleEngine.kt`:
+    - `BattleState.skillStatus`: "Ready", or "Ready after N more turns"; it counts the creature's own attack turns, matching the per-creature cooldown.
+    - `BattleState.activeEffects`: Burn/Weaken with the turns left.
+    - `SkillEffect.description`, worded from `EFFECT_AMOUNT` and `EFFECT_TURNS`.
+  - `ui/BattleScreen.kt`:
+    - Opponent effect pills.
+    - A skill line that says when the Skill is ready and what its effect does.
+    - The Skill button's TalkBack state description.
+    - A polite live region on the battle log, so new turns are announced.
+    - HP panels merged into one screen-reader item.
+  - `core/src/test/.../battle/BattleStatusTextTest.kt`: the promised turn count equals the number of attacks the engine actually needs; effect pills count down one per turn and clear, for both Burn (Sparklit) and Weaken (Inkling); descriptions use the engine values.
+- Verification:
+  - `./gradlew -p preview test` → 102 tests, 0 failures (99 before, plus 3 in `BattleStatusTextTest`).
+  - Renders `05-battle` (360dp, 130% text) and `22-party-battle` (360dp) checked by eye: the effect pill fits and nothing overlaps.
+  - Doc-link, contract and campaign checks: OK.
+  - Maven Central returned HTTP 429 to this container, so Gradle was run with a scratchpad-only init script pointing at Google's Maven Central mirror. No repository build file changed.
+  - Android assemble, lint and TalkBack on a device were not run here; CI covers assemble and lint.
+- Next: Phase B boundary. Report to Zeus97x for approval; do not start Phase C runtime work until it is approved.
+
+## 2026-10-10 — Auto battle moved onto a long press of Attack (Claude)
+- Request: Zeus97x wants auto battle started by holding the Attack button instead of a separate button.
+- Changes (`ui/BattleScreen.kt`):
+  - The "Auto battle / Stop auto" button is removed.
+  - New `AttackButton`: tap = Attack. Long press = start auto battle, with haptic feedback.
+  - While auto runs, the button reads "Stop", and a tap ends auto without making a move. Tapping any other move still takes control and makes that move.
+  - It is a clickable surface (Material `Button` has no long-click). It keeps the 54dp minimum and has TalkBack labels for "Attack", "Stop auto battle" and the long-press action "Start auto battle".
+  - The battle screen shows "Tip: hold Attack to battle automatically." when auto is off.
+  - `AppState` auto-fight logic, foreground-only behaviour and repeat sessions are unchanged.
+  - Docs updated: `ai/tasks/CLAUDE-005-CORE-PROGRESSION.md` (B1 note) and `ai/proposals/ECONOMY-PROPOSAL.md` (stop wording).
+- Verification:
+  - `./gradlew -p preview test` (local mirror init script) → 102 tests, 0 failures.
+  - Renders `05-battle` (412dp) and `05c-battle-auto` (360dp, 130% text) checked by eye. "Auto · Stop" was cut off at 130% text, so the label became "Stop".
+  - Not verified: the long-press gesture and haptics on a device (the render harness cannot press and hold), plus Android assemble and lint (left to CI).

@@ -2,7 +2,9 @@ package com.zeus97x.zbattle.ui
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +28,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.DirectionsRun
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -35,6 +36,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -49,7 +51,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -64,6 +73,7 @@ import com.zeus97x.zbattle.core.battle.Encounters
 import com.zeus97x.zbattle.core.battle.Outcome
 import com.zeus97x.zbattle.core.battle.RepeatEnd
 import com.zeus97x.zbattle.core.battle.RepeatSession
+import com.zeus97x.zbattle.core.battle.description
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -143,15 +153,19 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                 Pill("Turn ${battle.turn + 1}", container = p.accentDark, content = p.onAccent, icon = Icons.Filled.Bolt)
                 Pill("Next: ${battle.enemyIntent}")
             }
+            battle.activeEffects.takeIf { it.isNotEmpty() }?.let { effects -> EffectStrip(battle.enemy.creature.name, effects) }
             state.repeat?.takeIf { it.running }?.let { r ->
                 Pill("Repeat ${r.played + 1} of ${r.target} · ${r.wins} won", container = p.accentDark, content = p.onAccent)
             }
             if (battle.team.size > 1) TeamStrip(battle)
             if (state.autoFight) {
-                Text("Auto battle on · tap any move to take control. No items are used.", style = MaterialTheme.typography.bodyMedium, color = p.accent)
+                Text("Auto battle on · tap Stop to end it, or any other move to take control. No items are used.", style = MaterialTheme.typography.bodyMedium, color = p.accent)
+            } else {
+                Text("Tip: hold Attack to battle automatically.", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary)
             }
             notice?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = p.accent) }
-            ZCard(Modifier.fillMaxWidth()) {
+            // Screen readers announce each new turn without the player having to find the log.
+            ZCard(Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     battle.log.takeLast(5).forEach { line ->
                         Text(line, style = MaterialTheme.typography.bodyMedium, color = if (line.startsWith("Turn ")) p.textSecondary else p.textPrimary)
@@ -159,7 +173,8 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
                 }
             }
             Text(
-                "${battle.skill.name} · ${battle.skill.effect.label} · ready every ${com.zeus97x.zbattle.core.battle.BattleEngine.SKILL_COOLDOWN + 1} turns",
+                "${battle.skill.name} · ${battle.skillStatus} · ${battle.skill.effect.label}: ${battle.skill.effect.description}. " +
+                    "Usable every ${com.zeus97x.zbattle.core.battle.BattleEngine.SKILL_COOLDOWN + 1} turns.",
                 style = MaterialTheme.typography.labelMedium,
                 color = p.textSecondary,
             )
@@ -194,28 +209,29 @@ private fun androidx.compose.foundation.layout.ColumnScope.ActiveBattle(state: A
             return@Column
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ActionButton("Attack", Icons.Filled.Bolt, Modifier.weight(1f), primary = true) {
-                notice = null
-                state.battleAction(BattleAction.Attack)
-            }
+            // Attack doubles as the auto-battle control: hold to start, tap while auto runs to stop.
+            AttackButton(
+                auto = state.autoFight,
+                modifier = Modifier.weight(1f),
+                onTap = {
+                    notice = null
+                    if (state.autoFight) state.stopAutoFight() else state.battleAction(BattleAction.Attack)
+                },
+                onHold = {
+                    notice = null
+                    state.startAutoFight()
+                },
+            )
             ActionButton(
                 if (battle.skillReady) "Skill" else "Skill (${battle.skillCooldown})",
                 Icons.Filled.AutoAwesome,
-                Modifier.weight(1f),
+                Modifier.weight(1f).semantics { stateDescription = battle.skillStatus },
                 primary = true,
                 enabled = battle.skillReady,
             ) {
                 notice = null
                 state.battleAction(BattleAction.Skill)
             }
-        }
-        ActionButton(
-            if (state.autoFight) "Stop auto" else "Auto battle",
-            if (state.autoFight) Icons.Filled.Stop else Icons.Filled.PlayArrow,
-            Modifier.fillMaxWidth(),
-        ) {
-            notice = null
-            if (state.autoFight) state.stopAutoFight() else state.startAutoFight()
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ActionButton("Switch", Icons.Filled.SwapHoriz, Modifier.weight(1f)) {
@@ -249,6 +265,19 @@ private fun TeamStrip(battle: BattleState) {
                 content = if (i == battle.activeIndex) p.onAccent else p.textPrimary,
             )
         }
+    }
+}
+
+/** Effects still running on the opponent, with turns left, so they are not only in the log. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun EffectStrip(enemyName: String, effects: List<String>) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.semantics(mergeDescendants = true) {},
+    ) {
+        effects.forEach { Pill("$enemyName · $it") }
     }
 }
 
@@ -356,7 +385,8 @@ private fun HealthPanel(c: Combatant, role: String) {
         else -> Color(0xFFE5484D)
     }
     Column(
-        Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xCC141720)).padding(horizontal = 10.dp, vertical = 8.dp),
+        Modifier.clip(RoundedCornerShape(14.dp)).background(Color(0xCC141720)).padding(horizontal = 10.dp, vertical = 8.dp)
+            .semantics(mergeDescendants = true) {},
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -373,6 +403,57 @@ private fun HealthPanel(c: Combatant, role: String) {
     }
 }
 
+/**
+ * Attack with auto-battle on long press. A Material Button has no long-click, so this is a
+ * clickable surface styled like [ActionButton]; TalkBack offers "Start auto battle" as its long-press action.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun AttackButton(auto: Boolean, modifier: Modifier, onTap: () -> Unit, onHold: () -> Unit) {
+    val p = Z.colors
+    val haptics = LocalHapticFeedback.current
+    Surface(
+        modifier = modifier
+            .heightIn(min = Dimens.primaryButtonHeight)
+            .clip(RoundedCornerShape(16.dp))
+            .combinedClickable(
+                role = Role.Button,
+                onClickLabel = if (auto) "Stop auto battle" else "Attack",
+                onClick = onTap,
+                onLongClickLabel = if (auto) null else "Start auto battle",
+                onLongClick = if (auto) null else {
+                    {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onHold()
+                    }
+                },
+            ),
+        shape = RoundedCornerShape(16.dp),
+        color = p.accentDark,
+        contentColor = p.onAccent,
+    ) {
+        Box(Modifier.padding(ButtonDefaults.ContentPadding), contentAlignment = Alignment.Center) {
+            ActionContent(if (auto) "Stop" else "Attack", if (auto) Icons.Filled.Stop else Icons.Filled.Bolt)
+        }
+    }
+}
+
+@Composable
+private fun ActionContent(text: String, icon: ImageVector) {
+    // Large font scales stack the icon above the label so words never break mid-word.
+    if (LocalDensity.current.fontScale > 1.15f) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+            Text(text, style = MaterialTheme.typography.titleMedium, maxLines = 1, softWrap = false)
+        }
+    } else {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+            Text("  $text", style = MaterialTheme.typography.titleMedium, maxLines = 1, softWrap = false)
+        }
+    }
+}
+
 @Composable
 private fun ActionButton(text: String, icon: ImageVector, modifier: Modifier, primary: Boolean = false, enabled: Boolean = true, onClick: () -> Unit) {
     val p = Z.colors
@@ -386,15 +467,6 @@ private fun ActionButton(text: String, icon: ImageVector, modifier: Modifier, pr
             contentColor = if (primary) p.onAccent else p.textPrimary,
         ),
     ) {
-        // Large font scales stack the icon above the label so words never break mid-word.
-        if (LocalDensity.current.fontScale > 1.15f) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
-                Text(text, style = MaterialTheme.typography.titleMedium, maxLines = 1, softWrap = false)
-            }
-        } else {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
-            Text("  $text", style = MaterialTheme.typography.titleMedium, maxLines = 1, softWrap = false)
-        }
+        ActionContent(text, icon)
     }
 }

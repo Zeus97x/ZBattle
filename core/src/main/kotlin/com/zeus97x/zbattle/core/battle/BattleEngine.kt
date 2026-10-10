@@ -69,6 +69,27 @@ data class BattleState(
 
     /** ZPet telegraph: every third turn the opponent lands a heavy strike. */
     val enemyIntent: String get() = if ((turn + 1) % 3 == 0) "Heavy strike incoming" else "Steady strike"
+
+    /** Skill readiness in plain words, so the cooldown number is never the only cue (EXT-020). */
+    val skillStatus: String get() = when (skillCooldown) {
+        0 -> "Ready"
+        1 -> "Ready after 1 more turn"
+        else -> "Ready after $skillCooldown more turns"
+    }
+
+    /** Effects still running on the opponent, with the turns left; empty when none (EXT-020). */
+    val activeEffects: List<String> get() = buildList {
+        if (burnTurns > 0) add("${SkillEffect.Burn.label} · ${turnsLeft(burnTurns)}")
+        if (weakenTurns > 0) add("${SkillEffect.Weaken.label} · ${turnsLeft(weakenTurns)}")
+    }
+
+    private fun turnsLeft(n: Int) = if (n == 1) "1 turn left" else "$n turns left"
+}
+
+/** What a Skill effect does, worded from the engine's own constants (EXT-020). */
+val SkillEffect.description: String get() = when (this) {
+    SkillEffect.Burn -> "${BattleEngine.EFFECT_AMOUNT} damage at the end of each of the next ${BattleEngine.EFFECT_TURNS} turns"
+    SkillEffect.Weaken -> "the opponent hits for ${BattleEngine.EFFECT_AMOUNT} less on its next ${BattleEngine.EFFECT_TURNS} strikes"
 }
 
 /**
