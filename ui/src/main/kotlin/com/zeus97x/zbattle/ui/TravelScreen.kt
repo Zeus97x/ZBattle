@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,8 +38,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -83,24 +85,28 @@ fun TravelScreen(state: AppState, focusGroup: Int) {
                 }
             }
             item {
+                Column(Modifier.padding(horizontal = Dimens.screenPadding)) {
+                    Text(group.tradition, style = MaterialTheme.typography.titleLarge, color = p.textPrimary)
+                    Text("Group ${group.index + 1} · ${group.rangeLabel}", style = MaterialTheme.typography.bodyMedium, color = p.textSecondary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+            }
+            item {
+                // The whole portrait map is shown (Contain) so no landmark is cropped; a dimmed
+                // cover-scaled copy fills the side bands behind it.
+                val mapKey = ArtKey.RegionMap(group)
+                val hasMap = rememberArt(mapKey) != null
                 Box(
                     Modifier
                         .padding(horizontal = Dimens.screenPadding)
                         .fillMaxWidth()
-                        .height(190.dp)
-                        .clip(RoundedCornerShape(Dimens.cardRadius)),
+                        .then(if (hasMap) Modifier.aspectRatio(0.9f) else Modifier.height(190.dp))
+                        .clip(RoundedCornerShape(Dimens.cardRadius))
+                        .background(DarkPalette.surface),
                 ) {
-                    ArtworkSlot(ArtKey.RegionMap(group), contentDescription = "${group.tradition} region map", modifier = Modifier.fillMaxSize(), placeholderLabel = "Region map art pending", placeholderAlignment = Alignment.TopCenter)
-                    Column(
-                        Modifier
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth()
-                            .background(Brush.verticalGradient(listOf(Color.Transparent, Color(0xD9141720))))
-                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp),
-                    ) {
-                        Text(group.tradition, style = MaterialTheme.typography.titleLarge, color = Color.White)
-                        Text("Group ${group.index + 1} · ${group.rangeLabel}", style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE6E3EA), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    if (hasMap) {
+                        ArtworkSlot(mapKey, contentDescription = null, modifier = Modifier.fillMaxSize().alpha(0.35f), contentScale = ContentScale.Crop)
                     }
+                    ArtworkSlot(mapKey, contentDescription = "${group.tradition} region map", modifier = Modifier.fillMaxSize(), placeholderLabel = "Region map art pending")
                 }
             }
             items(group.areas, key = { it.id }) { area ->
