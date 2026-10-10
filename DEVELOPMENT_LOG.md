@@ -109,3 +109,10 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Not adopted: PR #1's Camp/Adventure/Tasks/Master tabs (the newer `ai/UI_LAYOUT_SPEC.md` on main specifies Collection/Shop/Home/Events/Profile); its Java Views shell; `.github/ai/**` workspace (left in PR #1 for the user to merge separately).
 - Verification: `./gradlew -p preview test` — 28 tests passed; 47 renders inspected (setup at 360dp/412dp/1.3× font, Home, Profile, Edit Pet Master, Double Battle). `docs/screenshots/claude-001/` refreshed (27 images). Android compile not run (paused by user; also blocked locally).
 - Next step: on user approval, run the manual "Android UI foundation checks" workflow and fix anything it reports.
+
+## 2026-10-09 (evening) — Build approved; ChatGPT summary added
+- Status: build started on PR #2; result recorded in the next entry.
+- Request: user said "Push the build and put a file in the repo for ChatGPT to tell it what you did".
+- Changes: `.github/workflows/android-ui.yml` trigger restored to `pull_request` + `workflow_dispatch` (this push starts the first Android build); added `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` (what was built, where, how art plugs in, decisions, remaining work); linked from `ai/README.md`; task file updated.
+- Verification: documentation/workflow only in this commit; `./gradlew -p preview test` last passed on `c365642` (28 tests).
+- Next step: read the Actions run on PR #2 and fix any compile/lint failure.

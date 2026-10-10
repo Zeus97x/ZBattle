@@ -2,8 +2,8 @@ name: Android UI foundation checks
 
 # Validation only: builds a debug APK, runs lint/tests and renders layout screenshots.
 # Nothing is signed, released or published.
-# Manual-only: the user asked not to build the app yet (2026-10-09). Run it from the Actions tab when ready.
 on:
+  pull_request:
   workflow_dispatch:
 
 permissions:
