@@ -76,7 +76,7 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Branch head before this entry: `5cf73a3`. Verification: documentation only; no new checks run.
 - Next step: follow the handoff's "Not done" list starting with the Android manifest and MainActivity.
 
-## 2026-10-10 — CLAUDE-001 resumed: Android entry point, CI, layout fixes
+## 2026-10-09 (evening) — CLAUDE-001 resumed: Android entry point, CI, layout fixes
 - Status: implemented; Android compile pending CI on the PR (see next entry for results).
 - Request: user withdrew the ChatGPT handoff ("go back to where u left off and finish everything").
 - Changes:
