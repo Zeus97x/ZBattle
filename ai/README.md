@@ -5,9 +5,9 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 ## Current work
 | Task | Owner | Status | Scope |
 |---|---|---|---|
-| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Merged — PR #2 | Android UI foundation using existing ZPet assets and new-art placeholders |
-| [CLAUDE-002](tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md) | Claude | Merged — PR #5 | Battle vertical slice: stats, real battle engine, saved progress, Android bottom-inset fix, full-circle lightning nav, ZCubes planning; double battles deferred |
-| [CLAUDE-003](tasks/CLAUDE-003-ARTWORK-INTEGRATION.md) | Claude | Review — PR #6, CI green (branch claude/zbattle-artwork-integration) | Package and wire maps/hero scenery |
+| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Done — merged PR #2 | Android UI foundation using existing ZPet assets and new-art placeholders |
+| [CLAUDE-002](tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md) | Claude | Done — merged PR #5 | Battle vertical slice: stats, real battle engine, saved progress, Android bottom-inset fix, full-circle lightning nav, ZCubes planning; double battles deferred |
+| [CLAUDE-003](tasks/CLAUDE-003-ARTWORK-INTEGRATION.md) | Claude | Done — merged PR #6 (includes PR #4 artwork) | Package and wire maps/hero scenery |
 | Artwork phase 1 | ChatGPT | Reference board uploaded; standalone exports pending | Logo, app icon, splash |
 | Artwork phase 2 | ChatGPT | 12 maps uploaded; wired in app by CLAUDE-003 | Exact ZPet region groups |
 | Artwork phase 3 | ChatGPT | 48 primary landscapes wired by CLAUDE-003; 7 variants kept as alternatives | Exact ZPet locations |

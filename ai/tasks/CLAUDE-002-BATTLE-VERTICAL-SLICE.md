@@ -3,7 +3,7 @@
 Updated: 2026-10-09 America/Toronto  
 Repository: Zeus97x/ZBattle  
 Recommended owner: Claude  
-Status: REVIEW — implemented by Claude; PR #5 CI green (run 38013147094, head 5b12835). Not merged.  
+Status: DONE — merged in PR #5 (merge 7024d1a). Device confirmation of the nav-bar inset fix is still with Zeus97x.  
 Priority: High  
 Base branch: main  
 Suggested branch: claude/zbattle-battle-vertical-slice  

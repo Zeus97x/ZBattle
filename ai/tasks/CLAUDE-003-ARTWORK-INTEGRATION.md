@@ -1,6 +1,6 @@
 # CLAUDE-003 — Integrate the artwork drop
 
-Status: REVIEW — implemented by Claude; PR #6 CI green (run 38015181723, head 72f7008). Not merged. Owner: Claude.
+Status: DONE — merged in PR #6 (merge 08a59c3; it also carries ChatGPT's artwork drop from PR #4). Owner: Claude.
 
 ## Read first
 Read AGENTS.md, DEVELOPMENT_LOG.md, ai/UI_LAYOUT_SPEC.md, ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md, design/artwork/README.md and design/artwork/manifest.json. Check current main and open work; avoid overlapping the battle vertical-slice task. Claim this task with branch/base/status/time before editing.
