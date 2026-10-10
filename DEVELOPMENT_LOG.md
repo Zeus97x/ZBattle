@@ -355,3 +355,13 @@ Remaining work:
 - Open: Zeus97x must confirm D-AUTO-FIGHT before B1 merges. No PR was opened because the GitHub connector session errors.
 - Compare link: https://github.com/Zeus97x/ZBattle/compare/claude/zbattle-phase-a-contract...claude/zbattle-b1-auto-fight?expand=1
 - Next: B2 once D-PARTY is answered (party size and switch turn cost).
+
+## 2026-10-10 — Phase A + B1 summary and question list (Claude)
+- Request: Zeus97x asked for everything done in the phase, plus all open questions, in one .md file.
+- Added `ai/PHASE-A-B1-SUMMARY-AND-QUESTIONS.md`. It covers:
+  - the PRs (#10 Phase A, #11 B1)
+  - what A1, A2, A3 and B1 delivered
+  - which checks ran and which didn't
+  - 21 numbered questions mapped to the `ai/integration/DECISIONS.md` ids, each with an answer line
+- Verification: `python3 tools/check_doc_links.py` → OK. Docs only.
+- Next: wait for answers. Q4 unblocks B2.
