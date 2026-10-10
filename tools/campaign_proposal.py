@@ -116,7 +116,8 @@ def validate():
         errs.append("area-00/slot-0 must stay exactly the shipped encounter")
     # The shipped encounter in code must still match the legacy row.
     src = ENCOUNTERS.read_text()
-    if "forZPetRule(RegionCatalog.area(0), slot = 0, boss = false)" not in src or "if (boss) 200 else 60" not in src:
+    # C2 moved the shipped encounter's 60 XP into LEGACY_FIRST_WIN_XP (D-ECONOMY-XP keeps it at 60).
+    if "forZPetRule(RegionCatalog.area(0), slot = 0, boss = false)" not in src or "LEGACY_FIRST_WIN_XP = 60L" not in src:
         errs.append("Encounters.kt no longer ships the legacy area-00/slot-0 encounter this proposal assumes")
     if errs:
         print("CAMPAIGN PROPOSAL CHECK FAILED")

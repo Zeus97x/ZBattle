@@ -703,3 +703,4 @@ Remaining work:
   - Shop sheet render checked at 360dp.
   - `PrefsSettingsStore` (app module) was not compiled locally (dl.google.com is blocked); CI covers it.
 - Next: Phase C checkpoint. C4/C5 mystical bosses need the campaign runtime (D-CURVE-STATS approval) and D-EXCLUSIVE-POOL.
+- CI fix (same day): the C2 PR failed CI at `tools/campaign_proposal.py`, which looked for the literal `if (boss) 200 else 60` that C2 replaced with `LEGACY_FIRST_WIN_XP = 60L`. The Android build, lint and tests had passed. The validator now checks the new constant. Reproduced locally (CHECK FAILED), then OK after the fix. Merged forward into the stacked branches.
