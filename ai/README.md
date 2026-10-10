@@ -4,15 +4,15 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 
 ## Cross-app A–G queue
 
-[Full roadmap](CROSS_APP_ROADMAP.md) · [Contract v0.2 draft](integration/CONTRACT-v0.2.md) · [Decisions](integration/DECISIONS.md) · [ZPet A3 handoff](integration/ZPET-HANDOFF-A3.md) · [v0.1](integration/CONTRACT-v0.1.md) · [ZPet counterpart handoff](integration/ZPET-COUNTERPART-HANDOFF.md) · [Proposals](proposals/README.md) · [Phase A/B1 summary + questions](PHASE-A-B1-SUMMARY-AND-QUESTIONS.md)
+[Full roadmap](CROSS_APP_ROADMAP.md) · [Contract v0.2 draft](integration/CONTRACT-v0.2.md) · [Decisions](integration/DECISIONS.md) · [ZPet A3 handoff](integration/ZPET-HANDOFF-A3.md) · [v0.1](integration/CONTRACT-v0.1.md) · [ZPet counterpart handoff](integration/ZPET-COUNTERPART-HANDOFF.md) · [Proposals](proposals/README.md) · [Phase A/B1 summary + questions](PHASE-A-B1-SUMMARY-AND-QUESTIONS.md) · [Extended backlog status (EXT-001–062)](EXTENDED_BACKLOG_STATUS.md)
 
 Claude owns implementation-heavy work. ChatGPT owns design/artwork/coordination. Phase A is ready for documentation/fixture work; later phases wait on dependencies and unresolved decisions. Check in after every phase.
 
 | Phase | Task | Status |
 |---|---|---|
 | A | [CLAUDE-004](tasks/CLAUDE-004-CONTRACT-AUDIT.md) | Review: contract v0.2 + fixtures; awaiting Zeus97x and ZPet owner (D-CONTRACT-ACCEPT) |
-| B | [CLAUDE-005](tasks/CLAUDE-005-CORE-PROGRESSION.md) | In progress: B1 review (#11); B2–B5 authorized by decision batch 1 |
-| C | [CLAUDE-006](tasks/CLAUDE-006-BOSS-REWARDS.md) | Queued: decisions recorded (Q8–Q11); economy proposal pending approval |
+| B | [CLAUDE-005](tasks/CLAUDE-005-CORE-PROGRESSION.md) | B1–B5 merged (#11, #14–#17); at phase boundary. Open: EXT-020 accessibility; decisions D-PARTY-XP, D-SWITCH-COOLDOWN, D-REPEAT-SESSION, D-EVOLUTION-THRESHOLDS, D-CAMPAIGN approval |
+| C | [CLAUDE-006](tasks/CLAUDE-006-BOSS-REWARDS.md) | Queued: decisions recorded (Q8–Q11); economy proposal pending approval; needs phase approval |
 | D | [CLAUDE-007](tasks/CLAUDE-007-CROSS-APP-BRIDGE.md) | Queued: origin/bond/inbox |
 | E | [CLAUDE-008](tasks/CLAUDE-008-EXPEDITION-EVENTS.md) | Queued: expedition integration |
 | F | [CLAUDE-009](tasks/CLAUDE-009-ADVANCED-COMBAT.md) | Queued: advanced combat |
@@ -23,13 +23,13 @@ Decisions are in [DECISIONS.md](integration/DECISIONS.md). Each item is a small 
 
 | Item | Owner | Status |
 |---|---|---|
-| Decision record + task board | Claude | Review |
-| Contract v0.2 amendments (Q8, Q14, Q15, Q16) + new bundle hash + ZPet handoff (Q3) | Claude (ZBattle side); ZPet Claude adopts | Review; awaiting ZPet Claude adoption |
-| B2 party of 3 + switching | Claude | Review |
-| B3 evolution identity + unlock ledger (thresholds inactive) | Claude | Review |
-| B4 campaign proposal + inactive config | Claude | Review |
-| B5 replay tracking + settlement ledger + repeat sessions (quantities inactive) | Claude | Review |
-| Proposals: economy, backend audit, expedition, elements, catching, advanced combat | Claude | Review |
+| Decision record + task board | Claude | Merged #12 |
+| Contract v0.2 amendments (Q8, Q14, Q15, Q16) + new bundle hash + ZPet handoff (Q3) | Claude (ZBattle side); ZPet Claude adopts | Merged #13; awaiting ZPet Claude adoption |
+| B2 party of 3 + switching | Claude | Merged #14 |
+| B3 evolution identity + unlock ledger (thresholds inactive) | Claude | Merged #15 |
+| B4 campaign proposal + inactive config | Claude | Merged #16; proposal awaiting approval |
+| B5 replay tracking + settlement ledger + repeat sessions (quantities inactive) | Claude | Merged #17 |
+| Proposals: economy, backend audit, expedition, elements, catching, advanced combat | Claude | Merged #16, #18; proposals awaiting approval |
 
 ## Current work
 | Task | Owner | Status | Scope |

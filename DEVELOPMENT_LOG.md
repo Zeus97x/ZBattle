@@ -473,3 +473,14 @@ Remaining work:
 - The backend audit used repository files only; the live Supabase project was **not** inspected (OQ6). Nothing was deployed or created.
 - Paths: `ai/proposals/{BACKEND-AUDIT,EXPEDITION-PROPOSAL,ELEMENTS-PROPOSAL,CATCHING-PROPOSAL,ADVANCED-COMBAT-PROPOSAL,README}.md`, `ai/README.md`.
 - Verification: `python3 tools/check_doc_links.py` → OK. Docs only.
+
+## 2026-10-10 — Extended backlog (PR #9) reconciled against main (Claude)
+- Request: Zeus97x asked Claude to rebuild the working branch from main and start the PR #9 extended backlog (62 EXT items): skip completed work, claim tasks, keep small PRs, report at phase boundaries.
+- Branch: `ccr-79612a33-kjesjl`, rebuilt from `main` at `400d46b` (PRs #2–#18 merged; PR #8 confirmed merged at `a304c72`).
+- Changes:
+  - New `ai/EXTENDED_BACKLOG_STATUS.md`: each EXT item checked against source and docs. Phase A 7 Done / 1 Partial (EXT-005 lacks `accepted`/`acknowledged` inbox fixtures; held to avoid changing the bundle hash before ZPet review). Phase B 7 Done, 2 Partial, 2 Blocked, EXT-020 claimed. Phases C–G queued pending phase approval, with the inputs each needs.
+  - `ai/README.md` and `ai/tasks/CLAUDE-005-CORE-PROGRESSION.md`: B1–B5 and the proposals marked merged (they still read "Review"); Phase B is at its boundary.
+  - PR #9's own file is not copied or changed; the status file links to the PR.
+- Verification: `python3 tools/check_doc_links.py` → OK; `python3 tools/validate_contract.py` → OK (bundle `77d69eb17081` unchanged); `python3 tools/campaign_proposal.py` → OK. The Gradle preview suite could not resolve dependencies (Maven Central HTTP 429); docs-only change.
+- CI note: the workflow's last `main` run is on `d2f938d`; `400d46b` has not been run in CI.
+- Next: EXT-020 battle accessibility as its own PR, then stop at the Phase B boundary for approval.

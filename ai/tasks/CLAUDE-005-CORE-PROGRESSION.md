@@ -1,6 +1,6 @@
 # CLAUDE-005 — Phase B: Core progression and auto battle
 Updated 2026-10-10 America/Toronto.
-Owner: Claude. Status: IN PROGRESS — B1 in review (#11); B2–B5 authorized by Zeus97x decision batch 1 (2026-10-10).
+Owner: Claude. Status: AT PHASE BOUNDARY — B1–B5 merged (#11, #14, #15, #16, #17). Remaining: EXT-020 accessibility (claimed) and the open decisions listed in [EXTENDED_BACKLOG_STATUS.md](../EXTENDED_BACKLOG_STATUS.md).
 Claim fields:
 - Implementation branch: `claude/zbattle-b1-auto-fight` (stacked on `claude/zbattle-phase-a-contract`, Phase A PR not yet merged)
 - Base commit: d24ade8
@@ -37,11 +37,11 @@ Pause for review at each phase boundary. Later tasks are queued plans, not permi
 ## Progress
 | Step | Status | Notes |
 |---|---|---|
-| B1 auto-fight | REVIEW | Built on the proposed D-AUTO-FIGHT scope (foreground only, no items, stops on interruption). Zeus97x still has to confirm that scope. |
-| B2 party/switching | REVIEW | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
-| B3 evolution | REVIEW | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
-| B4 campaign | REVIEW (proposal) | D-CAMPAIGN: proposal + inactive validated config only. |
-| B5 repeat battles | REVIEW | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
+| B1 auto-fight | MERGED #11 | D-AUTO-FIGHT confirmed (Q2): foreground only, no items, stops on interruption. |
+| B2 party/switching | MERGED #14 | D-PARTY decided: 3, one active, switching costs a turn, fainted replacement is free. Open: D-PARTY-XP, D-SWITCH-COOLDOWN (proposals implemented as config). |
+| B3 evolution | MERGED #15 | D-EVOLUTION decided. Build identity, form guard and unlock ledger; thresholds inactive (D-EVOLUTION-THRESHOLDS). |
+| B4 campaign | MERGED #16 (proposal awaiting approval) | D-CAMPAIGN: proposal + inactive validated config only. |
+| B5 repeat battles | MERGED #17 | D-REPLAY-REWARDS: tracking + duplicate-safe settlement first; quantities inactive. |
 
 ### B1 implementation
 - `core/.../battle/AutoFight.kt`: `AutoFight.choose`, a pure, legal policy: Skill when ready, otherwise Attack. It never uses items and never retreats. `BattleProgress.autoStep(battleId, turn)` acts only while that battle is active and still on that turn.
