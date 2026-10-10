@@ -5,7 +5,8 @@ Read root AGENTS.md and DEVELOPMENT_LOG.md first.
 ## Current work
 | Task | Owner | Status | Scope |
 |---|---|---|---|
-| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Review — PR #2, CI green (branch claude/zbattle-ui-foundation) | Build Android UI foundation using existing ZPet assets and new-art placeholders |
+| [CLAUDE-001](tasks/CLAUDE-001-UI-FOUNDATION.md) | Claude | Merged — PR #2 | Android UI foundation using existing ZPet assets and new-art placeholders |
+| [CLAUDE-002](tasks/CLAUDE-002-BATTLE-VERTICAL-SLICE.md) | Claude | Ready | Battle vertical slice: stats, real battle engine, saved progress, Android bottom-inset fix, full-circle lightning nav, ZCubes planning; double battles deferred |
 | Artwork phase 1 | ChatGPT | Branding preview made; approval/export pending | Logo, app icon, splash |
 | Artwork phases 2-8 | ChatGPT | Planned, not started | Maps, location scenery, battle scenery, opponents, shop, progress, finishing |
 
