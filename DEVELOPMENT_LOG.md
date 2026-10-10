@@ -118,3 +118,14 @@ Copy this template for a new dated entry; replace every placeholder with facts.
 - Next step: read the Actions run on PR #2 and fix any compile/lint failure.
 - First Android build (PR #2 run 38009145446, head `182b2d5`): `:core:test` passed, `:app:compileDebugKotlin` and `:app:assembleDebug` succeeded (debug APK built). `:app:lintDebug` failed with 1 error, 5 warnings: `Art.kt:61 ProduceStateDoesNotAssignValue` (the `value =` assignment was nested inside an `if`). Fixed by assigning at the top level of the `produceState` producer (`value = value ?: withContext(IO) { … }`); behaviour unchanged. `./gradlew -p preview test` passed locally after the fix. Lint warnings (5) not yet reviewed.
 - Second Android build (run 38009572212, head `882770c`): compile, core tests and APK again succeeded; lint still reported `ProduceStateDoesNotAssignValue` at `Art.kt:61` even with a top-level assignment (the detector does not recognise the `value ?: withContext(...)` pattern). Replaced `produceState` in `rememberArt` with `remember { mutableStateOf(cached) }` + `LaunchedEffect` decoding off the main thread — same behaviour, no `produceState`. `./gradlew -p preview test` passed; renders still show creature art.
+
+## 2026-10-09 (evening) — CLAUDE-001 first green Android build; status → Review
+- Status: implemented; in review on PR #2. Not merged, no release.
+- Evidence: GitHub Actions run 38009974938 (job 114087476890) on head `bccadf9` (merge ref with main `b1fa4c5`), ubuntu-24.04, JDK 17.0.20, Gradle 8.11.1:
+  - `./gradlew :core:test :app:assembleDebug :app:lintDebug` — BUILD SUCCESSFUL (50 tasks); lint passed (report `app/build/reports/lint-results-debug.html` in artifact).
+  - `./gradlew -p preview test` — BUILD SUCCESSFUL (core tests + layout renders on the runner).
+  - Artifact `zbattle-ui-validation` (ID 11653275180, 69 files): debug APK, lint report, test reports, renders.
+  - kotlinc warnings (non-blocking, intentional for harness compatibility with Compose Multiplatform 1.5.12): deprecated `Icons.Filled.ArrowBack`, `Icons.Filled.Sort`, `Icons.Filled.DirectionsRun` (AutoMirrored versions exist) and `LinearProgressIndicator(progress: Float)`.
+- Changes in this commit: task status → REVIEW (`ai/tasks/CLAUDE-001-UI-FOUNDATION.md`, `ai/README.md`); `ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md` status table and remaining-work list updated.
+- Not verified: no emulator/device run (insets, gestures, predictive back, rotation, TalkBack still need a device check).
+- Next step: user review of PR #2; on approval merge and close PR #1's superseded Java shell; then device testing and ChatGPT art drops.

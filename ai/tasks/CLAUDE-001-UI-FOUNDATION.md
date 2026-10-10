@@ -1,5 +1,5 @@
 # CLAUDE-001 — Android UI foundation
-Status: IN PROGRESS — Claude resumed 2026-10-09 (evening) at the user's request (the ChatGPT handoff was withdrawn). Owner: Claude. Updated 2026-10-09 America/Toronto.
+Status: REVIEW — implemented by Claude; PR #2 CI green (run 38009974938). Not merged. Owner: Claude.
 Claim: Claude Code session, started 2026-10-09 ~19:30 America/Toronto; branch claude/zbattle-ui-foundation; base main b1fa4c5414e45daeac5650aa1e96ac3b5dfb121e.
 Parallel work found at claim time: open PR #1 (branch ai/codex/zbattle-foundation, base 758c43c) adds a separate Java Activity shell under app/ plus .github/ai/**. It is unmerged and conflicts with this task's app/ and Gradle files; not overwritten — reconciliation is the user's decision (see Progress log).
 Repo: Zeus97x/ZBattle. Base: current main. Work branch: claude/zbattle-ui-foundation.
@@ -48,3 +48,4 @@ Return PR URL, commit, changes, checks, screenshots if available, remaining bloc
 - 2026-10-09 (evening): user asked not to build the app yet. CI run cancelled; workflow switched to manual-only (workflow_dispatch). Android compile/lint/APK remain unverified until the user approves a build.
 - 2026-10-09 (evening): user clarified PR #1 (Codex ZB-002) is guidance for this task. Integrated its Pet Master foundation: first-run setup (name 1–24, 5 styles × male/female, starter Sparklit/Inkling/Cindlet), persisted locally; party = chosen starter; Home/Profile show appearance and Level 1; Profile lists planned skills/equipment, Pet Master tasks and one-way ZPet connection. Kept the newer layout spec's tabs (Collection/Shop/Home/Events/Profile) instead of PR #1's Camp/Adventure/Tasks/Master.
 - 2026-10-09 (evening): user approved the build ("Push the build"). Workflow trigger restored to pull_request + workflow_dispatch; added ai/CLAUDE-001-SUMMARY-FOR-CHATGPT.md.
+- 2026-10-09 (evening): first green Android build — PR #2 run 38009974938 on head bccadf9: `:core:test`, `:app:assembleDebug`, `:app:lintDebug` and `-p preview test` all passed; APK, lint report, test reports and renders uploaded as artifact `zbattle-ui-validation`. Status → REVIEW. Remaining: device testing, user review/merge decision, final artwork.

@@ -14,7 +14,7 @@ Written by Claude, 2026-10-09 (America/Toronto). Read this first, then `DEVELOPM
 | All UI screens (setup + 9 spec layouts + Events/Achievements, sheets, dialogs) | Implemented |
 | Tests (`./gradlew -p preview test`) | 28 passing |
 | Layout renders at 360dp, 412dp, 1.3× font and light mode | Checked |
-| Android compile, lint and debug APK | First build started on PR #2 when the user said "push the build". Check the PR's Actions run for the result. |
+| Android compile, lint and debug APK | **Passing** on PR #2 — run 38009974938 (head `bccadf9`); APK + lint report + renders in the run's `zbattle-ui-validation` artifact |
 | Device/emulator testing | Not done |
 | Final artwork | Not added (placeholders everywhere except the 54 existing ZPet creature PNGs) |
 
@@ -98,7 +98,7 @@ Creature art rules:
 - **No network or ZPet writes.** There is no network permission and no backend, and nothing is written back to ZPet.
 
 ## Remaining work (suggested order)
-1. Read the PR #2 Actions result; if the build or lint fails, fix it on `claude/zbattle-ui-foundation`.
+1. CI is green. Optional cleanup: kotlinc deprecation warnings (`Icons.Filled.ArrowBack/Sort/DirectionsRun` → AutoMirrored, `LinearProgressIndicator(progress = Float)` → lambda) are kept deliberately because the JVM harness uses Compose Multiplatform 1.5.12, which lacks the new APIs; changing them means upgrading the harness first.
 2. Test on a device:
    - insets with gesture and with 3-button navigation
    - Back and predictive back
